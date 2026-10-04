@@ -1,6 +1,6 @@
 # R5 — Scroll landing, black-and-white theme, truegetherth
 
-Date: 2026-10-03 to 2026-10-04. Repository: `C:\Users\sutti\Documents\telemart-ubon-v2` (no remote, nothing committed).
+Date: 2026-10-03 to 2026-10-04. Repository: `C:\Users\sutti\Documents\telemart-ubon-v2`, pushed on 2026-10-04 to the private GitHub repository `telemartubonWebProduct/truegetherth` (not connected to Vercel).
 
 On 2026-10-03 the owner stopped work in the old repository and started a rebuild here: first a new landing page (minimal black and white, five scroll-driven stages, a real 3D router with a robot arm), then, the same day: bring the old system over, design a new logo for the theme, rename everything to **truegetherth**, keep the update/publish system and the back-office package management, reuse the old environment, and bring all the pages. This document records what that merge did and what still stands open. Older documents in this folder describe the system that was brought over; where they mention the film, the `[locale]` folder, the navy and red theme or the name Telemart, this document is what holds now.
 
@@ -76,7 +76,7 @@ A test browser draws WebGL in software, so in tests the hero keeps its still; th
 - Decide whether production gets its own Supabase project (the dev project now has every migration, section 3).
 - The legal name, e-mail addresses and domain under the new name (section 2, Brand); a domain for truegetherth, if there is to be one, and then `NEXT_PUBLIC_SITE_URL`, GA4 and Google Ads settings.
 - Package prices are still the imported ones, not verified.
-- Nothing is committed here and there is no remote; the old repository's `main` is still what Vercel serves.
+- Going live: the code is in the private repository `telemartubonWebProduct/truegetherth`, which Vercel does not know yet. The old repository's `main` is still what Vercel serves. To launch, import the new repository in Vercel (or point the existing Vercel project at it), set the environment there (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and as Sensitive `SUPABASE_SECRET_KEY`; `NEXT_PUBLIC_SITE_URL` for the domain; `GA4_PROPERTY_ID`, `EMAIL_USER`, `EMAIL_PASS` where used) and follow the checklist in `M6-LAUNCH.md`.
 
 ## 6. Last run (2026-10-04, on the owner's Windows machine)
 
