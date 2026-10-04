@@ -1,0 +1,1922 @@
+/* truegetherth — the home page's stages and the floating navigation of every
+   page (docs/renovation/R5-LANDING.md).
+   Theme: minimal black and white, floating pills and light type. Red is
+   rationed to marks: prices, meters, the live step, printed values. Motion:
+   five pinned stages driven by custom properties that ScrollDriver writes on
+   <html>; this file never knows about JavaScript beyond those values. The
+   choreography applies only under html[data-motion] (scripts running, no
+   reduced-motion request, a screen tall enough); otherwise, and in the Mirror
+   editor's preview, every section lies flat.
+   Colours come from the theme (src/styles/tokens.css, site settings > theme):
+   the short names below follow the tone of the section they are used in. */
+
+.tm-site,
+.tm-site [data-tone] {
+  --paper: var(--tm-color-canvas);
+  --ink: var(--tm-color-ink);
+  --ink-56: var(--tm-color-ink-muted);
+  --ink-34: color-mix(in srgb, var(--tm-color-ink) 48%, transparent);
+  --line: var(--tm-color-line);
+  --pill: var(--tm-color-surface);
+  --red: var(--tm-color-red);
+}
+
+.tm-site {
+  --night: var(--tm-tone-ink-canvas);
+  --slip: #fffdf8;
+  --pad: 16px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-cine: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (min-width: 768px) {
+  .tm-site {
+    --pad: 32px;
+  }
+}
+
+.num {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.wrap {
+  width: min(100% - 2 * var(--pad), 1180px);
+  margin-inline: auto;
+}
+
+/* Type ----------------------------------------------------------------------- */
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-56);
+}
+
+:lang(th) .label {
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+.display {
+  margin-top: 10px;
+  font-size: clamp(2.1rem, 1.2rem + 4.2vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+/* Thai carries marks above and below the line. */
+:lang(th) .display {
+  line-height: 1.24;
+}
+
+.lede {
+  max-width: 34rem;
+  margin-top: 16px;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.175rem);
+  line-height: 1.7;
+  color: var(--ink-56);
+}
+
+.note,
+.hint {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-56);
+}
+
+/* Navigation ------------------------------------------------------------------ */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px;
+  pointer-events: none;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-left > *,
+.nav-right {
+  pointer-events: auto;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.nav-logo img {
+  width: auto;
+  height: 18px;
+}
+
+.nav-menu-wrap {
+  position: relative;
+}
+
+.nav-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 0 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #ffffff;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+:lang(th) .nav-menu,
+:lang(th) .nav-tags,
+:lang(th) .nav-right {
+  font-size: 13px;
+}
+
+.nav-menu-dot,
+.nav-grid {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.nav-menu-dot {
+  background: var(--paper);
+  color: var(--ink);
+  transition:
+    transform 0.6s var(--ease),
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.nav-menu-dot[data-open] {
+  transform: rotate(135deg);
+}
+
+.nav-tags {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  font-size: 11px;
+  color: var(--tm-solid-ink);
+}
+
+.nav-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  font-size: 11px;
+  color: var(--tm-solid-ink);
+  text-decoration: none;
+}
+
+.nav-grid {
+  background: var(--ink);
+  color: var(--paper);
+  transition: transform 0.6s var(--ease);
+}
+
+.nav-right:hover .nav-grid {
+  transform: rotate(90deg);
+}
+
+/* On a phone only the round mark shows; the words stay for screen readers. */
+.nav-right-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Over the dark stages the black pill would vanish: it turns white. */
+html[data-nav="ink"] .nav-menu {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+html[data-nav="ink"] .nav-menu-dot {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.nav-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: min(320px, calc(100vw - 32px));
+  padding: 10px;
+  border-radius: 24px;
+  background: #ffffff;
+  color: var(--tm-solid-ink);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 40px 80px -30px rgba(0, 0, 0, 0.45);
+  transform-origin: 24px 0;
+}
+
+.nav-panel-n {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--ink-56);
+}
+
+@media (min-width: 768px) {
+  .nav {
+    padding: 24px 32px;
+  }
+
+  .nav-logo,
+  .nav-menu,
+  .nav-right {
+    height: 40px;
+  }
+
+  .nav-logo img {
+    height: 20px;
+  }
+
+  .nav-menu-dot,
+  .nav-grid {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-tags {
+    display: inline-flex;
+  }
+
+  .nav-right-label {
+    position: static;
+    width: auto;
+    height: auto;
+    padding-right: 14px;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+/* Stages: a tall section holding one screen that stays while it scrolls. ------ */
+
+.stage {
+  position: relative;
+}
+
+html[data-motion] .stage {
+  height: calc(var(--len) * 1svh);
+}
+
+html[data-motion] .pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* 1. Hero ---------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* The picture's layer: scrolling draws it back from full bleed into a rounded frame. */
+.hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform: scale(var(--hero-art-scale, 1));
+}
+
+/* The same pale grey as the picture's studio backdrop, so its edges never show. */
+.hero-art-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--hero-art-radius, 0px);
+  background: var(--pill);
+}
+
+/* The picture's own box (16:9): the still and the canvas fill it, and the arm
+   and the rings are placed in shares of it. On a phone or an upright tablet it
+   sits above the headline: wider than the screen, showing the router whole and
+   the hand that reaches it, and never taller than the room above the text. Its
+   edges fade, so they never show where the box ends inside the screen. */
+.hero-frame {
+  --w: max(280px, min(163%, calc((100svh - 400px) * 16 / 9)));
+  position: absolute;
+  top: 19svh;
+  left: calc(50% - var(--w) * 0.648);
+  width: var(--w);
+  aspect-ratio: 16 / 9;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 12%, #000 86%, transparent 100%), linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 12%, #000 86%, transparent 100%), linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* The still of the router, there from the first paint; and over it the canvas
+   that draws the same view live, shown once it has drawn a frame. */
+.hero-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.hero-frame[data-live="scene"] .hero-canvas {
+  opacity: 1;
+}
+
+/* The arm hangs by its fingertip on the antenna it touches (--touch-x, --touch-y
+   are shares of the picture; the tip's place in the arm's own picture is known).
+   The rig around it is what the scroll moves: the arm draws back and fades as
+   the camera swings up over the router. */
+.hero-arm-rig {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  translate: calc(var(--hero-progress, 0) * -52%) 0;
+  opacity: calc(1 - var(--hero-progress, 0) * 2.4);
+}
+
+.hero-arm {
+  position: absolute;
+  top: calc(var(--touch-y) - var(--arm-tip-y) * var(--arm-height));
+  left: calc(var(--touch-x) - var(--arm-tip-x) * var(--arm-width));
+  width: var(--arm-width);
+  height: var(--arm-height);
+}
+
+.hero-arm img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* At rest the hand points, with its finger on the antenna. */
+.hero-arm-open {
+  opacity: 0;
+}
+
+/* Signal rings around the point where the finger meets the antenna, and a spark on it. */
+.hero-rings {
+  position: absolute;
+  top: var(--touch-y);
+  left: var(--touch-x);
+  width: 30%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  /* They go with the arm when the scroll draws it back. */
+  opacity: calc(1 - var(--hero-progress, 0) * 2.4);
+}
+
+.hero-rings span {
+  position: absolute;
+  inset: 6%;
+  border: 1px solid rgba(11, 11, 12, 0.16);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+.hero-rings span:nth-child(1) {
+  inset: 38%;
+  border-color: rgba(230, 0, 18, 0.5);
+  opacity: 0.8;
+}
+
+.hero-rings span:nth-child(2) {
+  inset: 24%;
+  opacity: 0.6;
+}
+
+.hero-rings::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 5px rgba(230, 0, 18, 0.12);
+}
+
+/* The reach. Until the picture is live the arm waits, drawn back, its hand open.
+   Then it slides in, the hand closing to a point on the way, and stops with its
+   finger on the antenna (--reach is when that happens); from then on it draws
+   back a little and taps again once every --beat. Each touch lights the spark
+   and sends out three rings. Hero.tsx listens to these same animations to
+   switch the router's lights on, so the two can never drift apart. */
+html[data-motion] .hero-frame {
+  --reach: 3s;
+  --beat: 5.6s;
+}
+
+html[data-motion] .hero-arm {
+  translate: -46% 0;
+}
+
+html[data-motion] .hero-arm-open {
+  opacity: 1;
+}
+
+html[data-motion] .hero-arm-point {
+  opacity: 0;
+}
+
+html[data-motion] .hero-frame[data-live] .hero-arm {
+  animation:
+    reach 2.6s cubic-bezier(0.5, 0, 0.12, 1) 0.4s both,
+    tap var(--beat) cubic-bezier(0.65, 0, 0.35, 1) var(--reach) infinite;
+}
+
+/* The pointing hand fades in over the open one, which goes only once it is covered:
+   two half-faded pictures of the same arm would let the backdrop show through it. */
+html[data-motion] .hero-frame[data-live] .hero-arm-point {
+  animation: pose-in var(--reach) linear both;
+}
+
+html[data-motion] .hero-frame[data-live] .hero-arm-open {
+  animation: pose-out var(--reach) linear both;
+}
+
+html[data-motion] .hero-rings span {
+  inset: 0;
+  opacity: 0;
+}
+
+html[data-motion] .hero-rings::before {
+  opacity: 0;
+}
+
+html[data-motion] .hero-frame[data-live] .hero-rings span {
+  animation: ring var(--beat) cubic-bezier(0.2, 0.6, 0.3, 1) var(--reach) infinite;
+}
+
+html[data-motion] .hero-frame[data-live] .hero-rings span:nth-child(2) {
+  animation-delay: calc(var(--reach) + 0.45s);
+}
+
+html[data-motion] .hero-frame[data-live] .hero-rings span:nth-child(3) {
+  animation-delay: calc(var(--reach) + 0.9s);
+}
+
+html[data-motion] .hero-frame[data-live] .hero-rings::before {
+  animation: spark var(--beat) ease-out var(--reach) infinite;
+}
+
+/* Nothing in the hero keeps moving once it has scrolled off the screen. */
+html[data-hero-away] .hero-arm,
+html[data-hero-away] .hero-arm img,
+html[data-hero-away] .hero-rings span,
+html[data-hero-away] .hero-rings::before,
+html[data-hero-away] .dot::after,
+html[data-hero-away] .hero-scroll {
+  /* Over the animation shorthands above, which would set them running again. */
+  animation-play-state: paused !important;
+}
+
+@keyframes reach {
+  from {
+    translate: -46% 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+/* Each beat starts on the touch; near its end the finger draws back and comes down again. */
+@keyframes tap {
+  0%,
+  72% {
+    translate: 0 0;
+  }
+  88% {
+    translate: -2.2% 0;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes pose-in {
+  0%,
+  52% {
+    opacity: 0;
+  }
+  76%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes pose-out {
+  0%,
+  77% {
+    opacity: 1;
+  }
+  78%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.04);
+  }
+  5% {
+    opacity: 0.9;
+  }
+  55%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  3% {
+    opacity: 1;
+    transform: scale(1.7);
+  }
+  16% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0.8;
+    transform: scale(0.9);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+.hero-foot {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 120px 16px 28px;
+  background: linear-gradient(to top, #ffffff 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+}
+
+/* Three separate properties: the lockup lifts, shrinks and fades on its own curves. */
+.hero-type {
+  transform: translateY(var(--hero-type-y, 0px)) scale(var(--hero-type-scale, 1));
+  transform-origin: left bottom;
+  opacity: var(--hero-type-alpha, 1);
+}
+
+.hero-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+:lang(th) .hero-sub {
+  font-size: 15px;
+}
+
+.dot {
+  position: relative;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+html[data-motion] .dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse 2.4s var(--ease) infinite;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+
+.hero-title {
+  font-size: clamp(2rem, 8vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+:lang(th) .hero-title {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.hero-line {
+  display: block;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.hero-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  opacity: var(--hero-meta-alpha, 1);
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-note {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.hero-scroll {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hero-rings::before {
+    width: 9px;
+    height: 9px;
+    margin: -4.5px;
+  }
+
+  /* The wash sits under the headline only, so the router on the right keeps its base. */
+  .hero-foot {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 180px 32px 40px;
+    background:
+      linear-gradient(to top, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 24%),
+      radial-gradient(64% 120% at 0% 100%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.72) 40%, rgba(255, 255, 255, 0) 100%);
+  }
+
+  /* Sized by the screen's height as well as its width, so on a low, wide screen it stays under the hand. */
+  .hero-title {
+    font-size: clamp(2.5rem, min(5.5vw, 8.2svh), 4.5rem);
+  }
+
+  .hero-side {
+    align-items: flex-end;
+  }
+
+  html[data-motion] .hero-scroll {
+    position: absolute;
+    z-index: 31;
+    bottom: 40px;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-left: -20px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    opacity: var(--hero-meta-alpha, 1);
+    animation: nudge 2.2s var(--ease-cine) infinite;
+  }
+}
+
+/* On a wide screen the picture covers it. When the screen is less wide than the
+   picture, the picture keeps its right edge, where the router is, and loses
+   arm on the left. */
+@media (min-width: 768px) and (min-aspect-ratio: 5/4), (max-height: 559px) and (min-aspect-ratio: 5/4) {
+  .hero-frame {
+    --w: max(100%, calc(100svh * 16 / 9));
+    /* A little above the middle, which leaves the headline room under the router.
+       What shows below the picture is the same grey it is drawn on. */
+    top: 46.5%;
+    left: calc(100% - var(--w));
+    translate: 0 -50%;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* A phone on its side has no room for the picture beside the text: it stays behind it, faint. */
+@media (max-height: 559px) and (min-aspect-ratio: 5/4) {
+  .hero-frame {
+    opacity: 0.3;
+  }
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* 2. Manifesto ------------------------------------------------------------------ */
+
+.manifesto {
+  display: grid;
+  align-content: center;
+  gap: 22px;
+  height: 100%;
+  padding: 110px var(--pad) 72px;
+}
+
+/* The sentence in pale ink, and the same sentence in full ink over it, in the
+   same box, uncovered from the bottom up. */
+.manifesto-line {
+  position: relative;
+  max-width: 17ch;
+  font-size: clamp(34px, 5.6vw, 78px);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  transform: scale(var(--manifesto-scale, 1));
+  transform-origin: left center;
+}
+
+:lang(th) .manifesto-line {
+  max-width: 11.5em;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+}
+
+.manifesto-base {
+  color: var(--ink-34);
+}
+
+.manifesto-fill {
+  position: absolute;
+  inset: 0;
+  color: var(--ink);
+  clip-path: inset(calc(100% - var(--manifesto-wipe, 100%)) 0 0);
+}
+
+@media (min-width: 900px) {
+  .manifesto {
+    padding-left: max(var(--pad), 9vw);
+  }
+}
+
+/* 3. Rail ------------------------------------------------------------------------ */
+
+/* The one column must not grow with the row of cards, or there is nothing to walk along. */
+.stage-rail .pin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 20px;
+  padding: 92px 0 24px;
+  background: var(--pill);
+}
+
+.rail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-inline: var(--pad);
+}
+
+.rail-track {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 var(--pad);
+  list-style: none;
+}
+
+/* Scrolling down walks along the row: it moves by exactly its own overflow. */
+html[data-motion] .rail-track {
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-self: center;
+  justify-content: flex-start;
+  transform: translateX(var(--rail-x, 0px));
+  will-change: transform;
+}
+
+/* Padding at the end of a scrolled row is not counted in its width; a box with
+   some width is. Gap (16px) + margin + 1px puts the last card one page margin
+   from the edge. */
+html[data-motion] .rail-track::after {
+  content: "";
+  flex: 0 0 1px;
+  margin-left: calc(var(--pad) - 17px);
+}
+
+.card {
+  display: flex;
+  flex: 0 0 clamp(230px, 26vw, 400px);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(11, 11, 12, 0.06);
+}
+
+.card-plate {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #e9e9ec;
+}
+
+.card-plate img {
+  object-fit: cover;
+  transition: transform 1.4s var(--ease);
+}
+
+.card:hover .card-plate img {
+  transform: scale(1.06);
+}
+
+.card-speed {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #ffffff;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 16px 18px;
+}
+
+.card-title {
+  min-height: 2.7em;
+  font-size: 16.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.card-meta {
+  font-size: 12.5px;
+  color: var(--ink-56);
+}
+
+.card-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 6px;
+  margin: 8px 0 14px;
+  color: var(--red);
+}
+
+.card-price .num {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.card-unit {
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.card-vat {
+  flex-basis: 100%;
+  font-size: 11.5px;
+  color: var(--ink-56);
+}
+
+.rail-foot {
+  display: grid;
+  gap: 12px;
+  padding-inline: var(--pad);
+}
+
+.meter {
+  height: 2px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  background: var(--red);
+  transform: scaleX(var(--rail-meter, 1));
+  transform-origin: left;
+}
+
+/* 4. The slip ------------------------------------------------------------------- */
+
+.ticket {
+  display: grid;
+  align-content: center;
+  gap: 28px;
+  height: 100%;
+  padding: 88px var(--pad) 28px;
+}
+
+.cues {
+  display: grid;
+  gap: 8px;
+  margin: 22px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.cue {
+  display: flex;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition:
+    color 0.6s var(--ease),
+    border-color 0.6s var(--ease);
+}
+
+.cue-n {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  line-height: 2.1;
+  color: color-mix(in srgb, var(--red) 68%, #ffffff);
+}
+
+.cue h3 {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.cue p {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.55;
+  opacity: 0.82;
+}
+
+/* Steps light up one after another as the stage advances; the live one is ringed in red. */
+html[data-motion] .cue {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+html[data-motion] .cue[data-lit] {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+html[data-motion] .cue[data-now] {
+  border-color: var(--red);
+}
+
+.meter-ink span {
+  transform: scaleX(var(--packet-meter, 1));
+}
+
+.slip-wrap {
+  display: grid;
+  place-items: center;
+}
+
+.slip {
+  --ink: var(--tm-solid-ink);
+  --ink-56: var(--tm-solid-muted);
+  --red: var(--tm-color-red);
+  width: min(100%, 300px);
+  color: var(--tm-solid-ink);
+  opacity: var(--packet-alpha, 1);
+  transform: translateY(var(--packet-enter, 0px)) scale(var(--packet-scale, 1)) rotate(-1.5deg);
+}
+
+.slip-main {
+  padding: 18px 18px 14px;
+  border-radius: 20px 20px 4px 4px;
+  background: var(--slip);
+}
+
+.slip-kicker {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--ink-56);
+}
+
+.slip-name {
+  margin: 6px 0 12px;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.slip-plate {
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f3efe6;
+}
+
+.plate {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.slip-rows {
+  margin-top: 10px;
+}
+
+.slip-rows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(11, 11, 12, 0.1);
+  font-size: 13px;
+}
+
+.slip-rows dt {
+  color: var(--ink-56);
+}
+
+.slip-rows dd {
+  font-weight: 500;
+}
+
+/* Values the slip has "printed" show in red. */
+.slip-rows dd[data-set],
+.slip-stub strong {
+  color: var(--red);
+}
+
+/* The perforation opens at the end of the stage and the stub drops away. */
+.slip-perforation {
+  position: relative;
+  height: calc(var(--packet-cut, 0) * 16px);
+  margin: 0 12px;
+  opacity: var(--packet-cut, 0);
+}
+
+.slip-perforation::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  border-top: 2px dashed rgba(255, 255, 255, 0.7);
+}
+
+.slip-perforation span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 0 8px;
+  background: var(--night);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.7);
+  transform: translate(-50%, -50%);
+}
+
+.slip-stub {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px 14px;
+  border-radius: 4px 4px 20px 20px;
+  background: var(--slip);
+  font-size: 12.5px;
+  transform: rotate(calc(var(--packet-cut, 0) * 2.4deg));
+  transform-origin: left top;
+}
+
+.slip-stub span {
+  color: var(--ink-56);
+}
+
+/* On a pinned phone screen the steps shrink to a 2x2 of titles so the slip fits. */
+@media (max-width: 899px) {
+  html[data-motion] .ticket .lede,
+  html[data-motion] .cue p {
+    display: none;
+  }
+
+  html[data-motion] .cues {
+    grid-template-columns: 1fr 1fr;
+    margin: 16px 0 14px;
+  }
+
+  html[data-motion] .cue {
+    gap: 10px;
+    padding: 9px 12px;
+  }
+}
+
+@media (max-width: 899px) and (max-height: 760px) {
+  html[data-motion] .slip-plate {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .ticket {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+    align-items: center;
+    gap: 72px;
+    padding: 96px max(var(--pad), 7vw) 40px;
+  }
+
+  /* Beside the slip the copy drifts a little the other way; stacked on a phone it stays on the margin. */
+  .ticket-copy {
+    transform: translateX(var(--packet-copy-x, 0px));
+  }
+
+  .slip {
+    width: min(100%, 380px);
+  }
+
+  .slip-plate {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* 5. Services -------------------------------------------------------------------- */
+
+.season-plate {
+  position: absolute;
+  inset: -6% 0;
+  transform: translateY(var(--season-y, 0%)) scale(var(--season-scale, 1));
+}
+
+html:not([data-motion]) .season-plate {
+  inset: 0;
+}
+
+.season {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 96px var(--pad) 36px;
+  background: linear-gradient(to top, #ffffff 0%, rgba(255, 255, 255, 0.92) 42%, rgba(255, 255, 255, 0) 82%);
+}
+
+html:not([data-motion]) .stage-season .pin {
+  position: relative;
+  overflow: hidden;
+}
+
+.chapters {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter {
+  padding-top: 12px;
+  border-top: 1px solid var(--ink);
+}
+
+.chapter-n {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--red);
+}
+
+.chapter h3 {
+  margin: 2px 0 4px;
+  font-size: clamp(22px, 1.2rem + 1.2vw, 34px);
+  font-weight: 300;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+/* Exactly one chapter is lit at a time: they swap rather than add up. The one
+   whose turn it is gets the red rule, the ink heading and a small lift; the
+   others wait in grey, which still reads (no text is faded out). */
+html[data-motion] .chapter {
+  border-top-color: var(--line);
+}
+
+html[data-motion] .chapter h3,
+html[data-motion] .chapter-n {
+  color: var(--ink-56);
+  transition: color 0.7s var(--ease);
+}
+
+html[data-motion] .chapter[data-active] {
+  border-top-color: var(--red);
+  transform: translateY(-8px);
+}
+
+html[data-motion] .chapter[data-active] h3 {
+  color: var(--ink);
+}
+
+html[data-motion] .chapter[data-active] .chapter-n {
+  color: var(--red);
+}
+
+@media (min-width: 800px) {
+  .season {
+    padding: 96px max(var(--pad), 7vw) 56px;
+  }
+
+  .chapters {
+    gap: 32px;
+    margin-top: 36px;
+  }
+}
+
+/* Flat layout: without scripts, or with reduced motion, the stages are ordinary sections. */
+html:not([data-motion]) .manifesto,
+html:not([data-motion]) .ticket,
+html:not([data-motion]) .season {
+  height: auto;
+  padding-block: 88px;
+}
+
+html:not([data-motion]) .stage-season .pin {
+  min-height: 80svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+html:not([data-motion]) .stage-rail .pin {
+  padding-block: 88px 64px;
+}
+
+/* Bands after the stages --------------------------------------------------------- */
+
+.band {
+  padding: clamp(72px, 10vw, 150px) 0;
+  background: var(--paper);
+}
+
+.band-pill {
+  background: var(--pill);
+}
+
+.ruled {
+  width: 100%;
+  margin: 36px 0 18px;
+  border-collapse: collapse;
+  color: var(--ink);
+  font-size: 15.5px;
+}
+
+.ruled th,
+.ruled td {
+  padding: 18px 16px 18px 0;
+  border-top: 1px solid var(--line);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.ruled thead th {
+  padding-block: 12px;
+  border-top: 1.5px solid var(--ink);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-56);
+}
+
+:lang(th) .ruled thead th {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.ruled tbody tr:last-child > * {
+  border-bottom: 1px solid var(--line);
+}
+
+.ruled tbody th {
+  font-weight: 500;
+}
+
+.ruled .col-price {
+  padding-right: 0;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--red);
+}
+
+.ruled thead .col-price {
+  color: var(--ink-56);
+}
+
+.col-price .num {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.cell-unit {
+  margin-left: 6px;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.cell-sub {
+  display: none;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--ink-56);
+}
+
+@media (max-width: 640px) {
+  .ruled {
+    font-size: 14.5px;
+  }
+
+  .ruled th,
+  .ruled td {
+    padding: 14px 10px 14px 0;
+  }
+
+  .col-contract {
+    display: none;
+  }
+
+  .cell-sub {
+    display: block;
+  }
+
+  .cell-unit {
+    display: block;
+    margin: 0;
+  }
+}
+
+.wrap-split {
+  display: grid;
+  gap: 32px;
+}
+
+@media (min-width: 900px) {
+  .wrap-split {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 72px;
+  }
+}
+
+.faq details {
+  border-top: 1px solid var(--line);
+}
+
+.faq details:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.45;
+  list-style: none;
+  cursor: pointer;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-mark {
+  position: relative;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: transform 0.6s var(--ease);
+}
+
+.faq-mark::before,
+.faq-mark::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 1.5px;
+  margin: -0.75px 0 0 -5px;
+  background: var(--paper);
+}
+
+.faq-mark::after {
+  transform: rotate(90deg);
+}
+
+.faq details[open] .faq-mark {
+  transform: rotate(135deg);
+}
+
+.faq details p {
+  max-width: 62ch;
+  padding-bottom: 24px;
+  color: var(--ink-56);
+}
+
+/* Per-word and per-item motion ------------------------------------------------------- */
+
+html[data-motion] .w {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.42em);
+  transition:
+    opacity 0.7s ease calc(var(--i) * 38ms),
+    transform 0.9s var(--ease) calc(var(--i) * 38ms);
+}
+
+html[data-motion] .is-in .w {
+  opacity: 1;
+  transform: none;
+}
+
+/* The rise uses `translate`, so it never collides with an element's own transform. */
+html[data-motion] [data-rev] {
+  opacity: 0;
+  translate: 0 18px;
+  transition:
+    opacity 0.8s ease var(--d, 0ms),
+    translate 1s var(--ease) var(--d, 0ms);
+}
+
+html[data-motion] [data-rev].is-in {
+  opacity: 1;
+  translate: none;
+}
+
+/* Items with transitions of their own keep them next to the rise. */
+html[data-motion] .chapter[data-rev] {
+  transition:
+    opacity 0.8s ease var(--d, 0ms),
+    translate 1s var(--ease) var(--d, 0ms),
+    transform 0.8s var(--ease),
+    border-color 0.7s var(--ease);
+}
+
+html[data-motion] .cue[data-rev] {
+  transition:
+    opacity 0.8s ease var(--d, 0ms),
+    translate 1s var(--ease) var(--d, 0ms),
+    color 0.6s var(--ease),
+    border-color 0.6s var(--ease);
+}
+
+/* Parts the content system added to the stages ---------------------------------- */
+
+/* The whole menu, in the panel under the Menu pill. */
+.nav-panel {
+  max-height: calc(100svh - 96px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.nav-panel-link {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 16px;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 0.25s ease;
+}
+
+.nav-panel-link:hover,
+.nav-panel-link[aria-current="page"] {
+  background: var(--pill);
+}
+
+.nav-panel-n {
+  flex: none;
+  width: 18px;
+}
+
+.nav-panel-group {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 14px 14px 2px;
+  font-size: 12.5px;
+  color: var(--ink-56);
+}
+
+.nav-panel-child {
+  padding: 9px 14px 9px 46px;
+  font-size: 15px;
+}
+
+.nav-panel-lang {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.nav-panel-lang a {
+  display: flex;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  color: var(--ink-56);
+  text-decoration: none;
+}
+
+.nav-panel-lang a:hover {
+  background: var(--pill);
+  color: var(--ink);
+}
+
+.nav-tags a {
+  text-decoration: none;
+}
+
+.nav-tags a:hover,
+.nav-tags a[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* Hero tags are links to the three kinds of service. */
+.hero-tags a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 11px;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+:lang(th) .hero-tags a {
+  font-size: 13px;
+}
+
+.hero-tags a:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Tabs of the rail: one row of cards per category. */
+.rail-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.rail-tabs {
+  display: flex;
+  gap: 4px;
+  max-width: 100%;
+  padding: 4px;
+  overflow-x: auto;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px rgba(11, 11, 12, 0.06);
+  scrollbar-width: none;
+}
+
+.rail-tab {
+  flex: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-56);
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+:lang(th) .rail-tab {
+  font-size: 13.5px;
+}
+
+.rail-tab:hover {
+  color: var(--ink);
+}
+
+.rail-tab[aria-selected="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Like the pinned screen around it, the panel's one column must not grow with
+   the row of cards, or there is nothing to walk along. */
+.rail-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  min-width: 0;
+}
+
+/* The panel's own display would otherwise override [hidden]. */
+.rail-panel[hidden] {
+  display: none;
+}
+
+.rail-panel-title {
+  display: none;
+  margin-bottom: 14px;
+  padding-inline: var(--pad);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.rail-more-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+/* Every row at once, each under its title: the Mirror editor, and pages without scripts. */
+.rail-stack {
+  display: grid;
+  gap: 44px;
+}
+
+.rail-stack .rail-panel-title {
+  display: block;
+}
+
+.rail-stack .rail-more {
+  margin-top: 16px;
+  padding-inline: var(--pad);
+}
+
+@media (scripting: none) {
+  .rail-tabs {
+    display: none;
+  }
+
+  .rail-panel[hidden] {
+    display: grid;
+    margin-top: 28px;
+  }
+
+  .rail-panel .rail-panel-title {
+    display: block;
+  }
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin-top: auto;
+}
+
+.card-link,
+.chapter-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.card-link:hover,
+.chapter-link:hover {
+  text-decoration-color: var(--red);
+}
+
+/* The pinned rail holds the heading, the tabs, a row of cards and the foot on one
+   screen, whatever its height: the row takes the room between the other two,
+   and in each card the picture is what gives way. */
+html[data-motion] .rail-panel {
+  grid-template-rows: minmax(0, 1fr);
+  align-content: stretch;
+  min-height: 0;
+}
+
+html[data-motion] .rail-track {
+  height: min(100%, 560px);
+}
+
+html[data-motion] .card {
+  min-height: 0;
+}
+
+html[data-motion] .card-plate {
+  flex: 1 1 0;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
+html[data-motion] .card-body {
+  flex: none;
+}
+
+@media (max-height: 800px) {
+  html[data-motion] .stage-rail .pin {
+    gap: 14px;
+    padding: 80px 0 16px;
+  }
+
+  html[data-motion] .stage-rail .display {
+    margin-top: 4px;
+    font-size: clamp(1.75rem, 1rem + 2.6vw, 2.75rem);
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-motion] .stage-rail .pin {
+    gap: 12px;
+    padding: 76px 0 14px;
+  }
+
+  html[data-motion] .stage-rail .hint,
+  html[data-motion] .stage-rail .rail-more-row .note {
+    display: none;
+  }
+
+  html[data-motion] .stage-rail .display {
+    font-size: 1.75rem;
+  }
+
+  html[data-motion] .card-title {
+    min-height: 0;
+  }
+
+  html[data-motion] .rail-controls {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+/* Services: as many chapters as the content has. */
+.chapter-body {
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-56);
+}
+
+.chapter-provider {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ink-56);
+}
+
+@media (min-width: 800px) {
+  .chapters {
+    grid-template-columns: repeat(var(--chapters, 3), minmax(0, 1fr));
+  }
+}
+
+/* Price table */
+.ruled-link {
+  text-decoration: none;
+}
+
+.ruled-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-underline-offset: 0.3em;
+}
+
+.band-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.band-foot .note {
+  max-width: 60ch;
+}

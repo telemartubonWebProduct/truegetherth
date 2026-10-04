@@ -1,0 +1,101 @@
+/*
+ * truegetherth design tokens (docs/renovation/R5-LANDING.md).
+ * Minimal black and white: white is the canvas, near-black carries text,
+ * buttons and the dark sections, and red is rationed to marks (prices, meters,
+ * the live step). Values are plain CSS custom properties so theme settings can
+ * override them, after a contrast check (src/lib/content/theme.ts).
+ *
+ * Contrast on white: ink #0B0B0C = 19.6:1, red #E60012 = 4.8:1 (white text on
+ * red is the same), muted #5C5C61 = 6.7:1, danger #B8000E = 6.8:1, success
+ * #166534 = 7.1:1; white on the graphite glow #3A3A40 = 11.2:1.
+ */
+:root {
+  /* Brand palette */
+  --tm-color-canvas: #ffffff;
+  --tm-color-ink: #0b0b0c;
+  --tm-color-red: #e60012;
+  --tm-color-surface: #f4f4f6;
+  --tm-color-ink-muted: #5c5c61;
+  --tm-color-line: #e2e2e6;
+  /* Graphite: highlights behind white text (11.2:1). */
+  --tm-color-glow: #3a3a40;
+
+  /* Derived states */
+  --tm-color-red-press: #b8000e;
+  --tm-color-red-wash: #fdebec;
+  --tm-color-on-red: #ffffff;
+  --tm-color-on-ink: #ffffff;
+  --tm-color-on-ink-muted: #d4d4d8; /* secondary text on the ink, 13.3:1 */
+  --tm-color-danger: #b8000e;
+  --tm-color-danger-wash: #fdebec;
+  --tm-color-success: #166534;
+  --tm-color-success-wash: #ecf8f0;
+  --tm-color-focus: #0b0b0c;
+  --tm-color-focus-inverse: #ffffff;
+
+  /* The black section tone swaps the palette inside a section (see globals.css).
+     Derived from the theme's ink colour: ink, ink + 10% white, ink + 25% white. */
+  --tm-tone-ink-canvas: #0b0b0c;
+  --tm-tone-ink-text: #ffffff;
+  --tm-tone-ink-muted: #d4d4d8;
+  --tm-tone-ink-surface: #232324;
+  --tm-tone-ink-line: #484849;
+
+  /* Type: Inter for Latin letters and figures, Anuphan (a loopless Thai face)
+     for Thai, both variable and set light. Thai stacks vowels and tone marks,
+     so line heights stay generous. Containers that load the fonts through
+     next/font redeclare this with var(--font-inter) and var(--font-anuphan). */
+  --tm-font-sans: "Inter", "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Headlines, prices and speeds use the same pair. */
+  --tm-font-display: var(--tm-font-sans);
+  --tm-text-caption: 0.8125rem; /* 13px */
+  --tm-text-small: 0.875rem; /* 14px */
+  --tm-text-body: 1rem; /* 16px */
+  --tm-text-lead: 1.125rem; /* 18px */
+  --tm-text-h4: 1.25rem; /* 20px */
+  --tm-text-h3: 1.5rem; /* 24px */
+  --tm-text-h2: 2rem; /* 32px */
+  --tm-text-h1: 2.5rem; /* 40px */
+  --tm-text-display: 3.5rem; /* 56px */
+  --tm-leading-body: 1.7;
+  --tm-leading-heading: 1.3;
+
+  /* Shape: controls, panels and pills differ on purpose. */
+  --tm-radius-control: 12px;
+  --tm-radius-panel: 24px;
+  --tm-radius-pill: 999px;
+
+  /* Depth: raised cards and floating panels. */
+  --tm-shadow-raised: 0 0 0 1px rgb(11 11 12 / 0.05), 0 18px 40px -22px rgb(11 11 12 / 0.28);
+  --tm-shadow-float: 0 0 0 1px rgb(11 11 12 / 0.08), 0 40px 80px -30px rgb(11 11 12 / 0.45);
+
+  /* Layout */
+  --tm-content-max: 75rem; /* 1200px */
+  --tm-gutter: 1rem;
+  --tm-admin-nav-width: 15rem;
+  --tm-control-height: 2.75rem; /* 44px touch target */
+
+  /* Motion */
+  --tm-duration-fast: 120ms;
+  --tm-duration-base: 200ms;
+  --tm-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --tm-gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --tm-gutter: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tm-duration-fast: 0ms;
+    --tm-duration-base: 0ms;
+  }
+}

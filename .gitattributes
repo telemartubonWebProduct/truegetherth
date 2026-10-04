@@ -1,0 +1,3 @@
+# Vendored Markdown keeps intentional trailing spaces for Markdown line breaks.
+.agents/skills/vercel-react-best-practices/*.md whitespace=-blank-at-eol
+.agents/skills/vercel-react-best-practices/rules/*.md whitespace=-blank-at-eol
