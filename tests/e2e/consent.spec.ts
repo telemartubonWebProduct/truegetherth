@@ -10,9 +10,9 @@ import { blockThirdParty, serveAt, settle } from "./support/network";
 
 // Cookie consent (M5, PDPA): nothing optional loads until the visitor chooses;
 // refusing is as easy as accepting; "Cookie settings" in the footer changes or
-// withdraws the choice. Then Google Ads, GA4 (production domain only) and Tawk
-// load according to it, and clicks on LINE and phone links reach GA4 as their
-// own events. Requests to Google and Tawk are blocked, so the tag's queue
+// withdraws the choice. Then Google Ads and GA4 (production domain only) load
+// according to it, and clicks on LINE and phone links reach GA4 as their own
+// events. Requests to Google are blocked, so the tag's queue
 // (window.dataLayer) and the script elements show what would be sent.
 
 const { consent, integrations, contact } = content.site;
@@ -53,7 +53,7 @@ test("a first visit asks before anything optional loads, and refusing is one cli
   await banner(page).getByRole("button", { name: consent.rejectAll.th }).click();
   await expect(banner(page)).toBeHidden();
   const cookie = (await context.cookies()).find((entry) => entry.name === CONSENT_COOKIE);
-  expect(cookie?.value).toMatch(new RegExp(`^${consent.policyVersion}\\.000\\.\\d+$`));
+  expect(cookie?.value).toMatch(new RegExp(`^${consent.policyVersion}\\.00\\.\\d+$`));
 
   await page.reload();
   await settle(page);
@@ -61,14 +61,15 @@ test("a first visit asks before anything optional loads, and refusing is one cli
   expect(await scripts(page)).toEqual([]);
 });
 
-test("accepting everything on the production domain loads Google Ads, GA4 and the chat", async ({ page }) => {
+test("accepting everything on the production domain loads Google Ads and GA4, and no chat widget", async ({ page }) => {
   await page.goto(`${production}/broadband`);
   await banner(page).getByRole("button", { name: consent.acceptAll.th }).click();
   await expect(banner(page)).toBeHidden();
   await expect.poll(() => configured(page)).toEqual([integrations.googleAdsId, integrations.ga4MeasurementId]);
   const [first] = await gtagCalls(page);
   expect(first).toEqual(["consent", "default", { analytics_storage: "granted", ad_storage: "granted", ad_user_data: "granted", ad_personalization: "granted" }]);
-  await expect.poll(() => scripts(page), { timeout: 10_000 }).toEqual([expect.stringContaining("googletagmanager.com/gtag/js"), integrations.tawkSrc]);
+  await settle(page);
+  expect(await scripts(page)).toEqual([expect.stringContaining("googletagmanager.com/gtag/js")]);
 });
 
 test("choosing analytics only configures GA4 and not Google Ads, and nothing counts off the production domain", async ({ page }) => {
@@ -80,7 +81,7 @@ test("choosing analytics only configures GA4 and not Google Ads, and nothing cou
   expect((await gtagCalls(page))[0]).toEqual(["consent", "default", expect.objectContaining({ analytics_storage: "granted", ad_storage: "denied" })]);
 
   // The same choice on a preview or development host: GA4 is never configured there.
-  await page.context().addCookies(consentState({ analytics: true, ads: false, chat: false }).cookies);
+  await page.context().addCookies(consentState({ analytics: true, ads: false }).cookies);
   await page.goto("/monthy");
   await settle(page);
   expect(await configured(page)).toEqual([]);
@@ -88,7 +89,7 @@ test("choosing analytics only configures GA4 and not Google Ads, and nothing cou
 });
 
 test("Cookie settings in the footer reopens the choice, and withdrawing advertising reloads without it", async ({ page }) => {
-  await page.context().addCookies(consentState({ analytics: true, ads: true, chat: false }).cookies);
+  await page.context().addCookies(consentState({ analytics: true, ads: true }).cookies);
   await page.goto(`${production}/`);
   await expect.poll(() => configured(page)).toEqual([integrations.googleAdsId, integrations.ga4MeasurementId]);
   await expect(banner(page)).toBeHidden();
@@ -107,7 +108,7 @@ test("Cookie settings in the footer reopens the choice, and withdrawing advertis
 });
 
 test("clicks on LINE and phone links reach GA4 as their own events, with the button's id and no personal data", async ({ page }) => {
-  await page.context().addCookies(consentState({ analytics: true, ads: false, chat: false }).cookies);
+  await page.context().addCookies(consentState({ analytics: true, ads: false }).cookies);
   await page.goto(`${production}/service`);
   await expect.poll(() => configured(page)).toEqual([integrations.ga4MeasurementId]);
   // Keep the page: the clicks are counted, the LINE app and the dialler stay closed.

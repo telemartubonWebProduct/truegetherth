@@ -58,11 +58,11 @@ describe("every content value has an editor control", () => {
   });
 
   it("keeps structure out of the form", () => {
-    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "ga4MeasurementId", "tawkSrc", "src", "category", "group"].includes(field.key));
+    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "ga4MeasurementId", "src", "category", "group"].includes(field.key));
     expect(structural).toEqual([]);
   });
 
-  it("lets Admins change the home conversion of Google Ads, but not the tag or the chat script", () => {
+  it("lets Admins change the home conversion of Google Ads, but not the tag", () => {
     const integrations = fields.filter((field) => field.path.slice(0, 2).join("/") === "site/integrations");
     expect(integrations.map((field) => [field.path.join("/"), field.kind])).toEqual([
       ["site/integrations", "object"],

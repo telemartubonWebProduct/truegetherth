@@ -8,7 +8,7 @@
 //   node scripts/perf/lab-vitals.mjs [origin]          default http://127.0.0.1:3000
 //
 // Third-party requests are blocked and a "necessary cookies only" choice is set, so the numbers
-// are the site's own (Google tags and chat load only after consent anyway).
+// are the site's own (Google tags load only after consent anyway).
 import { chromium, devices } from "@playwright/test";
 
 const origin = process.argv[2] ?? "http://127.0.0.1:3000";

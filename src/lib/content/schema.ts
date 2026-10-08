@@ -290,8 +290,6 @@ export const consentCopy = z.strictObject({
   analyticsBody: localizedText,
   adsTitle: localizedText,
   adsBody: localizedText,
-  chatTitle: localizedText,
-  chatBody: localizedText,
   settingsLink: localizedText,
 });
 export type ConsentCopy = z.infer<typeof consentCopy>;
@@ -341,7 +339,6 @@ export const siteSettings = z.strictObject({
       ga4MeasurementId: z.string().regex(/^G-[A-Z0-9]+$/).optional(),
       /** Google Ads `send_to` of the conversion counted each time the home page opens (as on the old site). */
       googleAdsHomeConversion: z.string().regex(adsConversionPattern, "ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"),
-      tawkSrc: httpsUrl,
     })
     .superRefine((value, context) => {
       // The tag only configures googleAdsId, so a conversion of another account would go nowhere.

@@ -370,8 +370,8 @@ test("the home conversion is edited in the site settings, only for the site's ow
   await page.getByRole("button", { name: /การเชื่อมต่อ/ }).click();
   const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อเปิดหน้าแรก (send_to)" });
   await expect(field).toHaveValue(googleAdsHomeConversion);
-  // The tag and the chat script stay fixed.
-  await expect(page.getByRole("textbox", { name: /Google Ads ID|Tawk/ })).toHaveCount(0);
+  // The tag stays fixed.
+  await expect(page.getByRole("textbox", { name: /Google Ads ID/ })).toHaveCount(0);
 
   await field.fill("AW-1/OtherAccount");
   await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid", saving);

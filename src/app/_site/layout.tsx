@@ -49,7 +49,7 @@ export const siteViewport: Viewport = {
 
 export async function SiteLayout({ locale, children }: { locale: Locale; children: ReactNode }) {
   const { site } = await getPublishedContent();
-  const { googleAdsId, ga4MeasurementId, tawkSrc } = site.integrations;
+  const { googleAdsId, ga4MeasurementId } = site.integrations;
   const { policyVersion, ...consentCopy } = site.consent;
   const consentText = Object.fromEntries(Object.entries(consentCopy).map(([key, text]) => [key, tx(text, locale)])) as ConsentText;
   const policyHref = resolveLink({ kind: "page", path: "/termsAndPrivacy", hash: "cookies" }, locale, site).href;
@@ -68,8 +68,8 @@ export async function SiteLayout({ locale, children }: { locale: Locale; childre
         {/* First, so keyboard and screen-reader users meet the choice before the page. */}
         <ConsentBanner text={consentText} policyHref={policyHref} policyVersion={policyVersion} />
         {children}
-        {/* Google Ads (as on the old site), Google Analytics 4 on the production domain and Tawk chat, each only after consent; the home page reports its Ads conversion (AdsConversion). */}
-        <SiteTags googleAdsId={googleAdsId} ga4MeasurementId={ga4MeasurementId} productionHost={siteUrl().hostname} tawkSrc={tawkSrc} policyVersion={policyVersion} />
+        {/* Google Ads (as on the old site) and Google Analytics 4 on the production domain, each only after consent; the home page reports its Ads conversion (AdsConversion). */}
+        <SiteTags googleAdsId={googleAdsId} ga4MeasurementId={ga4MeasurementId} productionHost={siteUrl().hostname} policyVersion={policyVersion} />
       </body>
     </html>
   );

@@ -41,7 +41,7 @@ function cookieValue(): string {
   return "";
 }
 
-const categories = ["analytics", "ads", "chat"] as const;
+const categories = ["analytics", "ads"] as const;
 
 /**
  * Cookie consent (PDPA). Shown until the visitor chooses, for this version of
@@ -92,8 +92,8 @@ export function ConsentBanner({ text, policyHref, policyVersion }: ConsentBanner
     returnFocus.current?.focus();
   };
 
-  const titles = { analytics: text.analyticsTitle, ads: text.adsTitle, chat: text.chatTitle };
-  const bodies = { analytics: text.analyticsBody, ads: text.adsBody, chat: text.chatBody };
+  const titles = { analytics: text.analyticsTitle, ads: text.adsTitle };
+  const bodies = { analytics: text.analyticsBody, ads: text.adsBody };
 
   return (
     <section aria-labelledby="tm-consent-heading" className="tm-consent" data-consent-banner="">

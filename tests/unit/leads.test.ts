@@ -99,8 +99,10 @@ describe("cookie consent", () => {
   const version = content.site.consent.policyVersion;
 
   it("round-trips a choice and ignores one made under another policy version", () => {
-    const stored = { version, analytics: true, ads: false, chat: true, at: 1_759_390_000 };
+    const stored = { version, analytics: true, ads: false, at: 1_759_390_000 };
     expect(parseConsent(serializeConsent(stored), version)).toEqual(stored);
+    // A choice saved while the site still had live chat (a third digit) stands for analytics and advertising.
+    expect(parseConsent(`${version}.101.1759390000`, version)).toEqual(stored);
     expect(parseConsent(serializeConsent(stored), "2099-01-01")).toBeNull();
     expect(consentFromCookies(`a=1; tm_consent=${serializeConsent(stored)}; b=2`, version)).toEqual(stored);
     expect(consentFromCookies("a=1", version)).toBeNull();
@@ -108,10 +110,10 @@ describe("cookie consent", () => {
   });
 
   it("knows when a choice withdraws consent", () => {
-    const all = { analytics: true, ads: true, chat: true };
+    const all = { analytics: true, ads: true };
     expect(withdrawsConsent(all, { ...all, ads: false })).toBe(true);
     expect(withdrawsConsent({ ...all, ads: false }, all)).toBe(false);
-    expect(withdrawsConsent(null, { analytics: false, ads: false, chat: false })).toBe(false);
+    expect(withdrawsConsent(null, { analytics: false, ads: false })).toBe(false);
   });
 });
 

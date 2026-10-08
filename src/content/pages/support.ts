@@ -239,8 +239,8 @@ export const termsPage: LegalPage = {
           "If these cookies collect data that could identify you, or are used for marketing or advertising, we will tell you and ask for your consent as the law requires. You can refuse or delete cookies in your browser settings.",
         ),
         t(
-          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) คุกกี้โฆษณา (Google Ads) และแชตสด (Tawk) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
-          "The website uses analytics cookies (Google Analytics), advertising cookies (Google Ads) and live chat (Tawk) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
+          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) และคุกกี้โฆษณา (Google Ads) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
+          "The website uses analytics cookies (Google Analytics) and advertising cookies (Google Ads) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
         ),
       ],
       list: [
@@ -253,19 +253,8 @@ export const termsPage: LegalPage = {
       ],
     },
     {
-      id: "tawk",
-      heading: t("9. การเชื่อมต่อกับ Tawk Live Chat", "9. Tawk live chat"),
-      paragraphs: [
-        t(
-          "เว็บไซต์ของเราอาจใช้ปลั๊กอินหรือ API ของ Tawk Live Chat เพื่อให้ท่านสื่อสารและติดต่อสอบถามได้สะดวกขึ้น เมื่อท่านใช้ฟีเจอร์ดังกล่าว ข้อมูลบางส่วน เช่น ข้อความหรือรหัสผู้ใช้ อาจถูกส่งไปยัง Tawk.to ตามเงื่อนไขการใช้บริการและนโยบายความเป็นส่วนตัวของ Tawk.to (https://www.tawk.to/privacy-policy/) หากท่านไม่ต้องการให้มีการประมวลผลข้อมูลผ่าน Tawk Live Chat กรุณาไม่ใช้บริการดังกล่าว",
-          "Our website may use the Tawk live chat plug-in or API so you can message us more easily. When you use it, some data, such as your messages or a user ID, may be sent to Tawk.to under its terms of service and privacy policy (https://www.tawk.to/privacy-policy/). If you do not want your data processed through Tawk, please do not use the chat.",
-        ),
-      ],
-      list: [],
-    },
-    {
       id: "disclosure",
-      heading: t("10. การเปิดเผยข้อมูลให้บุคคลภายนอก", "10. Sharing data with third parties"),
+      heading: t("9. การเปิดเผยข้อมูลให้บุคคลภายนอก", "9. Sharing data with third parties"),
       paragraphs: [
         t(
           "เราจะไม่เปิดเผยข้อมูลส่วนบุคคลของท่านแก่บุคคลภายนอก เว้นแต่",
@@ -273,17 +262,17 @@ export const termsPage: LegalPage = {
         ),
       ],
       list: [
-        t("10.1 ได้รับความยินยอมจากท่าน", "10.1 You have given your consent."),
-        t("10.2 เป็นคำสั่งหรือข้อบังคับทางกฎหมาย", "10.2 The law or a legal order requires it."),
+        t("9.1 ได้รับความยินยอมจากท่าน", "9.1 You have given your consent."),
+        t("9.2 เป็นคำสั่งหรือข้อบังคับทางกฎหมาย", "9.2 The law or a legal order requires it."),
         t(
-          "10.3 จำเป็นต่อการดำเนินงานของบริการภายนอกที่เกี่ยวข้อง (เช่น บริการชำระเงิน ผู้ให้บริการ Messenger)",
-          "10.3 It is needed to run a related outside service (for example payment services or messaging providers).",
+          "9.3 จำเป็นต่อการดำเนินงานของบริการภายนอกที่เกี่ยวข้อง (เช่น บริการชำระเงิน ผู้ให้บริการ Messenger)",
+          "9.3 It is needed to run a related outside service (for example payment services or messaging providers).",
         ),
       ],
     },
     {
       id: "your-rights",
-      heading: t("11. สิทธิ์ของท่านเกี่ยวกับข้อมูลส่วนบุคคล", "11. Your rights over your personal data"),
+      heading: t("10. สิทธิ์ของท่านเกี่ยวกับข้อมูลส่วนบุคคล", "10. Your rights over your personal data"),
       paragraphs: [
         t(
           "ท่านมีสิทธิ์ขอเข้าถึง แก้ไข หรือลบข้อมูลส่วนบุคคลของท่าน หากกฎหมายในเขตอำนาจของท่านรองรับ หากต้องการใช้สิทธิ์ดังกล่าว กรุณาติดต่อเราผ่านช่องทางที่ระบุในเว็บไซต์",
@@ -294,7 +283,7 @@ export const termsPage: LegalPage = {
     },
     {
       id: "contact",
-      heading: t("12. การติดต่อ", "12. Contact"),
+      heading: t("11. การติดต่อ", "11. Contact"),
       paragraphs: [
         t(
           "หากท่านมีคำถามเกี่ยวกับเงื่อนไขการให้บริการหรือนโยบายความเป็นส่วนตัว ติดต่อได้ที่อีเมล Truetelemart@hotmail.com หรือโทร 091-019-2552 ในเวลาทำการ",

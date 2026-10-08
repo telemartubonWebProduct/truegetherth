@@ -185,7 +185,7 @@ test.describe("on desktop", () => {
   test("GA4 hears generate_lead only once the request is stored, without personal data", async ({ page, context, baseURL }) => {
     const production = siteUrl().origin;
     await serveAt(context, baseURL!, production);
-    await context.addCookies(consentState({ analytics: true, ads: false, chat: false }).cookies);
+    await context.addCookies(consentState({ analytics: true, ads: false }).cookies);
     const phone = uniquePhone();
     await page.goto(`${production}/service#callback`);
     await expect

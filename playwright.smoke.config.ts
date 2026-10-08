@@ -17,7 +17,7 @@ const { hostname, protocol } = new URL(baseURL);
 const bypass = process.env.SMOKE_BYPASS_SECRET;
 
 // A visitor who chose "necessary only", so the consent banner stays out of the way.
-const consent = serializeConsent({ analytics: false, ads: false, chat: false, version: content.site.consent.policyVersion, at: Math.floor(Date.now() / 1000) });
+const consent = serializeConsent({ analytics: false, ads: false, version: content.site.consent.policyVersion, at: Math.floor(Date.now() / 1000) });
 
 export default defineConfig({
   testDir: "tests/smoke",

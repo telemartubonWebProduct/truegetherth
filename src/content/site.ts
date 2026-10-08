@@ -154,14 +154,14 @@ export const site: SiteSettings = {
       preview: t("ตัวอย่างในหน้าแก้ไข: แบบฟอร์มนี้ไม่ส่งจริง", "Editor preview: this form does not send."),
     },
   },
-  // Cookie banner (PDPA): analytics, advertising and chat load only after the
+  // Cookie banner (PDPA): analytics and advertising load only after the
   // visitor agrees. policyVersion is also recorded with each call-back request.
   consent: {
     policyVersion: "2026-10-02",
     heading: t("เว็บไซต์นี้ใช้คุกกี้", "This website uses cookies"),
     body: t(
-      "เราใช้คุกกี้ที่จำเป็นเพื่อให้เว็บทำงาน และขอความยินยอมก่อนใช้คุกกี้วิเคราะห์การใช้งาน โฆษณา และแชตสด เปลี่ยนใจได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
-      "We use necessary cookies to run the site, and ask before using cookies for analytics, advertising and live chat. You can change your mind any time under “Cookie settings” at the bottom of each page.",
+      "เราใช้คุกกี้ที่จำเป็นเพื่อให้เว็บทำงาน และขอความยินยอมก่อนใช้คุกกี้วิเคราะห์การใช้งานและโฆษณา เปลี่ยนใจได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
+      "We use necessary cookies to run the site, and ask before using cookies for analytics and advertising. You can change your mind any time under “Cookie settings” at the bottom of each page.",
     ),
     policyLink: t("อ่านนโยบายความเป็นส่วนตัว", "Read our privacy policy"),
     acceptAll: t("ยอมรับทั้งหมด", "Accept all"),
@@ -175,8 +175,6 @@ export const site: SiteSettings = {
     analyticsBody: t("นับผู้เข้าชมและหน้าที่ดูด้วย Google Analytics เพื่อปรับปรุงเว็บ", "Count visits and pages viewed with Google Analytics, to improve the site."),
     adsTitle: t("โฆษณา", "Advertising"),
     adsBody: t("วัดผลโฆษณาของเราบน Google ด้วย Google Ads", "Measure our ads on Google with Google Ads."),
-    chatTitle: t("แชตสด", "Live chat"),
-    chatBody: t("แสดงหน้าต่างแชตกับเจ้าหน้าที่ ให้บริการโดย Tawk.to", "Show the chat window to talk to our team, provided by Tawk.to."),
     settingsLink: t("ตั้งค่าคุกกี้", "Cookie settings"),
   },
   ui: {
@@ -255,6 +253,5 @@ export const site: SiteSettings = {
     // The owner's GA4 property (web stream tag sent 2 Oct 2026).
     ga4MeasurementId: "G-DQGCC5J4YM",
     googleAdsHomeConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
-    tawkSrc: "https://embed.tawk.to/67c0738b25eb41190eae9189/1il3s6mmf",
   },
 };

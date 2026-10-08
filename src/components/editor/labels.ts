@@ -146,7 +146,6 @@ const labels: Record<string, string> = {
   googleAdsId: "Google Ads ID ของแท็ก",
   ga4MeasurementId: "Google Analytics 4 (Measurement ID)",
   googleAdsHomeConversion: "Google Ads conversion เมื่อเปิดหน้าแรก (send_to)",
-  tawkSrc: "สคริปต์แชต Tawk",
   source: "ที่มาของข้อมูล",
   category: "หมวดสินค้า",
   group: "กลุ่ม",
@@ -199,8 +198,6 @@ const labels: Record<string, string> = {
   analyticsBody: "คำอธิบายกลุ่ม วิเคราะห์การใช้งาน",
   adsTitle: "ชื่อกลุ่ม โฆษณา",
   adsBody: "คำอธิบายกลุ่ม โฆษณา",
-  chatTitle: "ชื่อกลุ่ม แชตสด",
-  chatBody: "คำอธิบายกลุ่ม แชตสด",
   settingsLink: "ลิงก์ตั้งค่าคุกกี้ ท้ายหน้าเว็บ",
 };
 

@@ -16,9 +16,10 @@ import { contentProblems } from "./validate";
  * call-back band became a form section. 5: the home page became the scroll
  * landing (hero with the 3D router, manifesto, package rail, the slip of
  * steps, services, a price table), the film is gone, and the theme turned
- * black and white.
+ * black and white. 6: Tawk live chat is gone, with its script in the site's
+ * integrations and its group in the cookie banner.
  */
-export const CONTENT_SCHEMA_VERSION = 5;
+export const CONTENT_SCHEMA_VERSION = 6;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
 

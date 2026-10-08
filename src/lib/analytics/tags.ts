@@ -1,6 +1,6 @@
 import type { ConsentChoice } from "./consent";
 
-// Google tags and Tawk chat of the public site, loaded in the browser only
+// Google tags of the public site, loaded in the browser only
 // after the visitor agrees (src/lib/analytics/consent.ts, PDPA): one gtag.js
 // for Google Ads (advertising) and Google Analytics 4 (analytics), with Google
 // consent mode set from the same choice. GA4 is configured on the production
@@ -17,7 +17,6 @@ export type TagConfig = {
   ga4MeasurementId?: string;
   /** Host whose visits count in Analytics: the site's own domain. */
   productionHost: string;
-  tawkSrc: string;
 };
 
 function consentModes(choice: ConsentChoice) {
@@ -85,17 +84,4 @@ export function trackEvent(name: string, params: Record<string, string | number 
   if (!tags?.analytics || !window.gtag) return;
   const defined = Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined));
   window.gtag("event", name, { ...defined, send_to: tags.ga4MeasurementId });
-}
-
-/** Loads Tawk live chat once, as the old site's snippet did. */
-export function loadChat(src: string): void {
-  if (window.Tawk_LoadStart) return;
-  window.Tawk_API = window.Tawk_API ?? {};
-  window.Tawk_LoadStart = new Date();
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = src;
-  script.charset = "UTF-8";
-  script.setAttribute("crossorigin", "*");
-  document.body.appendChild(script);
 }
