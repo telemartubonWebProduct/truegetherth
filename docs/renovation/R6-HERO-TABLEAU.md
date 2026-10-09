@@ -48,11 +48,11 @@ Content: the hero's fields are unchanged. `hero.visual` now names the painting's
 
 ## 4. Checks
 
-`npm run lint`, `npm run typecheck`, `npm test` (150), `npm run build`, and `E2E_PORT=3210 npx playwright test` against the build (171 passed; the 62 that need the local Supabase stack skipped, as on any machine without Docker). `tests/e2e/home-landing.spec.ts` now checks: every layer of the arrangement in view has its picture and the figures float; the layers shift with the pointer and part with the scroll, the nearer the more; the router's frame and its True Online mark are on screen and clear of the headline and of the navigation at nine screen sizes; with reduced motion nothing moves or shifts and the painting is all there; without scripts the sky, the goddess and the mark show.
+`npm run lint`, `npm run typecheck`, `npm test` (150), `npm run build`, and the whole browser suite against the local Supabase stack (`npm run db:start`, then `E2E_PORT=3210 npm run test:e2e:local`): 215 passed, 13 skipped, 1 failed. The failure is the password-recovery test of `admin-auth.spec.ts`: the local stack mails its links to port 3000, and on this machine the run's server was on 3210 because another app has 3000. The Admin suites include the Mirror editor and its comparison, pixel for pixel, of the preview of the home page with the public one, which passed. `tests/e2e/home-landing.spec.ts` now checks: every layer of the arrangement in view has its picture and the figures float; the layers shift with the pointer and part with the scroll, the nearer the more; the router's frame and its True Online mark are on screen and clear of the headline and of the navigation at nine screen sizes; with reduced motion nothing moves or shifts and the painting is all there; without scripts the sky, the goddess and the mark show.
 
 Looked at in screenshots of the dev server at 1920×1080, 1440×810, 1024×768, 768×1024, 390×844, 375×667, 360×640 and 844×390, at rest, half scrolled and with reduced motion.
 
-Not checked: the Mirror editor's preview and the Admin suites (they need the local Supabase stack), and the page on a real phone.
+Not checked: the page on a real phone, and the pgTAP database tests (nothing in the database changed).
 
 ## 5. Left open
 
