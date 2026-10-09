@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 
@@ -37,7 +38,7 @@ test.afterEach(async ({ page }) => {
   await settle(page);
 });
 
-const item = detailPackagesIn(content)[0];
+const item = detailPackagesIn(content, todayInThailand())[0];
 const pages = ["/", "/broadband", "/broadband-old", "/monthy", "/topup", "/wEnergy", "/service", "/wifiService", "/termsAndPrivacy", packageDetailPath(item.id), "/en", "/en/service", "/no-such-page"];
 
 for (const path of pages) {

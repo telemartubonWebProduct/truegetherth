@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { renderContext } from "@/components/site/context";
 import { PackageDetailView } from "@/components/site/PackageDetailView";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 import { getPublishedContent } from "@/lib/content/published";
@@ -14,19 +15,20 @@ import { pageMetadata } from "@/lib/seo/metadata";
 // A page per package that visitors may see (docs/renovation/R3-PACKAGE-PAGES.md).
 // The packages published at build time are prerendered; one published later
 // from the editor (M4) renders on its first visit (the route files set
-// dynamicParams). Hidden and unknown ids are a 404.
+// dynamicParams). Hidden and unknown ids, and packages outside the days they
+// are set to show, are a 404.
 
 type RouteProps = { params: Promise<{ packageId: string }> };
 
 function packageFor(content: SiteContent, id: string): CatalogPackage {
-  const item = detailPackagesIn(content).find((entry) => entry.id === id);
+  const item = detailPackagesIn(content, todayInThailand()).find((entry) => entry.id === id);
   if (!item) notFound();
   return item;
 }
 
 export function packageRoute(locale: Locale) {
   async function generateStaticParams() {
-    return detailPackagesIn(await getPublishedContent()).map((item) => ({ packageId: item.id }));
+    return detailPackagesIn(await getPublishedContent(), todayInThailand()).map((item) => ({ packageId: item.id }));
   }
 
   async function generateMetadata({ params }: RouteProps): Promise<Metadata> {

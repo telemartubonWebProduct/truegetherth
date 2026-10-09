@@ -2,7 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { heroArt } from "@/components/site/home/hero-art";
 import { content } from "@/lib/content";
-import { packagePageIn, publicPackagesIn } from "@/lib/content/lookup";
+import { todayInThailand } from "@/lib/content/dates";
+import { featuredIn, packagePageIn, publicPackagesIn } from "@/lib/content/lookup";
 
 import { blockThirdParty, settle } from "./support/network";
 
@@ -13,6 +14,9 @@ import { blockThirdParty, settle } from "./support/network";
 // scripts.
 
 const home = content.pages.home;
+const today = todayInThailand();
+/** The cards of a tab of recommended packages: the catalog's recommended packages of the tab's categories. */
+const cardsOf = (tab: number) => featuredIn(content, home.promos.tabs[tab].categories, today);
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
@@ -253,7 +257,7 @@ test("the package row walks its whole overflow and stops flush with the margin",
 test("the counted prices land on the catalog's own numbers", async ({ page }) => {
   await open(page);
   await scrub(page, "rail", 0);
-  const cards = home.promos.tabs[0].items.map((card) => content.catalog.find((item) => item.id === card.packageId)!);
+  const cards = cardsOf(0);
   const shown = page.locator("[data-rail-panel]:not([hidden]) .card-price > .num");
   await expect(shown).toHaveCount(cards.length);
   // A card counts when it comes into view, so the row is walked along first, as a visitor's scroll does.
@@ -263,7 +267,7 @@ test("the counted prices land on the catalog's own numbers", async ({ page }) =>
   }
   await expect.poll(() => shown.allTextContents(), { timeout: 8000 }).toEqual(cards.map((item) => item.price.amount.toLocaleString("en-US")));
   await page.locator("#prices").scrollIntoViewIfNeeded();
-  const listed = publicPackagesIn(content, home.prices.category, home.prices.group);
+  const listed = publicPackagesIn(content, home.prices.category, home.prices.group, today);
   await expect.poll(() => page.locator("#prices .col-price .num").allTextContents(), { timeout: 8000 }).toEqual(listed.map((item) => item.price.amount.toLocaleString("en-US")));
 });
 
@@ -280,8 +284,8 @@ test("each tab shows its own row of packages, and that row is the one that walks
   await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
   const panel = page.getByRole("tabpanel");
   await expect(panel).toHaveCount(1);
-  await expect(panel.locator(".card")).toHaveCount(second.items.length);
-  await expect(panel.locator(".card").first()).toHaveAttribute("data-package", second.items[0].packageId);
+  await expect(panel.locator(".card")).toHaveCount(cardsOf(1).length);
+  await expect(panel.locator(".card").first()).toHaveAttribute("data-package", cardsOf(1)[0].id);
   // The button under the row follows the tab.
   await expect(page.locator(".rail-more a")).toHaveAttribute("data-cta", second.viewAll.id);
 

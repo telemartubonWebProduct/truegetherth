@@ -26,6 +26,15 @@ export function contentProblems(content: SiteContent): string[] {
     if (item.price.regularAmount !== undefined && item.price.regularAmount <= item.price.amount) {
       problems.push(`แพ็กเกจ ${item.id}: ราคาปกติต้องสูงกว่าราคาเสนอ`);
     }
+    if (item.showFrom !== undefined && item.showUntil !== undefined && item.showUntil < item.showFrom) {
+      problems.push(`แพ็กเกจ ${item.id}: วันสิ้นสุดการแสดงต้องไม่ก่อนวันเริ่ม`);
+    }
+  }
+  // Recommended on the home page: a card needs its package's picture. (A hidden
+  // package, or an id the catalog no longer has, simply gets no card.)
+  for (const id of new Set(content.featured)) {
+    const item = catalog.find((entry) => entry.id === id);
+    if (item && item.review.status !== "hidden" && item.image === undefined) problems.push(`แพ็กเกจ ${item.id}: แพ็กเกจที่แนะนำในหน้าแรกต้องมีรูป`);
   }
   for (const [id, entry] of Object.entries(benefits)) needMedia(entry.icon, `สิทธิประโยชน์ ${id}`);
 
@@ -35,15 +44,21 @@ export function contentProblems(content: SiteContent): string[] {
   const groupExists = (category: CategoryId, group: string) =>
     catalog.some((item) => item.category === category && item.group === group);
 
+  // A group may be empty (one just made in the back office: its page passes it
+  // over until it has a package), but no two entries may name the same group.
+  const groups = new Set<string>();
   for (const doc of pages.packages) {
     const ids = new Set<string>();
     for (const section of doc.sections) {
       if (ids.has(section.id)) problems.push(`หน้า ${doc.id}: หมวด "${section.id}" ซ้ำกัน`);
       ids.add(section.id);
+      const entries = new Set<string>();
       for (const group of section.groups) {
-        if (!groupExists(group.category, group.group)) {
-          problems.push(`หน้า ${doc.id}#${section.id}: ไม่มีแพ็กเกจในกลุ่ม ${group.category}/${group.group}`);
-        }
+        if (entries.has(group.id)) problems.push(`หน้า ${doc.id}#${section.id}: กลุ่ม "${group.id}" ซ้ำกัน`);
+        entries.add(group.id);
+        const key = `${group.category}/${group.group}`;
+        if (groups.has(key)) problems.push(`หน้า ${doc.id}#${section.id}: กลุ่ม ${key} อยู่ในหน้าเว็บมากกว่าหนึ่งที่`);
+        groups.add(key);
       }
     }
     anchors.set(doc.path, ids);
@@ -55,16 +70,6 @@ export function contentProblems(content: SiteContent): string[] {
   for (const tab of pages.home.promos.tabs) {
     if (tabIds.has(tab.id)) problems.push(`หน้าแรก โปรแนะนำ: แท็บ "${tab.id}" ซ้ำกัน`);
     tabIds.add(tab.id);
-    const cardIds = new Set<string>();
-    for (const card of tab.items) {
-      const where = `หน้าแรก โปรแนะนำ ${tab.id}`;
-      if (cardIds.has(card.id)) problems.push(`${where}: การ์ด "${card.id}" ซ้ำกัน`);
-      cardIds.add(card.id);
-      const item = catalog.find((entry) => entry.id === card.packageId);
-      if (!item) problems.push(`${where}: ไม่มีแพ็กเกจ "${card.packageId}"`);
-      else if (item.review.status === "hidden") problems.push(`${where}: แพ็กเกจ "${card.packageId}" ถูกซ่อนจากหน้าเว็บ`);
-      needMedia(card.image, `${where} การ์ด ${card.id}`);
-    }
   }
 
   needMedia(site.brand.logo, "โลโก้");

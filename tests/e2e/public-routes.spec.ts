@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 import { localizePath, locales } from "@/lib/i18n/locales";
@@ -176,7 +177,7 @@ test("search engines get a sitemap of both languages and robots rules", async ({
   const xml = await sitemap.text();
   const listed = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname).sort();
   // Every public page and every package page (docs/renovation/R3-PACKAGE-PAGES.md), in both languages.
-  const pages = [...publicPaths, ...detailPackagesIn(content).map((item) => packageDetailPath(item.id))];
+  const pages = [...publicPaths, ...detailPackagesIn(content, todayInThailand()).map((item) => packageDetailPath(item.id))];
   const expected = pages.flatMap((path) => locales.map((locale) => localizePath(path, locale))).sort();
   expect(listed).toEqual(expected);
   expect(xml).toContain('hreflang="x-default"');

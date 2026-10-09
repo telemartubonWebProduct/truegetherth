@@ -22,9 +22,30 @@ export function packagePageIn(content: SiteContent, path: string): PackagePage {
   return doc;
 }
 
-/** Packages visitors may see, in catalog order. Hidden imports stay out. */
-export function publicPackagesIn(content: SiteContent, category: CategoryId, group: string): CatalogPackage[] {
-  return content.catalog.filter((item) => item.category === category && item.group === group && item.review.status !== "hidden");
+/**
+ * Whether visitors may see a package on `today` (a day in Thailand, such as
+ * "2026-10-31"): it is not hidden, and the day is inside the days it is set to
+ * show, when it has any.
+ */
+export function isShown(item: CatalogPackage, today: string): boolean {
+  if (item.review.status === "hidden") return false;
+  return (item.showFrom === undefined || item.showFrom <= today) && (item.showUntil === undefined || today <= item.showUntil);
+}
+
+/** Packages visitors may see, in catalog order. Hidden ones and ones outside their days stay out. */
+export function publicPackagesIn(content: SiteContent, category: CategoryId, group: string, today: string): CatalogPackage[] {
+  return content.catalog.filter((item) => item.category === category && item.group === group && isShown(item, today));
+}
+
+/**
+ * The home page's recommended packages of some categories, in the order of the
+ * recommended list: the ones visitors may see that have a picture for their card.
+ */
+export function featuredIn(content: SiteContent, categories: readonly CategoryId[], today: string): CatalogPackage[] {
+  const byId = new Map(content.catalog.map((item) => [item.id, item]));
+  return content.featured
+    .map((id) => byId.get(id))
+    .filter((item): item is CatalogPackage => item !== undefined && item.image !== undefined && categories.includes(item.category) && isShown(item, today));
 }
 
 /** Where a package belongs: its page and section, the notes that apply to it and the page's package button. */
@@ -52,18 +73,8 @@ export function packageHomeIn(content: SiteContent, item: CatalogPackage): Packa
 }
 
 /** Packages with a page of their own: shown on the site and listed on one of its pages. */
-export function detailPackagesIn(content: SiteContent): CatalogPackage[] {
-  return content.catalog.filter((item) => item.review.status !== "hidden" && packageHomeIn(content, item) !== null);
-}
-
-/** A picture for a package: its own, else the one a home page card shows with it. */
-export function packageImageIn(content: SiteContent, item: CatalogPackage): string | null {
-  if (item.image) return item.image;
-  for (const tab of content.pages.home.promos.tabs) {
-    const card = tab.items.find((entry) => entry.packageId === item.id);
-    if (card) return card.image;
-  }
-  return null;
+export function detailPackagesIn(content: SiteContent, today: string): CatalogPackage[] {
+  return content.catalog.filter((item) => isShown(item, today) && packageHomeIn(content, item) !== null);
 }
 
 export function packageIn(content: SiteContent, id: string): CatalogPackage {

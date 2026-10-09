@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { publicPages } from "@/content/routes";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 import { getPublishedContent } from "@/lib/content/published";
@@ -12,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = siteUrl();
   const absolute = (path: string) => new URL(path, origin).href;
   const content = await getPublishedContent();
-  const paths = [...publicPages.map((entry) => entry.path), ...detailPackagesIn(content).map((item) => packageDetailPath(item.id))];
+  const paths = [...publicPages.map((entry) => entry.path), ...detailPackagesIn(content, todayInThailand()).map((item) => packageDetailPath(item.id))];
   return paths.flatMap((path) =>
     locales.map((locale) => ({
       url: absolute(localizePath(path, locale)),

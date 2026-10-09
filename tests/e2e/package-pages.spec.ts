@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { content, getPackagePage, packageById } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn, packageHomeIn, publicPackagesIn } from "@/lib/content/lookup";
 import { benefitOptions, downloadMbps, packageDetailPath, priceLimits } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
@@ -11,7 +12,8 @@ import { blockThirdParty, settle } from "./support/network";
 // comparison over the page's packages, and a page for each package.
 
 const { ui } = content.site;
-const broadband = publicPackagesIn(content, "broadband-new", "new-customer");
+const today = todayInThailand();
+const broadband = publicPackagesIn(content, "broadband-new", "new-customer", today);
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
@@ -71,7 +73,7 @@ test("sorting reorders the cards on screen", async ({ page }) => {
 test("a section left empty by the filters says so and keeps its anchor", async ({ page }) => {
   const doc = getPackagePage("/monthy");
   await page.goto("/monthy");
-  const items = doc.sections.flatMap((section) => section.groups.flatMap((group) => publicPackagesIn(content, group.category, group.group)));
+  const items = doc.sections.flatMap((section) => section.groups.flatMap((group) => publicPackagesIn(content, group.category, group.group, today)));
   await page.getByLabel(ui.filterPrice.th).selectOption(String(priceLimits(items)[0]));
   await expect(page.getByText(ui.noMatches.th).first()).toBeVisible();
   for (const section of doc.sections) await expect(page.locator(`section[id="${section.id}"]`)).toBeAttached();
@@ -123,7 +125,7 @@ test("each package has its own page, in both languages", async ({ page }) => {
 
 test("every package page renders, and hidden packages have none", async ({ page, request, isMobile }) => {
   test.skip(isMobile, "the same pages as desktop");
-  for (const item of detailPackagesIn(content)) {
+  for (const item of detailPackagesIn(content, today)) {
     const response = await request.get(packageDetailPath(item.id));
     expect(response.status(), item.id).toBe(200);
   }

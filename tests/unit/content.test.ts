@@ -29,13 +29,15 @@ describe("site content", () => {
   it("reports broken references instead of rendering around them", () => {
     const broken: SiteContent = structuredClone(content);
     broken.catalog[0].benefits.push("no-such-benefit");
-    broken.pages.home.promos.tabs[0].items[0].packageId = "no-such-package";
-    broken.pages.home.promos.tabs[0].items[1].image = "no-such-picture";
+    broken.catalog[1].image = "no-such-picture";
+    // Recommended on the home page, but with no picture for its card.
+    const bare = broken.catalog.find((item) => item.review.status !== "hidden" && item.image === undefined)!;
+    broken.featured.push(bare.id);
     broken.pages.home.hero.tags[1].target = { kind: "page", path: "/monthy", hash: "no-such-section" };
     expect(contentProblems(broken)).toEqual(
       expect.arrayContaining([
         expect.stringContaining('ไม่มีสิทธิประโยชน์ "no-such-benefit"'),
-        expect.stringContaining('ไม่มีแพ็กเกจ "no-such-package"'),
+        expect.stringContaining(`แพ็กเกจ ${bare.id}: แพ็กเกจที่แนะนำในหน้าแรกต้องมีรูป`),
         expect.stringContaining('ไม่มีรูป "no-such-picture"'),
         expect.stringContaining('หน้า "/monthy" ไม่มีหมวด #no-such-section'),
       ]),

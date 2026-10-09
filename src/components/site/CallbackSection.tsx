@@ -19,7 +19,7 @@ export function CallbackSection({ ctx, page }: { ctx: RenderContext; page: Conta
   const { callback } = page;
   const { site } = ctx;
   const phone = site.contact.phones[0];
-  const packages = Object.fromEntries(requestablePackages(ctx.content).map((item) => [item.id, { name: ctx.t(item.name), service: serviceOf(item) }]));
+  const packages = Object.fromEntries(requestablePackages(ctx.content, ctx.today).map((item) => [item.id, { name: ctx.t(item.name), service: serviceOf(item) }]));
 
   return (
     <section id="callback" aria-labelledby="callback-heading" data-tone={callback.tone} {...ctx.bind("page:contact", "callback")}>

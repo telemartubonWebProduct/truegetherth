@@ -28,7 +28,7 @@ describe("editing lists in the editor", () => {
     // A copied tab gets new ids inside it too: its button keeps a tracking id of its own.
     const tab = newItem(page.promos.tabs) as (typeof page.promos.tabs)[number];
     expect(tab.packageCta.id).not.toBe(page.promos.tabs.at(-1)!.packageCta.id);
-    expect(tab.items.map((card) => card.packageId)).toEqual(page.promos.tabs.at(-1)!.items.map((card) => card.packageId));
+    expect(tab.categories).toEqual(page.promos.tabs.at(-1)!.categories);
 
     // Copying a copy counts up instead of piling suffixes.
     const twice = newItem([...page.faq.items, added]) as { id: string };

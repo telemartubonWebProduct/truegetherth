@@ -3,6 +3,7 @@ import { randomInt } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { requestablePackages, serviceOf } from "@/lib/leads/packages";
 import { siteUrl } from "@/lib/seo/metadata";
 
@@ -115,7 +116,7 @@ test("a request is stored once, however often it is sent", async ({ page }) => {
 });
 
 test("from a package page, the package is filled in, and a repeat joins the open request", async ({ page }) => {
-  const item = requestablePackages(content).find((entry) => serviceOf(entry) === "broadband")!;
+  const item = requestablePackages(content, todayInThailand()).find((entry) => serviceOf(entry) === "broadband")!;
   const phone = uniquePhone();
   await page.goto(`/packages/${item.id}`);
   await page.getByRole("link", { name: content.site.ui.requestCallback.th }).click();

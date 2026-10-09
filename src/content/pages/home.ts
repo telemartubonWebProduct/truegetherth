@@ -1,11 +1,8 @@
 import type { Cta, HomePage, LinkTarget } from "@/lib/content/schema";
 
 import { t } from "../catalog/helpers";
-import type { MediaId } from "../media";
 
 const page = (path: string, hash?: string): LinkTarget => (hash ? { kind: "page", path, hash } : { kind: "page", path });
-
-const promo = (packageId: string, image: MediaId) => ({ id: packageId, packageId, image });
 
 const interested = (id: string): Cta => ({
   id,
@@ -62,19 +59,13 @@ export const home: HomePage = {
     label: t("แพ็กเกจที่เราแนะนำ", "Packages we recommend"),
     heading: t("โปรแนะนำ", "Recommended packages"),
     description: t("เลือกหมวด แล้วเลื่อนลงเพื่อดูแพ็กเกจถัดไป", "Pick a category, then keep scrolling to walk along the row"),
-    // Packages straight from the catalog; the cards show their price and terms as the catalog has them.
+    // Each tab shows the packages recommended in the catalog (src/content/catalog/featured.ts, then the
+    // back office) that belong to its categories; the cards show price, terms and picture as the catalog has them.
     tabs: [
       {
         id: "broadband",
         title: t("เน็ตบ้าน", "Home internet"),
-        items: [
-          promo("fiber-500-499", "flow-s2-work-from-home"),
-          promo("fiber-700-599", "flow-s1-family-streaming"),
-          promo("fiber-1g-799", "flow-s3-gamer"),
-          promo("fiber-500-650-cctv", "flow-s6-technician"),
-          promo("fiber-500-999-netflix", "flow-s5-friends-phone"),
-          promo("fiber-1500-1199", "flow-s8-fibre"),
-        ],
+        categories: ["broadband-new", "broadband-existing"],
         packageCta: interested("home-package-interest"),
         viewAll: {
           id: "home-all-broadband",
@@ -86,14 +77,7 @@ export const home: HomePage = {
       {
         id: "monthly",
         title: t("มือถือรายเดือน", "Postpaid mobile"),
-        items: [
-          promo("m-boost-60gb", "flow-s4-mobile-city"),
-          promo("m-unlimited-7d", "flow-s8-fibre"),
-          promo("m-social-4-apps", "flow-s5-friends-phone"),
-          promo("m-asian-combo-179", "flow-s1-family-streaming"),
-          promo("m-up2u-true-coffee", "flow-s2-work-from-home"),
-          promo("m-call-200", "flow-s7-support"),
-        ],
+        categories: ["mobile-monthly"],
         remark: t("แพ็กเสริมสำหรับลูกค้ามือถือรายเดือน", "Add-ons for postpaid mobile customers"),
         packageCta: interested("home-monthly-interest"),
         viewAll: {
@@ -106,13 +90,7 @@ export const home: HomePage = {
       {
         id: "prepaid",
         title: t("เติมเงิน", "Prepaid"),
-        items: [
-          promo("p-net-20mbps", "flow-s4-mobile-city"),
-          promo("p-net-10mbps", "flow-s8-fibre"),
-          promo("p-net-call-6mbps", "flow-s5-friends-phone"),
-          promo("p-call-200", "flow-s7-support"),
-          promo("p-game-prohub", "flow-s3-gamer"),
-        ],
+        categories: ["mobile-prepaid"],
         remark: t("แพ็กเสริมสำหรับลูกค้ามือถือเติมเงิน", "Add-ons for prepaid mobile customers"),
         packageCta: interested("home-prepaid-interest"),
         viewAll: {
@@ -125,11 +103,7 @@ export const home: HomePage = {
       {
         id: "solar",
         title: t("โซลาร์เซลล์", "Solar"),
-        items: [
-          promo("solar-3kwp", "solar-rooftop"),
-          promo("solar-5kwp", "solar-aerial"),
-          promo("solar-10kwp", "solar-rooftop"),
-        ],
+        categories: ["solar"],
         remark: t("บริการของ W&W Energy แยกจากแพ็กเกจของทรู", "A W&W Energy service, separate from True's packages"),
         packageCta: {
           id: "home-solar-interest",

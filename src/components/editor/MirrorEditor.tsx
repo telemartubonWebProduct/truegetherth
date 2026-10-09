@@ -268,9 +268,10 @@ export function MirrorEditor({ published, working, drafts, problems, draftsAvail
         <button type="button" className="min-h-8 rounded-tm-control border border-white/25 px-2.5 text-tm-caption font-semibold hover:border-white" onClick={() => select("site")}>
           ตั้งค่าทั้งเว็บ
         </button>
-        <button type="button" className="min-h-8 rounded-tm-control border border-white/25 px-2.5 text-tm-caption font-semibold hover:border-white" onClick={() => select("catalog")}>
-          แพ็กเกจและสิทธิประโยชน์
-        </button>
+        {/* Packages are managed on a page of their own; waiting edits save first. */}
+        <Link href="/admin/catalog" onClick={() => store.flushAll()} className="inline-flex min-h-8 items-center rounded-tm-control border border-white/25 px-2.5 text-tm-caption font-semibold hover:border-white">
+          แพ็กเกจและโปร
+        </Link>
         {/* Review and publish the saved drafts (M4); waiting edits save first. */}
         <Link
           href="/admin/publish"

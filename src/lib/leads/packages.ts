@@ -3,9 +3,9 @@ import type { CatalogPackage, SiteContent } from "@/lib/content/schema";
 
 import type { LeadService } from "./form";
 
-/** Packages a request may name: the ones with a page of their own. */
-export function requestablePackages(content: SiteContent): CatalogPackage[] {
-  return detailPackagesIn(content);
+/** Packages a request may name: the ones with a page of their own on `today` (a day in Thailand). */
+export function requestablePackages(content: SiteContent, today: string): CatalogPackage[] {
+  return detailPackagesIn(content, today);
 }
 
 export function serviceOf(item: CatalogPackage): LeadService {

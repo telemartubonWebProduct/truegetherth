@@ -49,12 +49,11 @@ describe("validating a save", () => {
   });
 
   it("rejects bodies the schema refuses, broken references and unreadable colours", () => {
-    const hiddenPackage = content.catalog.find((item) => item.review.status === "hidden")!;
-    const withHidden = structuredClone(home);
-    withHidden.promos.tabs[0].items[0].packageId = hiddenPackage.id;
-    const hidden = validateDraft(content, "page:home", withHidden);
-    expect(hidden.ok).toBe(false);
-    expect(!hidden.ok && hidden.messages[0]).toContain("ถูกซ่อน");
+    // Recommending a package on the home page needs its picture.
+    const bare = content.catalog.find((item) => item.review.status !== "hidden" && item.image === undefined)!;
+    const recommended = validateDraft(content, "catalog", { order: content.catalog.map((item) => item.id), featured: [...content.featured, bare.id] });
+    expect(recommended.ok).toBe(false);
+    expect(!recommended.ok && recommended.messages[0]).toContain("ต้องมีรูป");
 
     const paleTheme = { ...content.site, theme: { ...defaultTheme, accent: "#ffb3b3" } };
     const pale = validateDraft(content, "site", paleTheme);

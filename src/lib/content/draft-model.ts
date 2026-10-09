@@ -19,9 +19,12 @@ import { contentProblems } from "./validate";
  * black and white. 6: Tawk live chat is gone, with its script in the site's
  * integrations and its group in the cookie banner. 7: the home page's opening
  * is a painting in layers: hero.visual names its sky, which the page lays the
- * figures over (a release naming the router's still would get them too).
+ * figures over (a release naming the router's still would get them too). 8:
+ * the catalog says which packages are recommended on the home page (its tabs
+ * name categories instead of listing cards), and a package can say from which
+ * day and until which day it shows.
  */
-export const CONTENT_SCHEMA_VERSION = 7;
+export const CONTENT_SCHEMA_VERSION = 8;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
 

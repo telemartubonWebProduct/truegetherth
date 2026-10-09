@@ -17,8 +17,8 @@ test.describe.configure({ mode: "serial" });
 
 let admin: TestUser;
 const home = content.pages.home;
-const card = home.promos.tabs[0].items[0];
-const priced = content.catalog.find((item) => item.id === card.packageId)!;
+// The first recommended package: its card, with its picture, is on the home page.
+const priced = content.catalog.find((item) => item.id === content.featured[0])!;
 
 type Edition = { heading: string; price: number; accent: string; picture: string; file: string };
 const first: Edition = { heading: "คำถามฉบับหนึ่ง", price: priced.price.amount + 11, accent: "#c8102e", picture: "flow-s7-support", file: "s7-support.webp" };
@@ -36,8 +36,7 @@ async function clearHistory() {
 async function draftEdition(edition: Edition) {
   const page = structuredClone(home);
   page.faq.heading.th = edition.heading;
-  page.promos.tabs[0].items[0].image = edition.picture;
-  const item = { ...priced, price: { ...priced.price, amount: edition.price } };
+  const item = { ...priced, image: edition.picture, price: { ...priced.price, amount: edition.price } };
   const site = { ...content.site, theme: { ...content.site.theme, accent: edition.accent } };
   const bodies: [string, unknown][] = [
     ["page:home", page],

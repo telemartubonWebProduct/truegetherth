@@ -25,6 +25,9 @@ export const mediaRef = z.string().regex(stableIdPattern, "รหัสรูป
 export const benefitRef = z.string().regex(stableIdPattern, "รหัสสิทธิประโยชน์ไม่ถูกต้อง");
 export const packageRef = z.string().regex(stableIdPattern, "รหัสแพ็กเกจไม่ถูกต้อง");
 
+/** A calendar day in Thailand, such as 2026-10-31. */
+export const isoDate = z.iso.date("ใช้วันที่แบบ ปปปป-ดด-วว เช่น 2026-10-31");
+
 /** In-page anchor; some legacy anchors are camelCase (#socialInternet). */
 export const anchorId = z.string().regex(/^[A-Za-z][A-Za-z0-9-]*$/, "ชื่อหมวดในหน้าใช้ a-z ตัวเลข และขีดกลาง");
 
@@ -161,7 +164,11 @@ export const catalogPackage = z.strictObject({
     .string()
     .regex(/^\*[0-9*]+#$/, "รหัสกดขึ้นต้นด้วย * และลงท้ายด้วย # เช่น *900*7129#")
     .optional(),
+  /** Its picture: on its own page, and on its card when it is recommended on the home page. */
   image: mediaRef.optional(),
+  /** Shown to visitors only from this day, and only until this day (both included); either may be left out. */
+  showFrom: isoDate.optional(),
+  showUntil: isoDate.optional(),
   /** Legacy record this package was imported from. */
   source: z.strictObject({ file: z.string().min(1), entry: z.string().min(1) }),
   review: z.strictObject({ status: reviewStatus, notes: z.array(z.string().min(1)) }),
@@ -382,18 +389,15 @@ export const packagePage = z.strictObject({
 });
 export type PackagePage = z.infer<typeof packagePage>;
 
-/** A card of the home page's recommended packages: a catalog package with a picture. */
-const promoItem = z.strictObject({
-  id: stableId,
-  /** Price, speed and terms come from the catalog as they are; the card adds no offer of its own. */
-  packageId: packageRef,
-  image: mediaRef,
-});
-
+/**
+ * A tab of the home page's recommended packages. Its cards are the packages
+ * recommended in the catalog (siteContent.featured) that belong to these
+ * categories; price, speed, terms and picture come from each package as it is.
+ */
 const promoTab = z.strictObject({
   id: stableId,
   title: localizedText,
-  items: z.array(promoItem).min(1).max(8),
+  categories: z.array(categoryId).min(1),
   /** Under the cards, such as who provides the service. */
   remark: localizedText.optional(),
   packageCta: cta,
@@ -609,6 +613,8 @@ export const siteContent = z.strictObject({
   media: z.record(stableId, mediaAsset),
   benefits: z.record(stableId, benefit),
   catalog: z.array(catalogPackage),
+  /** Packages recommended on the home page, in the order of their cards (ids no longer in the catalog are passed over). */
+  featured: z.array(packageRef),
   pages: z.strictObject({
     home: homePage,
     packages: z.array(packagePage),

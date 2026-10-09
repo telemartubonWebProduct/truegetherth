@@ -88,7 +88,7 @@ describe("the call-back form", () => {
   });
 
   it("offers the packages that have a page, under the right service", () => {
-    const items = requestablePackages(content);
+    const items = requestablePackages(content, "2026-10-09");
     expect(items.length).toBeGreaterThan(0);
     expect(items.every((item) => item.review.status !== "hidden")).toBe(true);
     expect(new Set(items.map(serviceOf))).toEqual(new Set(["broadband", "mobile", "solar"]));

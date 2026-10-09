@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 // Sections appear here as their milestones ship; the shell stays the same.
 const sections = [
   { href: "/admin", label: "ภาพรวม" },
+  { href: "/admin/catalog", label: "แพ็กเกจและโปร" },
   { href: "/admin/editor", label: "แก้ไขหน้าเว็บ" },
   { href: "/admin/publish", label: "เผยแพร่" },
   { href: "/admin/releases", label: "ประวัติการเผยแพร่" },

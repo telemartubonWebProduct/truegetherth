@@ -86,7 +86,7 @@ export type FieldKind =
   | "objectList";
 
 /** Structure the editor shows but never changes. */
-const readOnlyKeys = new Set(["id", "path", "source", "src", "width", "height", "kind", "category", "group", "layout", "googleAdsId", "ga4MeasurementId"]);
+const readOnlyKeys = new Set(["id", "path", "source", "src", "width", "height", "kind", "category", "categories", "group", "layout", "googleAdsId", "ga4MeasurementId"]);
 
 export function isReadOnly(key: string | undefined): boolean {
   return key !== undefined && readOnlyKeys.has(key);

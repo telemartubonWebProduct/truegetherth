@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ZodType } from "zod";
 
 import { documentSchema, isCollectionDocument, readDocument, type DocumentId } from "@/lib/content/documents";
 import { parseDocument, validateDraft, type FieldIssue } from "@/lib/content/draft-model";
 import { bindingPath, decodeBinding, diffPaths, encodeBinding, getAt } from "@/lib/content/paths";
+import { formatNumber } from "@/lib/content/render";
 import type { CatalogPackage, SiteContent } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
 
@@ -35,7 +37,6 @@ import {
 import { documentLabel, fieldLabel, itemLabel, pageLabels, pathLabel, valueLabel } from "./labels";
 import { arrayBounds, moveItem, newItem, removeItem } from "./list-edit";
 import { defOf, enumOptions, fieldKind, isReadOnly, objectFields, schemaAt, unwrap, type FieldKind } from "./schema-walk";
-import { CatalogManager } from "./CatalogManager";
 import { benefitUsage, mediaUsage, packagePages } from "./usage";
 
 // The side panel of the Mirror editor. It shows the object that holds the
@@ -516,14 +517,29 @@ export function FieldPanel({ state, store, published, selection, onSelect, local
     );
   }
 
-  if (documentId === "catalog") {
+  // Packages, benefits and their order are managed on "Packages and promos",
+  // not here: this panel says what the thing is and leads there.
+  const [kind, key] = documentId.split(":");
+  if (documentId === "catalog" || kind === "package" || kind === "benefit") {
+    const item = kind === "package" ? (body as CatalogPackage) : null;
     return (
-      <div ref={panelRef} className="grid gap-4">
-        <div className="border-b border-tm-line pb-3">
+      <div ref={panelRef} className="grid gap-3">
+        <div className="grid gap-2 border-b border-tm-line pb-3">
           <h2 className="text-tm-h4 font-semibold">{documentLabel(state.content, documentId)}</h2>
-          <p className={`text-tm-caption ${statusLine(meta).tone}`}>{statusLine(meta).text}</p>
+          {item ? (
+            <p className="text-tm-small">
+              <span className="tm-num font-semibold">{formatNumber(item.price.amount, "th")} บาท</span> · {valueLabel(item.review.status)}
+            </p>
+          ) : null}
+          <DocumentNotes content={state.content} documentId={documentId} />
+          <p className={`text-tm-caption font-medium ${statusLine(meta).tone}`} data-doc-status={meta.status}>
+            {statusLine(meta).text}
+          </p>
         </div>
-        <CatalogManager content={state.content} published={published} store={store} onSelect={onSelect} />
+        <p className="text-tm-small text-tm-muted">แพ็กเกจ ราคา สิทธิประโยชน์ กลุ่ม และโปรแนะนำหน้าแรก แก้ที่หน้า “แพ็กเกจและโปร” หน้านี้แก้เฉพาะข้อความและรูปของหน้าเว็บ</p>
+        <Link href={item ? `/admin/catalog?package=${encodeURIComponent(key)}` : "/admin/catalog"} onClick={() => store.flushAll()} className={`${smallButton} justify-self-start border-tm-ink bg-tm-ink text-tm-on-ink`}>
+          {item ? "แก้แพ็กเกจนี้ในหน้าแพ็กเกจและโปร" : "ไปหน้าแพ็กเกจและโปร"}
+        </Link>
       </div>
     );
   }
