@@ -22,9 +22,10 @@ import { contentProblems } from "./validate";
  * figures over (a release naming the router's still would get them too). 8:
  * the catalog says which packages are recommended on the home page (its tabs
  * name categories instead of listing cards), and a package can say from which
- * day and until which day it shows.
+ * day and until which day it shows. 9: the site's words gained the mark that
+ * a recommended package's card carries.
  */
-export const CONTENT_SCHEMA_VERSION = 8;
+export const CONTENT_SCHEMA_VERSION = 9;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
 

@@ -903,17 +903,53 @@ html[data-motion] .rail-track::after {
   transform: scale(1.06);
 }
 
-.card-speed {
+/* What the package gives, over the foot of its picture, on a shade that belongs to the picture. */
+.card-plate::after {
+  content: "";
   position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: #ffffff;
-  font-family: var(--font-inter), sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 11, 12, 0) 38%, rgba(11, 11, 12, 0.7));
+  pointer-events: none;
+}
+
+.card-figure {
+  position: absolute;
+  z-index: 1;
+  right: 14px;
+  bottom: 12px;
+  left: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 6px;
+  color: #ffffff;
+}
+
+.card-figure .num {
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.card-figure-unit {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+/* Not a speed but a phrase ("60 GB of data"): two lines at most. */
+.card-figure-text {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card-perks {
+  margin-top: 8px;
 }
 
 .card-body {
@@ -1855,6 +1891,31 @@ html[data-motion] .card-body {
   html[data-motion] .rail-controls {
     align-items: flex-start;
     width: 100%;
+  }
+}
+
+/* A short phone: the picture has little room left, so the row of benefit
+   pictures goes (the package's own page lists them) and the figure over the
+   picture is set smaller. */
+@media (max-width: 767px) and (max-height: 700px) {
+  html[data-motion] .card-perks {
+    display: none;
+  }
+
+  html[data-motion] .card-plate {
+    min-height: 52px;
+  }
+
+  html[data-motion] .card-plate::after {
+    background: linear-gradient(180deg, rgba(11, 11, 12, 0.3), rgba(11, 11, 12, 0.72));
+  }
+
+  html[data-motion] .card-figure {
+    bottom: 8px;
+  }
+
+  html[data-motion] .card-figure .num {
+    font-size: 24px;
   }
 }
 

@@ -211,6 +211,7 @@ export const site: SiteSettings = {
     opensInNewTab: t("เปิดในแท็บใหม่", "opens in a new tab"),
     footerContact: t("ติดต่อ", "Contact"),
     packageDetails: t("ดูรายละเอียด", "See details"),
+    recommended: t("แนะนำ", "Recommended"),
     findPackage: t("ค้นหาแพ็กเกจ", "Find a package"),
     filterSpeed: t("ความเร็ว", "Speed"),
     filterPrice: t("ราคาไม่เกิน", "Price up to"),

@@ -59,6 +59,27 @@ test("speed, price and benefit filters leave only matching packages, and clear a
   await expect.poll(() => visibleCards(page)).toEqual(broadband.filter((item) => item.benefits.includes(benefit)).map((item) => item.id));
 });
 
+test("a card leads with what the package gives, marks the recommended, and shows each benefit with its picture", async ({ page }) => {
+  const recommended = broadband.find((item) => content.featured.includes(item.id) && item.benefits.length > 0)!;
+  const plain = broadband.find((item) => !content.featured.includes(item.id))!;
+  await page.goto("/broadband");
+  const card = page.locator(`[data-package="${recommended.id}"]`);
+  const speed = recommended.speed!;
+  await expect(card.locator('[data-row="figure"]')).toContainText(`${formatNumber(speed.download.value, "th")}/${formatNumber(speed.upload.value, "th")}`);
+  await expect(card.locator(".tm-slip-mark")).toHaveText(ui.recommended.th);
+  await expect(page.locator(`[data-package="${plain.id}"] .tm-slip-mark`)).toHaveCount(0);
+  // The price is on the stub, below everything the package lists.
+  await expect(card.locator('[data-row="stub"]')).toContainText(formatNumber(recommended.price.amount, "th"));
+
+  const benefits = card.locator('[data-row="benefits"] li');
+  await expect(benefits).toHaveText(recommended.benefits.map((id) => content.benefits[id].label.th));
+  await benefits.last().scrollIntoViewIfNeeded();
+  // Every one has its picture, and the picture arrived.
+  await expect
+    .poll(() => benefits.evaluateAll((items) => items.map((item) => item.querySelector("img")?.naturalWidth ?? 0).every((width) => width > 0)))
+    .toBe(true);
+});
+
 test("sorting reorders the cards on screen", async ({ page }) => {
   await page.goto("/broadband");
   await page.getByLabel(ui.sortBy.th).selectOption("price-low");

@@ -83,7 +83,7 @@ function OptionalText({ label, value, onChange, issues }: { label: string; value
   );
 }
 
-/** The card as the home page shows a recommended package, small. */
+/** The card as the home page shows a recommended package, small: the figure over the picture, then what comes with it. */
 function CardPreview({ content, item }: { content: SiteContent; item: CatalogPackage }) {
   const image = item.image ? content.media[item.image] : undefined;
   const { ui } = content.site;
@@ -92,11 +92,29 @@ function CardPreview({ content, item }: { content: SiteContent; item: CatalogPac
     <div className="max-w-[20rem] overflow-hidden rounded-tm-panel border border-tm-line bg-tm-canvas" role="group" aria-label="ตัวอย่างการ์ดที่ลูกค้าเห็น">
       <div className="relative aspect-[16/9] bg-tm-surface">
         {image ? <Image src={image.src} alt="" fill sizes="320px" className="object-cover" /> : <p className="absolute inset-0 grid place-items-center text-tm-caption text-tm-muted">ยังไม่มีรูป</p>}
-        {speed ? <span className="absolute left-3 top-3 rounded-tm-pill bg-tm-canvas px-2.5 py-1 text-tm-caption font-semibold">{speed}</span> : null}
+        {image && (speed || item.allowance) ? <span className="absolute inset-0 bg-gradient-to-b from-transparent from-40% to-black/70" aria-hidden="true" /> : null}
+        {speed ? (
+          <span className={`tm-num absolute bottom-2.5 left-3.5 text-[1.75rem] font-light leading-none tracking-tight ${image ? "text-white" : ""}`}>{speed}</span>
+        ) : item.allowance ? (
+          <span className={`absolute bottom-2.5 left-3.5 right-3.5 line-clamp-2 text-tm-small font-medium ${image ? "text-white" : ""}`}>{item.allowance.th}</span>
+        ) : null}
       </div>
       <div className="grid gap-1 p-4">
         <p className="font-medium">{item.name.th || "ยังไม่มีชื่อ"}</p>
-        <p className="text-tm-caption text-tm-muted">{[item.allowance?.th, item.contract ? `${ui.contract.th} ${item.contract.th}` : item.validity ? `${ui.validity.th} ${item.validity.th}` : null].filter(Boolean).join(" · ")}</p>
+        <p className="text-tm-caption text-tm-muted">{item.contract ? `${ui.contract.th} ${item.contract.th}` : item.validity ? `${ui.validity.th} ${item.validity.th}` : ""}</p>
+        {item.benefits.length > 0 ? (
+          <ul className="mt-1 flex gap-1.5" aria-label="สิทธิประโยชน์">
+            {item.benefits.slice(0, 4).map((id) => {
+              const icon = content.media[content.benefits[id]?.icon ?? ""];
+              return (
+                <li key={id} className="grid size-8 place-items-center overflow-hidden rounded-[0.625rem] border border-tm-line bg-white p-1" title={content.benefits[id]?.label.th}>
+                  {icon ? <Image src={icon.src} width={icon.width} height={icon.height} alt={content.benefits[id]?.label.th ?? ""} sizes="32px" className="size-full object-contain" /> : null}
+                </li>
+              );
+            })}
+            {item.benefits.length > 4 ? <li className="tm-num grid h-8 min-w-8 place-items-center rounded-[0.625rem] bg-tm-surface px-1.5 text-tm-caption font-semibold text-tm-muted">+{item.benefits.length - 4}</li> : null}
+          </ul>
+        ) : null}
         <p className="mt-1">
           <span className="tm-num text-tm-h3 font-light text-tm-red">{formatNumber(item.price.amount, "th")}</span>{" "}
           <span className="text-tm-caption">{(item.price.per === "month" ? ui.perMonth : ui.baht).th}</span>

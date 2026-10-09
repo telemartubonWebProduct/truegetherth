@@ -75,7 +75,7 @@ Not checked: a real phone; the dev Supabase project (no sign-in here); pgTAP (no
 
 ## 7. Left open
 
-- **The public cards.** The owner asked for better-looking promo cards. This change keeps the cards as they were. `design/cards/proposals.html` (open it in a browser) shows three directions on real packages, with the prices the catalog has: A, a slip led by the figure, needing no picture; B, a picture plate with the figure over it; C, one row per package. 77 of the 99 packages have no picture, which is why A and C exist. Nothing is built until the owner chooses. The "until" tag in it is an example of what a package with an end day could show; no package has one yet.
+- **The public cards.** The owner asked for better-looking promo cards. This change keeps the cards as they were. `design/cards/proposals.html` (open it in a browser) shows three directions on real packages, with the prices the catalog has: A, a slip led by the figure, needing no picture; B, a picture plate with the figure over it; C, one row per package. 77 of the 99 packages have no picture, which is why A and C exist. The owner chose A and B together; `R8-PROMO-CARDS.md` is what was built. The "until" tag in the proposals is an example of what a package with an end day could show; no package has one yet, and it is not built.
 - **An exact hour** for a promo to start or end (§4) would need the pages rebuilt on a schedule; that is a Vercel setting, the owner's to decide.
 - **A package's address cannot be renamed** once made. To change it: copy the package under the new name and remove the old one (the old address then answers "not found").
 - The catalog's categories are fixed (decision 1). A sixth would be a new page of the site: its route, its page document, its menu entry.

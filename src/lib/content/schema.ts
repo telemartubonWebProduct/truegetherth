@@ -209,6 +209,7 @@ export const uiKeys = [
   "opensInNewTab",
   "footerContact",
   "packageDetails",
+  "recommended",
   "findPackage",
   "filterSpeed",
   "filterPrice",

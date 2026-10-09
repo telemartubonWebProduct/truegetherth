@@ -7,7 +7,7 @@ import type { CatalogPackage, HomePage } from "@/lib/content/schema";
 
 import type { RenderContext } from "../context";
 import { CtaLink, TargetLink } from "../links";
-import { speedText } from "../PackageCompare";
+import { BenefitList, speedText } from "../PackageCompare";
 import CountUp from "./CountUp";
 import { Hero } from "./Hero";
 import { heroArt } from "./hero-art";
@@ -370,7 +370,7 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
   );
 }
 
-/** One recommended package: its picture, what it gives, its price as the catalog has it, and how to ask for it. */
+/** One recommended package: its picture with what it gives over it, what comes with it, its price as the catalog has it, and how to ask for it. */
 function PackageCard({ ctx, tab, item, index }: { ctx: RenderContext; tab: Tab; item: CatalogPackage; index: number }) {
   const { ui } = ctx.site;
   // A recommended package always has a picture (ctx.featured leaves out the ones without).
@@ -390,10 +390,15 @@ function PackageCard({ ctx, tab, item, index }: { ctx: RenderContext; tab: Tab; 
           {...own("image")}
         />
         {speed ? (
-          <span className="card-speed" {...own("speed")}>
+          <p className="card-figure" {...own("speed")}>
             <span className="sr-only">{ctx.t(ui.speed)} </span>
-            {speed.figure} {speed.unit}
-          </span>
+            <span className="num">{speed.figure}</span>
+            <span className="card-figure-unit">{speed.unit}</span>
+          </p>
+        ) : item.allowance ? (
+          <p className="card-figure card-figure-text" {...own("allowance")}>
+            {ctx.t(item.allowance)}
+          </p>
         ) : null}
       </div>
       <div className="card-body">
@@ -401,13 +406,13 @@ function PackageCard({ ctx, tab, item, index }: { ctx: RenderContext; tab: Tab; 
           {ctx.t(item.name)}
         </h3>
         <p className="card-meta">
-          {item.allowance && !speed ? <span {...own("allowance")}>{ctx.t(item.allowance)}</span> : null}
           {term ? (
             <span {...own(item.contract ? "contract" : "validity")}>
               {ctx.t(item.contract ? ui.contract : ui.validity)} {ctx.t(term)}
             </span>
           ) : null}
         </p>
+        {item.benefits.length > 0 ? <BenefitList ctx={ctx} ids={item.benefits} dense className="card-perks" /> : null}
         <p className="card-price" {...own("price")}>
           <CountUp to={item.price.amount} separator="," className="num" duration={1.4} />
           <span className="card-unit">{ctx.t(item.price.per === "month" ? ui.perMonth : ui.baht)}</span>

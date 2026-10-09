@@ -240,6 +240,7 @@ const contextLabels: Record<string, string> = {
   "ui.opensInNewTab": "คำบอกว่าเปิดแท็บใหม่ (โปรแกรมอ่านหน้าจอ)",
   "ui.footerContact": "หัวข้อ ติดต่อ ในส่วนท้าย",
   "ui.packageDetails": "ลิงก์ ดูรายละเอียด บนการ์ดโปร",
+  "ui.recommended": "ป้าย แนะนำ บนการ์ดของแพ็กเกจที่แนะนำในหน้าแรก",
   "hero.heading": "หัวเรื่อง (ทีละบรรทัด)",
   "slip.title": "ชื่อบนใบ",
   "slip.service": "บรรทัด บริการ",

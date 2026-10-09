@@ -271,6 +271,17 @@ test("the counted prices land on the catalog's own numbers", async ({ page }) =>
   await expect.poll(() => page.locator("#prices .col-price .num").allTextContents(), { timeout: 8000 }).toEqual(listed.map((item) => item.price.amount.toLocaleString("en-US")));
 });
 
+test("a card shows what its package gives over its picture, and a picture for each benefit", async ({ page }) => {
+  await open(page);
+  await scrub(page, "rail", 0);
+  const [first] = cardsOf(0);
+  const card = page.locator(`[data-rail-panel]:not([hidden]) [data-package="${first.id}"]`);
+  await expect(card.locator(".card-figure")).toContainText(`${first.speed!.download.value}/${first.speed!.upload.value}`);
+  await expect(card.locator(".card-perks .tm-benefit-tile img")).toHaveCount(first.benefits.length);
+  // Only the pictures show, but every benefit is named for a screen reader.
+  await expect(card.getByRole("list", { name: content.site.ui.benefits.th }).getByRole("listitem")).toHaveText(first.benefits.map((id) => content.benefits[id].label.th));
+});
+
 test("each tab shows its own row of packages, and that row is the one that walks", async ({ page }) => {
   await open(page);
   await scrub(page, "rail", 0);
