@@ -59,9 +59,17 @@ export function BenefitList({ ctx, ids, dense = false, className = "" }: { ctx: 
     <ul role="list" className={`tm-benefits ${className}`.trim()} data-dense={dense ? "" : undefined} aria-label={dense ? ctx.t(ctx.site.ui.benefits) : undefined}>
       {ids.map((id, index) => {
         const benefit = ctx.benefit(id);
+        // Past the tiles that show, only the name is kept, for screen readers: a picture nobody sees is never fetched.
+        if (index >= shown) {
+          return (
+            <li key={id} className="sr-only">
+              {ctx.t(benefit.label)}
+            </li>
+          );
+        }
         const icon = ctx.media(benefit.icon);
         return (
-          <li key={id} className={index >= shown ? "sr-only" : undefined} {...ctx.bind(`benefit:${id}`)}>
+          <li key={id} {...ctx.bind(`benefit:${id}`)}>
             <span className="tm-benefit-tile">
               <Image src={icon.src} width={icon.width} height={icon.height} alt="" sizes="48px" />
             </span>

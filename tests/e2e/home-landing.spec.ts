@@ -277,7 +277,7 @@ test("a card shows what its package gives over its picture, and a picture for ea
   const [first] = cardsOf(0);
   const card = page.locator(`[data-rail-panel]:not([hidden]) [data-package="${first.id}"]`);
   await expect(card.locator(".card-figure")).toContainText(`${first.speed!.download.value}/${first.speed!.upload.value}`);
-  await expect(card.locator(".card-perks .tm-benefit-tile img")).toHaveCount(first.benefits.length);
+  await expect(card.locator(".card-perks .tm-benefit-tile img")).toHaveCount(Math.min(first.benefits.length, 4));
   // Only the pictures show, but every benefit is named for a screen reader.
   await expect(card.getByRole("list", { name: content.site.ui.benefits.th }).getByRole("listitem")).toHaveText(first.benefits.map((id) => content.benefits[id].label.th));
 });
