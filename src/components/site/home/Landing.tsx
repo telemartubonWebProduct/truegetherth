@@ -40,7 +40,7 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
   const { ui } = ctx.site;
   const { hero, manifesto, promos, steps, services, prices, faq } = home;
   const bind = (...path: (string | number)[]) => ctx.bind(doc, ...path);
-  const still = ctx.media(hero.visual);
+  const picture = ctx.media(hero.visual);
 
   // The slip's lines at each of its five moments: before any step, and after each of the four.
   const { slip } = steps;
@@ -94,10 +94,9 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
                   </p>
                 </>
               ),
-              still: { src: still.src, width: still.width, height: still.height, alt: ctx.t(still.alt), bind: bind("hero", "visual") },
+              picture: { src: picture.src, width: picture.width, height: picture.height, alt: ctx.t(picture.alt), bind: bind("hero", "visual") },
               art: heroArt,
               next: { href: "#manifesto", label: ctx.t(manifesto.label) },
-              backdrop: ctx.site.theme.surface,
             }}
           />
         </div>

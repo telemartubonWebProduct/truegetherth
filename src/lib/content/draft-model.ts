@@ -17,9 +17,11 @@ import { contentProblems } from "./validate";
  * landing (hero with the 3D router, manifesto, package rail, the slip of
  * steps, services, a price table), the film is gone, and the theme turned
  * black and white. 6: Tawk live chat is gone, with its script in the site's
- * integrations and its group in the cookie banner.
+ * integrations and its group in the cookie banner. 7: the home page's opening
+ * is a painting in layers: hero.visual names its sky, which the page lays the
+ * figures over (a release naming the router's still would get them too).
  */
-export const CONTENT_SCHEMA_VERSION = 6;
+export const CONTENT_SCHEMA_VERSION = 7;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
 

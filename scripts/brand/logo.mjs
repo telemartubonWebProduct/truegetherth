@@ -119,7 +119,7 @@ const share = await browser.newPage({ viewport: { width: 1200, height: 630 }, de
 await share.setContent(
   `<!doctype html><html><body style="margin:0">
 <div style="position:relative;width:1200px;height:630px;background:${SURFACE};overflow:hidden">
-  <img src="${dataUri("public/media/hero-v3/poster-2560.webp", "image/webp")}" style="position:absolute;right:-70px;top:-74px;height:780px">
+  <img src="${dataUri("design/hero/router/poster-v3.webp", "image/webp")}" style="position:absolute;right:-70px;top:-74px;height:780px">
   <div style="position:absolute;inset:0;background:linear-gradient(to right,${SURFACE} 0%,rgba(244,244,246,0.86) 30%,rgba(244,244,246,0) 58%)"></div>
   <img src="data:image/png;base64,${logo.toString("base64")}" style="position:absolute;left:72px;top:72px;height:54px">
   <div style="position:absolute;left:72px;top:156px;width:96px;height:3px;background:${RED}"></div>

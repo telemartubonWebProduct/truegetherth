@@ -403,8 +403,8 @@ test("the preview is the public page, pixel for pixel", async ({ browser, baseUR
   // Six full-page shots of long pages and three comparisons take about half
   // the default timeout.
   test.setTimeout(60_000);
-  // Reduced motion lays the home page's stages flat and keeps the 3D router on
-  // its still in both, so the shots are stable.
+  // Reduced motion lays the home page's stages flat and holds the painting
+  // still in both, so the shots are stable.
   const context = await browser.newContext({ locale: "th-TH", viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
   await blockThirdParty(context, baseURL!);
   const page = await context.newPage();

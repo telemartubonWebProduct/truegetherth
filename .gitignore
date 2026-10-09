@@ -52,3 +52,6 @@ next-env.d.ts
 
 # screenshots taken for review: scripts/media/shots.mjs
 /shots/
+
+# The generator's own PNGs of the hero drafts: the .jpg copies beside them are the ones kept.
+design/hero/tableau/drafts/*.png

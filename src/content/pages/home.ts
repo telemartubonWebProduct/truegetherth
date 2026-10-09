@@ -14,8 +14,8 @@ const interested = (id: string): Cta => ({
   style: "primary",
 });
 
-// The home page (docs/renovation/R5-LANDING.md): the opening with the router
-// and the robot arm, then five sections the scroll moves through, a price
+// The home page (docs/renovation/R5-LANDING.md): the opening, an oil painting
+// in layers, then five sections the scroll moves through, a price
 // table and the questions. The copy is the old site's, as the owner had it;
 // it is draft copy for the owner to edit in the back office.
 export const home: HomePage = {
@@ -48,8 +48,8 @@ export const home: HomePage = {
       { id: "hero-tag-mobile", label: t("เน็ตมือถือ", "Mobile"), target: page("/monthy") },
       { id: "hero-tag-solar", label: t("โซลาร์เซลล์", "Solar"), target: page("/wEnergy") },
     ],
-    visual: "hero-router-still",
-    visualNote: t("ภาพจำลอง 3 มิติและภาพประกอบจาก AI ไม่ใช่ภาพถ่ายอุปกรณ์จริง", "3D model and AI illustration, not a photograph of the actual equipment"),
+    visual: "hero-tableau-sky",
+    visualNote: t("ภาพประกอบสร้างด้วย AI ไม่ใช่ภาพถ่ายอุปกรณ์จริง", "AI-generated illustration, not a photograph of the actual equipment"),
   },
   manifesto: {
     label: t("เครือข่าย", "The network"),

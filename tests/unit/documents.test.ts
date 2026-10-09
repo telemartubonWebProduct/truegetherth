@@ -12,7 +12,7 @@ describe("content documents", () => {
     expect(ids).toContain("site");
     expect(ids).toContain("page:home");
     expect(ids).toContain("package:fiber-500-499");
-    expect(ids).toContain("media:hero-router-still");
+    expect(ids).toContain("media:hero-tableau-sky");
     expect(ids).toContain("catalog");
     expect(ids.length).toBe(2 + 9 + content.catalog.length + Object.keys(content.media).length + Object.keys(content.benefits).length);
     for (const id of ids) {

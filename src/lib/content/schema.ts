@@ -407,7 +407,7 @@ export const homePage = z.strictObject({
   id: z.literal("home"),
   path: z.literal("/"),
   seo,
-  /** The opening screen: the router drawn live in 3D, and a robot arm that reaches in to touch it. */
+  /** The opening screen: an oil painting in layers, a goddess lifting the router among figures that drift a little. */
   hero: z.strictObject({
     /** Small line over the heading. */
     eyebrow: localizedText,
@@ -417,9 +417,9 @@ export const homePage = z.strictObject({
     secondaryCta: cta,
     /** Pills beside the heading: what the business offers, each a link. */
     tags: z.array(link).max(4),
-    /** The router as a still picture: shown first, and instead of the live scene where nothing may move. */
+    /** The painting's sky; the page lays the figures over it. Its description is of the whole picture. */
     visual: mediaRef,
-    /** Visible line by the picture, such as "3D model, not a photograph". */
+    /** Visible line by the picture, such as "AI-generated illustration, not a photograph". */
     visualNote: localizedText,
   }),
   /** One sentence that fills with ink as visitors scroll. */

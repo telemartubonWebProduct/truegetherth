@@ -35,11 +35,9 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      // The home page's picture (the router's still and the robot arm) and the
-      // router's model with its baked shading. A new version goes in a new
-      // folder or name (hero-v4, router-v2), so visitors can keep these a week.
+      // The home page's picture (the painting's sky and its cut-out figures). A
+      // new version goes in a new folder (hero-v5), so visitors can keep these a week.
       { source: "/media/:cut(hero-v\\d+)/:path*", headers: week },
-      { source: "/models/:path*", headers: week },
     ];
   },
   async redirects() {
