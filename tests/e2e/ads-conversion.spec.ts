@@ -3,19 +3,20 @@ import { expect, test, type Page } from "@playwright/test";
 import { content } from "@/lib/content";
 import { siteUrl } from "@/lib/seo/metadata";
 
-import { consentState, everything } from "./support/consent";
+import { consentState, everything, necessaryOnly } from "./support/consent";
 import { blockThirdParty, serveAt, settle } from "./support/network";
 
-// The home page reports one Google Ads conversion each time it opens on the
-// production domain, as the old site did (commit 9b768a6); previews and
-// development machines report none. Since M5 the tags load only after the
-// visitor agrees to them (consent.spec.ts covers refusing); here the visitor
-// agreed to everything. The server under test is served at the production
+// A Google Ads conversion is a visitor asking to be contacted: a click on LINE
+// or on a phone number (here), or a sent call-back form (leads.spec.ts, which
+// needs the local database). Opening a page is not one. It counts on the
+// production domain only, and only after the visitor agreed to advertising
+// cookies (consent.spec.ts covers refusing); previews and development
+// machines report none. The server under test is served at the production
 // origin, and requests to Google are blocked, so the calls are read from the
 // tag's queue (window.dataLayer) that gtag.js sends.
 // The editor and its preview are covered in admin-editor.spec.ts.
 
-const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
+const { googleAdsId, googleAdsLeadConversion } = content.site.integrations;
 const production = siteUrl().origin;
 
 test.use({ storageState: consentState(everything) });
@@ -47,49 +48,61 @@ async function tagConfigured(page: Page) {
   await settle(page);
 }
 
-for (const path of ["/", "/en"]) {
-  test(`opening ${path} on the production domain reports one conversion, after the tag is configured`, async ({ page }) => {
-    await page.goto(`${production}${path}`);
-    await tagConfigured(page);
-    const calls = await gtagCalls(page);
-    expect(await conversions(page)).toEqual([["event", "conversion", { send_to: googleAdsHomeConversion, value: 1, currency: "THB" }]]);
-    const configAt = calls.findIndex(([command]) => command === "config");
-    const conversionAt = calls.findIndex(([command, name]) => command === "event" && name === "conversion");
-    expect(conversionAt).toBeGreaterThan(configAt);
-
-    // A reload opens the page again.
-    await page.reload();
-    await tagConfigured(page);
-    expect(await conversions(page)).toHaveLength(1);
+/** Clicks a contact link of the footer without leaving the page: the site's own listener hears the click first. */
+async function clickContact(page: Page, cta: string) {
+  await page.locator(`footer a[data-cta="${cta}"]`).first().evaluate((link) => {
+    link.addEventListener("click", (event) => event.preventDefault(), { once: true });
+    (link as HTMLAnchorElement).click();
   });
 }
 
-test("other pages report none, and going home from them counts once", async ({ page }) => {
-  for (const path of ["/broadband", "/en/monthy", "/wEnergy"]) {
-    await page.goto(`${production}${path}`);
-    await tagConfigured(page);
-    expect(await conversions(page), path).toEqual([]);
-  }
-
-  // The logo goes home without reloading the document (client-side navigation).
-  await page.goto(`${production}/broadband`);
-  await tagConfigured(page);
-  await page.evaluate(() => Object.assign(window, { sameDocument: true }));
-  await page.getByRole("banner").getByRole("link").first().click();
-  await expect(page).toHaveURL(`${production}/`);
-  await expect.poll(async () => (await conversions(page)).length).toBe(1);
-  await settle(page);
-  expect(await conversions(page)).toHaveLength(1);
-  expect(await page.evaluate(() => "sameDocument" in window)).toBe(true);
+test("the site names its own domain as the production domain", () => {
+  expect(production).toBe("https://www.truegetherth.com");
 });
 
-test("elsewhere, such as a preview deployment, the home page reports none", async ({ page }) => {
-  for (const path of ["/", "/en"]) {
-    await page.goto(path);
+for (const path of ["/", "/en", "/broadband"]) {
+  test(`opening ${path} on the production domain reports no conversion`, async ({ page }) => {
+    await page.goto(`${production}${path}`);
     await tagConfigured(page);
-    expect(new URL(page.url()).origin).not.toBe(production);
-    expect(await conversions(page), path).toEqual([]);
-  }
+    expect(await conversions(page)).toEqual([]);
+  });
+}
+
+test("a click on LINE or on a phone number is one conversion each, after the tag is configured", async ({ page }) => {
+  await page.goto(`${production}/broadband`);
+  await tagConfigured(page);
+
+  await clickContact(page, "footer-line");
+  expect(await conversions(page)).toEqual([["event", "conversion", { send_to: googleAdsLeadConversion }]]);
+  await clickContact(page, "footer-call");
+  expect(await conversions(page)).toHaveLength(2);
+
+  // E-mail and Facebook are contact events in Analytics, but not conversions.
+  await clickContact(page, "footer-email");
+  await clickContact(page, "footer-facebook");
+  expect(await conversions(page)).toHaveLength(2);
+  const events = (await gtagCalls(page)).filter(([command]) => command === "event").map(([, name]) => name);
+  expect(events).toEqual(["contact_line", "conversion", "contact_phone", "conversion", "contact_email", "contact_facebook"]);
+});
+
+test("elsewhere, such as a preview deployment, a click reports none", async ({ page }) => {
+  await page.goto("/broadband");
+  await tagConfigured(page);
+  expect(new URL(page.url()).origin).not.toBe(production);
+  await clickContact(page, "footer-line");
+  await clickContact(page, "footer-call");
+  expect(await conversions(page)).toEqual([]);
+});
+
+test.describe("without advertising cookies", () => {
+  test.use({ storageState: consentState(necessaryOnly) });
+
+  test("a click reports nothing at all", async ({ page }) => {
+    await page.goto(`${production}/broadband`);
+    await settle(page);
+    await clickContact(page, "footer-line");
+    expect(await gtagCalls(page)).toEqual([]);
+  });
 });
 
 test("Google Analytics 4 counts the production domain only", async ({ page }) => {

@@ -324,6 +324,12 @@ export const siteSettings = z.strictObject({
     ),
     email: z.email(),
     facebook: httpsUrl,
+    /** Where the company's head office is, in a few words (no street address is published). */
+    office: localizedText,
+    /** A map of the head office. */
+    mapUrl: httpsUrl,
+    /** When the team answers. */
+    hours: localizedText,
   }),
   navigation: z.array(navItem),
   headerCta: cta,
@@ -339,21 +345,21 @@ export const siteSettings = z.strictObject({
   seo: z.strictObject({ siteName: localizedText, description: localizedText, image: mediaRef }),
   /** Brand colours; every text/background pair must keep 4.5:1. */
   theme,
-  /** Third-party tags. The editor shows only the home conversion as editable (src/components/editor/schema-walk.ts). */
+  /** Third-party tags. The editor shows only the lead conversion as editable (src/components/editor/schema-walk.ts). */
   integrations: z
     .strictObject({
       googleAdsId: z.string().regex(/^AW-[0-9]+$/),
       /** Google Analytics 4 web stream; reports count the production domain only. */
       ga4MeasurementId: z.string().regex(/^G-[A-Z0-9]+$/).optional(),
-      /** Google Ads `send_to` of the conversion counted each time the home page opens (as on the old site). */
-      googleAdsHomeConversion: z.string().regex(adsConversionPattern, "ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"),
+      /** Google Ads `send_to` of the conversion counted when a visitor asks to be contacted: a sent call-back form, or a click on LINE or a phone number. */
+      googleAdsLeadConversion: z.string().regex(adsConversionPattern, "ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"),
     })
     .superRefine((value, context) => {
       // The tag only configures googleAdsId, so a conversion of another account would go nowhere.
       // Zod runs this after field errors too; a malformed value already has its message.
-      const account = adsConversionPattern.exec(String(value.googleAdsHomeConversion))?.[1];
+      const account = adsConversionPattern.exec(String(value.googleAdsLeadConversion))?.[1];
       if (account === undefined || account === value.googleAdsId) return;
-      context.addIssue({ code: "custom", path: ["googleAdsHomeConversion"], message: `ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${value.googleAdsId}/…)` });
+      context.addIssue({ code: "custom", path: ["googleAdsLeadConversion"], message: `ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${value.googleAdsId}/…)` });
     }),
 });
 export type SiteSettings = z.infer<typeof siteSettings>;

@@ -1,12 +1,9 @@
 "use client";
 
 import { ArrowDown } from "lucide-react";
-import { motion, MotionConfig } from "motion/react";
 import { type CSSProperties, type ReactNode, useEffect, useRef } from "react";
 
 import type { Files, HeroLayer, HeroPack, HeroTableau } from "./hero-art";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 /** Marks an element as the view of one content field in the Mirror editor; empty on the public site. */
 type Binding = { "data-edit"?: string };
@@ -34,6 +31,29 @@ type Variables = CSSProperties & Record<`--${string}`, string | number>;
 const percent = (share: number) => `${(share * 100).toFixed(2)}%`;
 const srcSet = (files: Files) => files.map((file) => `${file.src} ${file.width}w`).join(", ");
 
+/**
+ * How wide a layer's picture is drawn, for the browser to choose a file by.
+ * The wide arrangement may be wider than the screen. The tall one is at most
+ * as wide as the screen, a little less on most phones; said exactly, a phone
+ * takes the smaller file of each figure instead of missing it by a few pixels.
+ * The cloud bank, wider than the picture and soft, does not need the larger
+ * file on an ordinary phone.
+ */
+const layerSizes = (layer: HeroLayer, pack: "wide" | "tall") => `${Math.ceil(layer.w * (pack === "wide" ? 125 : layer.w > 1 ? 75 : 96))}vw`;
+
+/**
+ * Asks for the largest figure of an arrangement with the page itself, when the
+ * screen is the one that arrangement is for. The sky fills the screen, which a
+ * browser takes for a background, so this figure is what it times as the
+ * page's largest picture; left to lazy loading it would be found last.
+ */
+function LargestFigure({ pack, name }: { pack: HeroPack; name: "wide" | "tall" }) {
+  const figures = pack.layers.filter((layer) => layer.id !== "near-clouds");
+  if (figures.length === 0) return null;
+  const largest = figures.reduce((a, b) => (b.w * b.h > a.w * a.h ? b : a));
+  return <link rel="preload" as="image" href={largest.files[largest.files.length - 1].src} imageSrcSet={srcSet(largest.files)} imageSizes={layerSizes(largest, name)} media={name === "tall" ? TALL : `not all and ${TALL}`} fetchPriority="high" />;
+}
+
 /** One cut-out of the painting, with the signal frame hung on it. */
 function Layer({ layer, index, pack, art }: { layer: HeroLayer; index: number; pack: "wide" | "tall"; art: HeroTableau }) {
   const place: Variables = {
@@ -50,8 +70,7 @@ function Layer({ layer, index, pack, art }: { layer: HeroLayer; index: number; p
     "--delay": `${(-1.7 * index).toFixed(1)}s`,
   };
   const largest = layer.files[layer.files.length - 1];
-  // The tall arrangement fills the screen's width, the wide one may be wider than the screen.
-  const sizes = `${Math.ceil(layer.w * (pack === "tall" ? 100 : 125))}vw`;
+  const sizes = layerSizes(layer, pack);
   const frame = layer.frame;
   const box: Variables | undefined = frame && { "--bx": percent(frame.box[0]), "--by": percent(frame.box[1]), "--bw": percent(frame.box[2]), "--bh": percent(frame.box[3]) };
   return (
@@ -93,7 +112,10 @@ function Pack({ name, pack, art }: { name: "wide" | "tall"; pack: HeroPack; art:
  * (and, on any screen, as the page scrolls: the --hero-* properties, written by
  * ScrollDriver). Thin frames with a reading hang on the figures, as if the
  * router's signal had found them. In front, at the bottom: one line of
- * context, the headline and two buttons, each sliding in on its own delay.
+ * context, the headline and two buttons. The entrance is CSS (landing.css,
+ * under data-motion): the picture settles and the smaller parts rise in, while
+ * the headline, the largest thing on the screen, is there from the first
+ * paint and waits for no script.
  *
  * There are two arrangements of the same figures, wide and tall; both are in
  * the page and landing.css shows one. All of it is plain pictures in the page:
@@ -155,8 +177,10 @@ function HeroStage({ view }: { view: HeroView }) {
 
   return (
     <div className="hero" id="top">
+      <LargestFigure pack={wide} name="wide" />
+      <LargestFigure pack={tall} name="tall" />
       <div className="hero-art">
-        <motion.div className="hero-art-inner" initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.8, ease: EASE }}>
+        <div className="hero-art-inner">
           <div className="hero-scene" ref={scene} style={shapes}>
             <picture>
               <source media={TALL} srcSet={srcSet(tall.sky)} sizes="100vw" />
@@ -179,29 +203,29 @@ function HeroStage({ view }: { view: HeroView }) {
               <Pack name="tall" pack={tall} art={art} />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* The ink tone: white words and white buttons, on the painting's shade. */}
-      <motion.div className="hero-foot" data-tone="ink" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 1, ease: EASE }}>
+      <div className="hero-foot" data-tone="ink">
         <div className="hero-type">
-          <motion.p className="hero-sub" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.8, ease: EASE }}>
+          <p className="hero-sub">
             <span className="dot" aria-hidden="true" />
             <span {...view.eyebrow.bind}>{view.eyebrow.text}</span>
-          </motion.p>
-          <motion.h1 className="hero-title" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.8, ease: EASE }}>
+          </p>
+          <h1 className="hero-title">
             {view.heading.map((line, index) => (
               <span key={index} className="hero-line" {...line.bind}>
                 {line.text}{" "}
               </span>
             ))}
-          </motion.h1>
-          <motion.div className="hero-actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.8, ease: EASE }}>
+          </h1>
+          <div className="hero-actions">
             {view.actions}
-          </motion.div>
+          </div>
         </div>
         <div className="hero-side">{view.side}</div>
-      </motion.div>
+      </div>
 
       <a className="hero-scroll" href={view.next.href} aria-label={view.next.label}>
         <ArrowDown size={14} strokeWidth={2.5} aria-hidden="true" />
@@ -210,11 +234,7 @@ function HeroStage({ view }: { view: HeroView }) {
   );
 }
 
-/** The hero, with an entrance that respects "reduce motion": things still fade in, nothing slides or scales. */
+/** The hero. With "reduce motion" (no data-motion) it has no entrance: everything is simply there. */
 export function Hero({ view }: { view: HeroView }) {
-  return (
-    <MotionConfig reducedMotion="user">
-      <HeroStage view={view} />
-    </MotionConfig>
-  );
+  return <HeroStage view={view} />;
 }

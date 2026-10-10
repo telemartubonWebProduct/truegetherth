@@ -170,13 +170,13 @@ export const media = {
   },
 
   "og-image": {
-    src: "/media/og-image.png",
+    src: "/media/og-image-v2.png",
     width: 1200,
     height: 630,
     kind: "illustration",
     alt: {
-      th: "โลโก้ truegetherth กับภาพจำลองเราเตอร์ไฟเบอร์ทรู",
-      en: "The truegetherth logo with a model of a True fibre router",
+      th: "โลโก้ truegetherth บนภาพวาดสีน้ำมัน เทพธิดาชูเราเตอร์ทรูเหนือศีรษะ ท่ามกลางคิวปิดและเทพที่ถืออุปกรณ์ออนไลน์",
+      en: "The truegetherth logo over an oil painting of a goddess lifting the True router over her head, among cherubs and gods holding online devices",
     },
     source: "สร้างจากโลโก้และภาพนิ่งของเราเตอร์ (scripts/brand/logo.mjs)",
   },

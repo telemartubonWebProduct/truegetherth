@@ -5,9 +5,13 @@ import { tx } from "@/lib/content/render";
 import type { Seo, SiteContent } from "@/lib/content/schema";
 import { defaultLocale, localizePath, locales, type Locale } from "@/lib/i18n/locales";
 
-/** Public origin for canonical URLs, sitemaps and social cards. */
+/**
+ * Public origin for canonical URLs, sitemaps and social cards, and the host on
+ * which Google Analytics and the Ads conversions count. The owner's one
+ * domain since 2026-10-11 (telemartubon.com is no longer used).
+ */
 export function siteUrl(): URL {
-  return new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.telemartubon.com");
+  return new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.truegetherth.com");
 }
 
 const ogLocale: Record<Locale, string> = { th: "th_TH", en: "en_GB" };

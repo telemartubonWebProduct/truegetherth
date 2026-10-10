@@ -26,6 +26,10 @@ export const site: SiteSettings = {
     ],
     email: "Truetelemart@hotmail.com",
     facebook: "https://www.facebook.com/profile.php?id=61571963492436",
+    // The head office, its map and the hours are as the company's other site states them (truefiberhome.com, read 2026-10-11).
+    office: t("สำนักงานใหญ่ จังหวัดอุบลราชธานี", "Head office in Ubon Ratchathani"),
+    mapUrl: "https://maps.app.goo.gl/rHnXppgYGqKn9aD97",
+    hours: t("จันทร์–เสาร์ 09:00–18:00 น.", "Monday to Saturday, 9:00 to 18:00"),
   },
   navigation: [
     {
@@ -55,10 +59,10 @@ export const site: SiteSettings = {
     style: "primary",
   },
   footer: {
-    // Who runs the site, as the owner states it (2026-10-11): an official True partner, not True itself.
+    // Who runs the site, as the owner states it (2026-10-11) and as the company's other site words it: an appointed dealer and partner, not True itself.
     about: t(
-      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์อย่างเป็นทางการของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เราไม่ใช่ทรู และไม่ใช่ผู้ให้บริการเครือข่าย",
-      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an official True partner. We take applications for True home internet and arrange installation, wherever you are in Thailand. We are not True and not the network operator.",
+      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์และตัวแทนจำหน่ายที่ได้รับการแต่งตั้งอย่างเป็นทางการ (Authorized Dealer) ของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เว็บไซต์นี้ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย",
+      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed partner and Authorized Dealer of True. We take applications for True home internet and arrange installation, wherever you are in Thailand. This is not the main website of True Corporation Public Company Limited, and we are not the network operator.",
     ),
     groups: [
       {
@@ -254,6 +258,6 @@ export const site: SiteSettings = {
     googleAdsId: "AW-18007307609",
     // The owner's GA4 property (web stream tag sent 2 Oct 2026).
     ga4MeasurementId: "G-DQGCC5J4YM",
-    googleAdsHomeConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
+    googleAdsLeadConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
   },
 };

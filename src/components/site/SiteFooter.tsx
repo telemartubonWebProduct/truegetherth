@@ -124,6 +124,15 @@ export function SiteFooter({ ctx, path }: { ctx: RenderContext; path: string }) 
               </ContactLink>
             </li>
           </ul>
+          {/* Where the company is and when it answers: part of saying who runs the site. */}
+          <p className="mt-4 text-tm-small text-tm-on-ink-muted">
+            <TargetLink ctx={ctx} target={{ kind: "external", url: contact.mapUrl }} className="underline underline-offset-4 hover:text-tm-on-ink" bind={ctx.bind("site", "contact", "office")}>
+              {ctx.t(contact.office)}
+            </TargetLink>
+            <span className="mt-1 block" {...ctx.bind("site", "contact", "hours")}>
+              {ctx.t(contact.hours)}
+            </span>
+          </p>
         </section>
       </div>
 

@@ -4,13 +4,14 @@ import { notFound } from "next/navigation";
 import { renderContext } from "@/components/site/context";
 import { PackageDetailView } from "@/components/site/PackageDetailView";
 import { todayInThailand } from "@/lib/content/dates";
-import { detailPackagesIn } from "@/lib/content/lookup";
+import { detailPackagesIn, packageHomeIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 import { getPublishedContent } from "@/lib/content/published";
-import { formatNumber } from "@/lib/content/render";
+import { formatNumber, tx } from "@/lib/content/render";
 import type { CatalogPackage, SiteContent } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { breadcrumbData, jsonLd } from "@/lib/seo/structured-data";
 
 // A page per package that visitors may see (docs/renovation/R3-PACKAGE-PAGES.md).
 // The packages published at build time are prerendered; one published later
@@ -52,7 +53,20 @@ export function packageRoute(locale: Locale) {
 
   async function Page({ params }: RouteProps) {
     const content = await getPublishedContent();
-    return <PackageDetailView ctx={renderContext(content, locale)} item={packageFor(content, (await params).packageId)} />;
+    const item = packageFor(content, (await params).packageId);
+    const home = packageHomeIn(content, item);
+    // For search engines: the same way back that the page's own breadcrumb shows.
+    const trail = [
+      { name: tx(content.site.ui.homeLink, locale), path: "/" },
+      ...(home ? [{ name: tx(home.pageTitle, locale), path: home.path }] : []),
+      { name: tx(item.name, locale), path: packageDetailPath(item.id) },
+    ];
+    return (
+      <>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([breadcrumbData(trail, locale)]) }} />
+        <PackageDetailView ctx={renderContext(content, locale)} item={item} />
+      </>
+    );
   }
 
   return { generateStaticParams, generateMetadata, Page };

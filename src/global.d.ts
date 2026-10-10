@@ -4,7 +4,7 @@ declare global {
 		dataLayer?: unknown[];
 		gtag?: (...args: unknown[]) => void;
 		/** Which Google tags this page has configured. */
-		__tmTags?: { ads: boolean; analytics: boolean; ga4MeasurementId?: string };
+		__tmTags?: { ads: boolean; analytics: boolean; ga4MeasurementId?: string; leadConversion?: string };
 	}
 }
 

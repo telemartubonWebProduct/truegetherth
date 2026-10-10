@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
     // Picture uploads (8 MB at most, see media-actions.ts) plus the form's own bytes.
     serverActions: { bodySizeLimit: "9mb" },
+    // inlineCss was tried (2026-10-11) and left off: on a throttled phone it brought the first paint 0.1 s forward
+    // and added 200 to 370 ms of blocked main thread to every page measured.
   },
   images: {
     remotePatterns: supabaseUrl

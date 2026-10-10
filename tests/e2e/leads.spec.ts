@@ -206,4 +206,24 @@ test.describe("on desktop", () => {
     expect(JSON.stringify(all)).not.toContain(phone.slice(-4));
     expect(await leadsFor(phone)).toHaveLength(1);
   });
+
+  test("with advertising cookies, a stored request is one Google Ads conversion", async ({ page, context, baseURL }) => {
+    const production = siteUrl().origin;
+    await serveAt(context, baseURL!, production);
+    await context.addCookies(consentState({ analytics: false, ads: true }).cookies);
+    const phone = uniquePhone();
+    await page.goto(`${production}/service#callback`);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __tmTags?: { ads: boolean } }).__tmTags?.ads ?? false)).toBe(true);
+    await fill(page, { name: "ทดสอบ Ads", phone });
+    const events = () =>
+      page.evaluate(() =>
+        Array.from((window as unknown as { dataLayer: ArrayLike<unknown>[] }).dataLayer, (entry) => Array.from(entry)).filter(([command]) => command === "event"),
+      );
+    // Opening the page and filling the form in are not conversions.
+    expect(await events()).toEqual([]);
+    await page.locator("form[data-lead-form]").getByRole("button", { name: form.submit.th }).click();
+    await expect(sent(page)).toBeVisible();
+    expect(await events()).toEqual([["event", "conversion", { send_to: content.site.integrations.googleAdsLeadConversion }]]);
+    expect(await leadsFor(phone)).toHaveLength(1);
+  });
 });

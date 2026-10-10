@@ -27,7 +27,7 @@ export const home: HomePage = {
   },
   hero: {
     eyebrow: t("รับเรื่องจากทุกจังหวัด", "We take requests from every province"),
-    heading: [t("เลือกเน็ตบ้านที่เหมาะ", "Home internet that fits"), t("กับทุกวันของคุณ", "your every day")],
+    heading: [t("เลือกเน็ตบ้านทรูที่เหมาะ", "True home internet that fits"), t("กับทุกวันของคุณ", "your every day")],
     primaryCta: {
       id: "hero-broadband",
       label: t("ดูแพ็กเกจเน็ตบ้าน", "See home internet packages"),

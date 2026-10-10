@@ -23,9 +23,11 @@ import { contentProblems } from "./validate";
  * the catalog says which packages are recommended on the home page (its tabs
  * name categories instead of listing cards), and a package can say from which
  * day and until which day it shows. 9: the site's words gained the mark that
- * a recommended package's card carries.
+ * a recommended package's card carries. 10: the contact details gained the
+ * head office, its map and the hours, and the Google Ads conversion counts
+ * requests to be contacted, not openings of the home page.
  */
-export const CONTENT_SCHEMA_VERSION = 9;
+export const CONTENT_SCHEMA_VERSION = 10;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
 

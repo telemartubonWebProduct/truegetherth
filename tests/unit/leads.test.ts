@@ -5,7 +5,7 @@ import { contactEventFor } from "@/lib/analytics/contact-channel";
 import { content } from "@/lib/content";
 import { csvCell } from "@/lib/leads/csv";
 import { containsPattern, filterLeads, leadFilters } from "@/lib/leads/filters";
-import { fieldErrors, formValues, leadInput, normalizePhone, requestSource } from "@/lib/leads/form";
+import { checkLead, fieldErrors, formValues, leadInput, normalizePhone, requestSource } from "@/lib/leads/form";
 import { requestablePackages, serviceOf } from "@/lib/leads/packages";
 import { provinceName, provinceOptions, provinces } from "@/lib/leads/provinces";
 import { buildLeadReport, percent } from "@/lib/leads/report";
@@ -71,6 +71,24 @@ describe("the call-back form", () => {
     expect(result.success).toBe(false);
     expect(fieldErrors(result.error!)).toEqual({ name: "required", phone: "phone", province: "required", service: "required", consent: "consent", message: "tooLong" });
     for (const code of ["required", "phone", "consent", "tooLong"] as const) expect(content.site.leadForm.errors[code].th).not.toBe("");
+  });
+
+  it("gives the same answers in the browser, which checks without the schema, as on the server", () => {
+    const cases: Record<string, string>[] = [
+      valid,
+      { ...valid, name: " ", phone: "12345", province: "TH-99", service: "", consent: "", message: "ก".repeat(1001) },
+      { ...valid, name: "ก".repeat(101), phone: "", area: "ข".repeat(121), preferredTime: "midnight" },
+      { ...valid, phone: "+66 81 234 5678", area: " ".repeat(200), message: ` ${"ค".repeat(1000)} ` },
+      { ...valid, phone: "0112345678", packageId: "Not An Id", consent: "no" },
+      { ...valid, packageId: "fiber-500-499" },
+      { ...valid, packageId: "a".repeat(65) },
+      {},
+    ];
+    for (const entry of cases) {
+      const values = formValues(form(entry));
+      const parsed = leadInput.safeParse(values);
+      expect(checkLead(values), JSON.stringify(entry).slice(0, 80)).toEqual(parsed.success ? {} : fieldErrors(parsed.error));
+    }
   });
 
   it("treats a missing field as an empty one, and works without a key from the browser", () => {

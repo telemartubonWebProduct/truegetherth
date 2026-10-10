@@ -319,19 +319,19 @@ test("a picture uploaded from the editor joins the library and shows on the page
   await clearDrafts();
 });
 
-test("the home conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {
-  const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
+test("the lead conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {
+  const { googleAdsId, googleAdsLeadConversion } = content.site.integrations;
   const storedConversion = async () => {
     const { data, error } = await serviceClient().from("content_drafts").select("body").eq("document_id", "site").maybeSingle();
     if (error) throw error;
-    return data && (data.body as { integrations: { googleAdsHomeConversion: string } }).integrations.googleAdsHomeConversion;
+    return data && (data.body as { integrations: { googleAdsLeadConversion: string } }).integrations.googleAdsLeadConversion;
   };
   await signIn(page, admin);
   await openEditor(page);
   await page.getByRole("button", { name: "ตั้งค่าทั้งเว็บ" }).click();
   await page.getByRole("button", { name: /การเชื่อมต่อ/ }).click();
-  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อเปิดหน้าแรก (send_to)" });
-  await expect(field).toHaveValue(googleAdsHomeConversion);
+  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อลูกค้าส่งฟอร์มหรือกดติดต่อ (send_to)" });
+  await expect(field).toHaveValue(googleAdsLeadConversion);
   // The tag stays fixed.
   await expect(page.getByRole("textbox", { name: /Google Ads ID/ })).toHaveCount(0);
 
@@ -346,7 +346,7 @@ test("the home conversion is edited in the site settings, only for the site's ow
 
   await page.getByRole("button", { name: "ทิ้งร่างของเอกสารนี้" }).click();
   await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
-  await expect(field).toHaveValue(googleAdsHomeConversion);
+  await expect(field).toHaveValue(googleAdsLeadConversion);
   await expect.poll(storedConversion, saving).toBeNull();
 });
 

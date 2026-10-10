@@ -829,6 +829,12 @@
     accent-color: var(--tm-color-ink);
   }
 
+  /* A visitor who has already chosen: the banner in the page's HTML stays out
+     of sight until the component reads the cookie and removes it. */
+  html[data-consent] .tm-consent {
+    display: none;
+  }
+
   .tm-consent {
     position: fixed;
     z-index: 60;

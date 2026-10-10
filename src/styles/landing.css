@@ -771,6 +771,52 @@ html[data-motion] .dot::after {
   }
 }
 
+/* The entrance, in CSS so that nothing waits for script: the navigation drops
+   in, the picture settles from a little larger, and the context line, the
+   buttons and the side notes rise in one after another. The headline is not
+   part of it: it is the largest thing on the screen and is there from the
+   first paint. Only under data-motion; otherwise everything simply shows. */
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+html[data-motion] .nav {
+  animation: nav-drop 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+html[data-motion] .hero-art-inner {
+  animation: hero-settle 1.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+html[data-motion] .hero-sub {
+  animation: hero-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards;
+}
+
+html[data-motion] .hero-actions {
+  animation: hero-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards;
+}
+
+html[data-motion] .hero-side {
+  animation: hero-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s backwards;
+}
+
 @keyframes nudge {
   0%,
   100% {

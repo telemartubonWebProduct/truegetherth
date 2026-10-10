@@ -2,7 +2,7 @@
 //   public/brand/truegetherth-logo.png   the lockup (mark + wordmark) for white surfaces
 //   public/brand/truegetherth-mark.svg   the mark alone
 //   src/app/icon.svg, src/app/favicon.ico, src/app/apple-icon.png   the app icon
-//   public/media/og-image.png            1200x630, what social apps show for a shared page
+//   public/media/og-image-v2.png         1200x630, what social apps show for a shared page
 //
 // The mark is two rings that overlap ("together"); where they meet is the one
 // red mark. The wordmark is Inter, the site's own Latin face, set tight; the
@@ -113,21 +113,24 @@ pictures.forEach((picture, index) => {
 writeFileSync(at("src/app/favicon.ico"), Buffer.concat([header, ...pictures]));
 await sharp(Buffer.from(iconSvg), { density: 1200 }).resize(180, 180).png().toFile(at("src/app/apple-icon.png"));
 
-// The share picture: the hero's router with the logo, no words, so it suits both languages.
-const dataUri = (file, type) => `data:${type};base64,${readFileSync(at(file)).toString("base64")}`;
+// The share picture: the painting that opens the home page (the owner's, design/hero/tableau/source/master.jpg),
+// cut to the card's shape from its top so the router stays in, with the logo on a white pill as in the
+// navigation. No words, so it suits both languages. A new picture takes a new file name: apps that show
+// shared links keep the old one for a long time.
+const painting = await sharp(at("design/hero/tableau/source/master.jpg")).resize({ width: 1200, height: 630, fit: "cover", position: "north" }).jpeg({ quality: 88 }).toBuffer();
 const share = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
 await share.setContent(
   `<!doctype html><html><body style="margin:0">
-<div style="position:relative;width:1200px;height:630px;background:${SURFACE};overflow:hidden">
-  <img src="${dataUri("design/hero/router/poster-v3.webp", "image/webp")}" style="position:absolute;right:-70px;top:-74px;height:780px">
-  <div style="position:absolute;inset:0;background:linear-gradient(to right,${SURFACE} 0%,rgba(244,244,246,0.86) 30%,rgba(244,244,246,0) 58%)"></div>
-  <img src="data:image/png;base64,${logo.toString("base64")}" style="position:absolute;left:72px;top:72px;height:54px">
-  <div style="position:absolute;left:72px;top:156px;width:96px;height:3px;background:${RED}"></div>
+<div style="position:relative;width:1200px;height:630px;overflow:hidden;background:${SURFACE}">
+  <img src="data:image/jpeg;base64,${painting.toString("base64")}" style="position:absolute;inset:0;width:1200px;height:630px">
+  <div style="position:absolute;left:48px;top:44px;display:flex;align-items:center;height:76px;padding:0 30px;border-radius:999px;background:#ffffff;box-shadow:0 10px 30px -12px rgba(11,11,12,0.45)">
+    <img src="data:image/png;base64,${logo.toString("base64")}" style="height:36px">
+  </div>
 </div></body></html>`,
   { waitUntil: "load" },
 );
-await share.screenshot({ path: at("public/media/og-image.png") });
+await share.screenshot({ path: at("public/media/og-image-v2.png") });
 await browser.close();
 
 console.log(`public/brand/truegetherth-logo.png ${size.width}x${size.height} (set this size in src/content/media.ts)`);
-console.log("public/brand/truegetherth-mark.svg, src/app/icon.svg, src/app/favicon.ico, src/app/apple-icon.png, public/media/og-image.png written");
+console.log("public/brand/truegetherth-mark.svg, src/app/icon.svg, src/app/favicon.ico, src/app/apple-icon.png, public/media/og-image-v2.png written");

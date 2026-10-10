@@ -66,7 +66,7 @@ describe("every content value has an editor control", () => {
     const integrations = fields.filter((field) => field.path.slice(0, 2).join("/") === "site/integrations");
     expect(integrations.map((field) => [field.path.join("/"), field.kind])).toEqual([
       ["site/integrations", "object"],
-      ["site/integrations/googleAdsHomeConversion", "text"],
+      ["site/integrations/googleAdsLeadConversion", "text"],
     ]);
   });
 });
@@ -96,17 +96,17 @@ describe("field messages and bindings", () => {
   it("accepts a Google Ads conversion only for the site's own tag", () => {
     const site = structuredClone(content.site);
     const { googleAdsId } = site.integrations;
-    site.integrations.googleAdsHomeConversion = `${googleAdsId}/Label_2-x`;
+    site.integrations.googleAdsLeadConversion = `${googleAdsId}/Label_2-x`;
     expect(parseDocument("site", site).ok).toBe(true);
 
     const messages = (value: string) => {
-      site.integrations.googleAdsHomeConversion = value;
+      site.integrations.googleAdsLeadConversion = value;
       const parsed = parseDocument("site", site);
       return !parsed.ok && parsed.messages;
     };
-    expect(messages("AW-1/abc")).toEqual([`integrations.googleAdsHomeConversion: ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${googleAdsId}/…)`]);
+    expect(messages("AW-1/abc")).toEqual([`integrations.googleAdsLeadConversion: ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${googleAdsId}/…)`]);
     for (const value of ["", googleAdsId, `${googleAdsId}/`, `${googleAdsId}/a'b`, `'};alert(1);//`]) {
-      expect(messages(value), value).toEqual(["integrations.googleAdsHomeConversion: ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"]);
+      expect(messages(value), value).toEqual(["integrations.googleAdsLeadConversion: ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"]);
     }
   });
 
