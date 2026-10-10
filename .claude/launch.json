@@ -4,8 +4,26 @@
     {
       "name": "telemart-v2",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3200"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3200"
+      ],
       "port": 3200
+    },
+    {
+      "name": "truegetherth-start",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start",
+        "--",
+        "--port",
+        "3210"
+      ],
+      "port": 3210
     }
   ]
 }

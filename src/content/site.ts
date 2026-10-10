@@ -55,9 +55,10 @@ export const site: SiteSettings = {
     style: "primary",
   },
   footer: {
+    // Who runs the site, as the owner states it (2026-10-11): an official True partner, not True itself.
     about: t(
-      "แพ็กเกจเน็ตบ้านทรู เน็ตมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ช่วยเลือกและติดต่อกลับ รับเรื่องจากทุกจังหวัด",
-      "True home internet, mobile packages and W&W Energy solar. Our team helps you choose and calls you back, wherever you are in Thailand.",
+      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์อย่างเป็นทางการของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เราไม่ใช่ทรู และไม่ใช่ผู้ให้บริการเครือข่าย",
+      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an official True partner. We take applications for True home internet and arrange installation, wherever you are in Thailand. We are not True and not the network operator.",
     ),
     groups: [
       {

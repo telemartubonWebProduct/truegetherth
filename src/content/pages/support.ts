@@ -186,8 +186,8 @@ export const termsPage: LegalPage = {
       heading: t("4. ลิขสิทธิ์และทรัพย์สินทางปัญญา", "4. Copyright and intellectual property"),
       paragraphs: [
         t(
-          "เว็บไซต์นี้เป็นลูกข่ายและ/หรือพันธมิตรของ True เนื้อหา ข้อความ รูปภาพ โลโก้ หรือสื่ออื่น ๆ บนเว็บไซต์อาจเป็นทรัพย์สินทางปัญญาที่ได้รับอนุญาตให้ใช้อย่างถูกต้อง ทั้งจากบริษัทเราเอง หรือจาก True และ/หรือพันธมิตรอื่นตามสัญญา ห้ามทำซ้ำ ดัดแปลง หรือเผยแพร่เนื้อหาดังกล่าวไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษรจากเจ้าของสิทธิ์หรือผู้ที่ได้รับสิทธิ์อย่างถูกต้อง",
-          "This website is a dealer and/or partner of True. Content, text, images, logos and other media on it may be intellectual property licensed to us, whether our own or from True and/or other partners under contract. Do not copy, adapt or publish any of it, in whole or in part, without written permission from the rights holder or an authorised licensee.",
+          "เว็บไซต์นี้ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) ซึ่งเป็นพาร์ทเนอร์อย่างเป็นทางการของ True ที่รับสมัครและประสานงานติดตั้งบริการของ True เราไม่ใช่ True และไม่ใช่ผู้ให้บริการเครือข่าย เนื้อหา ข้อความ รูปภาพ โลโก้ หรือสื่ออื่น ๆ บนเว็บไซต์อาจเป็นทรัพย์สินทางปัญญาที่ได้รับอนุญาตให้ใช้อย่างถูกต้อง ทั้งจากบริษัทเราเอง หรือจาก True และ/หรือพันธมิตรอื่นตามสัญญา ห้ามทำซ้ำ ดัดแปลง หรือเผยแพร่เนื้อหาดังกล่าวไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษรจากเจ้าของสิทธิ์หรือผู้ที่ได้รับสิทธิ์อย่างถูกต้อง",
+          "This website is run by Telemart Communication Co., Ltd. (Telemart), an official True partner that takes applications for and arranges installation of True's services. We are not True and not the network operator. Content, text, images, logos and other media on it may be intellectual property licensed to us, whether our own or from True and/or other partners under contract. Do not copy, adapt or publish any of it, in whole or in part, without written permission from the rights holder or an authorised licensee.",
         ),
       ],
       list: [],
