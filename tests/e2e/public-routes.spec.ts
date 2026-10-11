@@ -124,6 +124,13 @@ test("old in-page anchors still land on their sections", async ({ page }) => {
   }
 });
 
+test("Google Search Console finds the file that proves who owns the site", async ({ request }) => {
+  // The name and the line are Google's (the property https://www.truegetherth.com/, added 2026-10-11); removing the file ends the verification.
+  const response = await request.get("/googleb1396b0e8315a5c3.html");
+  expect(response.status()).toBe(200);
+  expect((await response.text()).trim()).toBe("google-site-verification: googleb1396b0e8315a5c3.html");
+});
+
 test("the site's former domain sends every address, for good, to the same address on the one it has now", async ({ request }) => {
   for (const host of ["telemartubon.com", "www.telemartubon.com"]) {
     const response = await request.get("/broadband?utm_source=old", { headers: { host }, maxRedirects: 0 });
