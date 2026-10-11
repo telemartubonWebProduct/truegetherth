@@ -1,14 +1,14 @@
 "use client";
 
-import { useInView, useMotionValue, useSpring } from "motion/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-// Animated number counter, from React Bits (https://reactbits.dev, CountUp TS-CSS,
-// MIT + Commons Clause). Two changes for this site: the final number is in the
-// server's HTML (prices must be readable without JavaScript and by search
-// engines; the original rendered an empty span), visitors who ask for
-// reduced motion keep that number instead of a count, and the count lands on
-// the number when its time is up (a spring's tail is long, and a price must
+// A number that counts up to its value when it comes into view (after
+// React Bits' CountUp, https://reactbits.dev, MIT + Commons Clause; rewritten
+// here without an animation library, which the page would have had to fetch
+// before anything else for this alone). The final number is in the server's
+// HTML: prices must be readable without JavaScript and by search engines.
+// Visitors who ask for reduced motion keep that number instead of a count,
+// and the count lands on the number exactly when its time is up (a price must
 // not sit a few baht short of itself).
 
 interface CountUpProps {
@@ -32,40 +32,50 @@ function format(value: number, decimals: number, separator: string): string {
 
 export default function CountUp({ to, from = 0, delay = 0, duration = 2, className = "", separator = "" }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const motionValue = useMotionValue(from);
-  const springValue = useSpring(motionValue, { damping: 20 + 40 * (1 / duration), stiffness: 100 * (1 / duration) });
-  const isInView = useInView(ref, { once: true, margin: "0px" });
   const decimals = Math.max(decimalPlaces(from), decimalPlaces(to));
-  const formatValue = useCallback((latest: number) => format(latest, decimals, separator), [decimals, separator]);
 
-  // Start from `from` only where the count will play: off screen, with motion allowed.
   useEffect(() => {
     const element = ref.current;
     if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const { top, bottom } = element.getBoundingClientRect();
-    if (bottom < 0 || top > window.innerHeight) element.textContent = formatValue(from);
-  }, [from, formatValue]);
-
-  useEffect(() => {
-    if (!isInView || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const start = setTimeout(() => motionValue.set(to), delay * 1000);
-    const land = setTimeout(() => springValue.jump(to), (delay + duration) * 1000);
-    return () => {
-      clearTimeout(start);
-      clearTimeout(land);
+    const show = (value: number) => {
+      element.textContent = format(value, decimals, separator);
     };
-  }, [isInView, motionValue, springValue, to, delay, duration]);
+    let frame = 0;
+    let timer = 0;
 
-  useEffect(() => {
-    const unsubscribe = springValue.on("change", (latest: number) => {
-      if (ref.current) ref.current.textContent = formatValue(latest);
+    const count = () => {
+      const began = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - began) / (duration * 1000));
+        // Fast at first, slowing into the number.
+        show(t < 1 ? from + (to - from) * (1 - (1 - t) ** 4) : to);
+        if (t < 1) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    // The browser says whether the number is on the screen, so nothing is measured here (a measurement while the
+    // page starts up makes it lay itself out there and then). Off screen it goes back to `from`, and it counts
+    // when it comes into view.
+    const seen = new IntersectionObserver(([entry]) => {
+      show(from);
+      if (!entry.isIntersecting) return;
+      seen.disconnect();
+      timer = window.setTimeout(count, delay * 1000);
     });
-    return () => unsubscribe();
-  }, [springValue, formatValue]);
+    seen.observe(element);
+
+    return () => {
+      seen.disconnect();
+      window.clearTimeout(timer);
+      cancelAnimationFrame(frame);
+      show(to);
+    };
+  }, [to, from, delay, duration, decimals, separator]);
 
   return (
     <span className={className} ref={ref}>
-      {formatValue(to)}
+      {format(to, decimals, separator)}
     </span>
   );
 }

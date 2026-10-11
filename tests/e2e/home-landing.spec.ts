@@ -102,7 +102,7 @@ const shift = (page: Page, id: string) =>
 const composition = async (page: Page) => {
   // Measured once the picture's entrance (it settles from slightly enlarged) is over.
   await expect
-    .poll(() => page.locator(".hero-art-inner").evaluate((element) => getComputedStyle(element).transform), { timeout: 10_000 })
+    .poll(() => page.locator(".hero-scene").evaluate((element) => getComputedStyle(element).transform), { timeout: 10_000 })
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
   return page.evaluate(() => {
     type Box = { left: number; top: number; right: number; bottom: number };
@@ -266,7 +266,9 @@ test("the counted prices land on the catalog's own numbers", async ({ page }) =>
     await page.waitForTimeout(120);
   }
   await expect.poll(() => shown.allTextContents(), { timeout: 8000 }).toEqual(cards.map((item) => item.price.amount.toLocaleString("en-US")));
+  // The table counts row by row as it comes into view, and may be taller than the screen: down to its last row.
   await page.locator("#prices").scrollIntoViewIfNeeded();
+  await page.locator("#prices .col-price .num").last().scrollIntoViewIfNeeded();
   const listed = publicPackagesIn(content, home.prices.category, home.prices.group, today);
   await expect.poll(() => page.locator("#prices .col-price .num").allTextContents(), { timeout: 8000 }).toEqual(listed.map((item) => item.price.amount.toLocaleString("en-US")));
 });
@@ -321,9 +323,12 @@ test("the slip prints one step at a time and tears at the end", async ({ page })
   await open(page);
   const lit = () => page.locator(".cue[data-lit]").count();
   const status = page.locator("[data-slip-status]");
+  // The slip's picture: the one of the step just done, none before the first step.
+  const shown = page.locator("[data-slip-picture][data-shown]");
 
   await scrub(page, "ticket", 0);
   expect(await lit()).toBe(0);
+  await expect(shown).toHaveCount(0);
   const first = await status.textContent();
   expect(Number(await variable(page, "--packet-alpha"))).toBe(0);
 
@@ -333,10 +338,17 @@ test("the slip prints one step at a time and tears at the end", async ({ page })
   await expect(page.locator(".cue[data-now]")).toHaveCount(1);
   expect(await status.textContent()).not.toBe(first);
   expect(Number(await variable(page, "--packet-cut"))).toBe(0);
+  await expect(shown).toHaveCount(1);
+  await expect(shown).toHaveAttribute("data-slip-picture", String((await lit()) - 1));
+  // Where the slip has room for its picture (not on a short phone), the picture has loaded and is seen.
+  if (await page.locator(".slip-plate").isVisible()) {
+    await expect.poll(() => shown.evaluate((picture: HTMLImageElement) => picture.complete && picture.naturalWidth > 0 && getComputedStyle(picture).opacity === "1")).toBe(true);
+  }
 
   await scrub(page, "ticket", 1);
   expect(await lit()).toBe(4);
   await expect(page.locator("[data-slip-value][data-set]")).toHaveCount(3);
+  await expect(shown).toHaveAttribute("data-slip-picture", "3");
   expect(Number(await variable(page, "--packet-cut"))).toBe(1);
 });
 
@@ -454,8 +466,9 @@ test.describe("with reduced motion", () => {
     expectClear(await composition(page));
     await expect(page.locator(".hero-title")).toBeVisible();
     await expect(page.locator("[data-rail-panel]:not([hidden]) .card").last()).toBeVisible();
-    // The slip shows its finished state rather than an empty form.
+    // The slip shows its finished state rather than an empty form, with the last step's picture.
     await expect(page.locator("[data-slip-value][data-set]")).toHaveCount(3);
+    await expect(page.locator("[data-slip-picture][data-shown]")).toHaveAttribute("data-slip-picture", "3");
   });
 });
 
@@ -522,6 +535,7 @@ test.describe("on a screen too short to pin a stage", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-motion", "");
     await expect(page.locator(".cue[data-now]")).toHaveCount(0);
     await expect(page.locator("[data-slip-value][data-set]")).toHaveCount(3);
+    await expect(page.locator("[data-slip-picture][data-shown]")).toHaveAttribute("data-slip-picture", "3");
     expect(await variable(page, "--manifesto-wipe")).toBe("");
   });
 });

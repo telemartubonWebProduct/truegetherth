@@ -1,6 +1,6 @@
 "use client";
 
-import Lenis from "lenis";
+import type Lenis from "lenis";
 import { useEffect, useState } from "react";
 
 import "lenis/dist/lenis.css";
@@ -12,6 +12,7 @@ import "lenis/dist/lenis.css";
 //
 // Mouse wheels scroll in steps, which would make scroll-driven motion jerk, so
 // Lenis eases the scroll position itself (touch screens keep native scrolling).
+// It is fetched once the page has painted: the first paint does not wait for it.
 // Visitors who ask for reduced motion get none of this, and neither does a
 // screen too short to pin a stage in (a phone on its side): the stages lie flat
 // in the page (landing.css keys the choreography on html[data-motion], set
@@ -67,12 +68,14 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     const cues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-cue]") ?? []);
     const slipStatus = ticket?.querySelector<HTMLElement>("[data-slip-status]");
     const slipValues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-value]") ?? []);
+    const slipPictures = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-picture]") ?? []);
     const phases: SlipPhase[] = JSON.parse(ticket?.dataset.phases ?? "[]");
     const chapters = Array.from(season?.querySelectorAll<HTMLElement>("[data-chapter]") ?? []);
     const motion = root.hasAttribute("data-motion");
 
     let frame = 0;
     let railOverflow = 0;
+    let railMeasured = false;
     let phase = -1;
     let chapter = -1;
     let heroAway = false;
@@ -90,6 +93,8 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       phase = next;
       cues.forEach((cue, index) => cue.toggleAttribute("data-lit", index < next));
       cues.forEach((cue, index) => cue.toggleAttribute("data-now", index === next - 1));
+      // The slip's picture is the one of the step just done; before the first step, the bare plate.
+      slipPictures.forEach((picture, index) => picture.toggleAttribute("data-shown", index === next - 1));
       const current = phases[Math.min(next, phases.length - 1)];
       if (slipStatus) slipStatus.textContent = current.status;
       slipValues.forEach((value, index) => {
@@ -104,23 +109,37 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       chapters.forEach((item, index) => item.toggleAttribute("data-active", index === next));
     };
 
+    // The row's stage is laid out only when it comes near the screen (landing.css), and measuring the row from
+    // afar would lay the stage out there and then: while the page starts, that is before anything has been shown.
+    // So it is measured once its stage is within two screens; the observer below says when the row gets its size.
     const measure = () => {
+      railMeasured = false;
+      if (!rail || rail.getBoundingClientRect().top > window.innerHeight * 2) return;
       const track = railTrack();
       railOverflow = track ? Math.max(0, track.scrollWidth - track.clientWidth) : 0;
+      railMeasured = true;
     };
 
     const update = () => {
       frame = 0;
       if (!motion) return;
 
+      // Everything is measured first and written after: a measurement that follows a write makes the browser
+      // work the whole page's styles out again there and then, five times a frame.
+      const away = hero ? hero.getBoundingClientRect().bottom <= 0 : false;
+      const h = progress(hero);
+      const m = progress(manifesto);
+      const r = progress(rail);
+      const t = progress(ticket);
+      const s = progress(season);
+      if (!railMeasured && r > 0) measure();
+
       // 1. Hero: the lockup lifts, shrinks and fades on three separate curves; the picture draws back into a frame.
       //    Once it has left the screen, its own animations rest (landing.css pauses them on this flag).
-      const away = hero ? hero.getBoundingClientRect().bottom <= 0 : false;
       if (away !== heroAway) {
         heroAway = away;
         root.toggleAttribute("data-hero-away", away);
       }
-      const h = progress(hero);
       set("--hero-progress", h.toFixed(4));
       set("--hero-type-y", `${(-90 * easeInOut(span(h, 0, 0.85))).toFixed(2)}px`);
       set("--hero-type-scale", (1 - 0.26 * easeOut(span(h, 0, 0.9))).toFixed(4));
@@ -130,18 +149,15 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       set("--hero-meta-alpha", (1 - span(h, 0, 0.3)).toFixed(3));
 
       // 2. Manifesto: ink fills the sentence from the bottom up while it grows a little.
-      const m = progress(manifesto);
       set("--manifesto-wipe", `${(span(m, 0.06, 0.88) * 100).toFixed(2)}%`);
       set("--manifesto-scale", (1 + 0.05 * m).toFixed(4));
 
       // 3. Rail: scrolling down walks along the row, by exactly its overflow.
-      const r = progress(rail);
       const along = easeInOut(span(r, 0.08, 0.94));
       set("--rail-x", `${(-along * railOverflow).toFixed(1)}px`);
       set("--rail-meter", along.toFixed(4));
 
       // 4. Slip: arrives, fills in step by step, then tears along its perforation.
-      const t = progress(ticket);
       set("--packet-alpha", span(t, 0, 0.12).toFixed(3));
       set("--packet-enter", `${(38 * (1 - easeOut(span(t, 0, 0.2)))).toFixed(2)}px`);
       set("--packet-scale", (0.78 + 0.22 * easeOut(span(t, 0, 0.28))).toFixed(4));
@@ -151,7 +167,6 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       showPhase(Math.min(4, Math.floor(span(t, 0.1, 0.86) * 4.999)));
 
       // 5. Season: the contour plate drifts behind the chapters, which take turns.
-      const s = progress(season);
       set("--season-y", `${(-4 + 8 * s).toFixed(3)}%`);
       set("--season-scale", (1.1 - 0.045 * s).toFixed(4));
       showChapter(Math.min(chapters.length - 1, Math.floor(s * chapters.length)));
@@ -178,16 +193,32 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     );
     document.querySelectorAll("[data-rev], [data-words]").forEach((element) => reveal.observe(element));
 
-    const lenis = motion ? new Lenis({ autoRaf: true, anchors: true, lerp: 0.11 }) : null;
+    // What can wait for the first paint: Lenis, and the row's overflow (the row lies in a stage that is not laid
+    // out until it is near, so measuring it now would lay that stage out before anything has been shown). A
+    // frame is on the screen a little after it is made: a short while after the first one, not the next task.
+    let lenis: Lenis | null = null;
+    let over = false;
+    let later = 0;
+    const painted = requestAnimationFrame(() => {
+      later = window.setTimeout(() => {
+        onResize();
+        if (!motion) return;
+        void import("lenis").then(({ default: Smooth }) => {
+          if (!over) lenis = new Smooth({ autoRaf: true, anchors: true, lerp: 0.11 });
+        });
+      }, 250);
+    });
     const resized = new ResizeObserver(onResize);
     rail?.querySelectorAll("[data-rail-track]").forEach((track) => resized.observe(track));
     window.addEventListener("scroll", request, { passive: true });
     window.addEventListener("resize", onResize);
-    measure();
     update();
     root.setAttribute("data-ready", "");
 
     return () => {
+      over = true;
+      cancelAnimationFrame(painted);
+      window.clearTimeout(later);
       cancelAnimationFrame(frame);
       // Leave the page as the flat layout expects it: no stage values, the slip complete.
       written.forEach((name) => root.style.removeProperty(name));

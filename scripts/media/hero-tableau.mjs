@@ -1,4 +1,4 @@
-// Cuts the hero painting into its layers:  node scripts/media/hero-tableau.mjs [--debug]
+// Cuts the hero painting into its layers:  node scripts/media/hero-tableau.mjs [--debug] [--replace]
 //
 // The sources (design/hero/tableau/source/, see the README beside them) are
 // pictures made from one painting: the sky with nobody in it, the figures
@@ -18,8 +18,13 @@
 // green, and small patches of green enclosed by a figure (the router's lights)
 // are kept. Figures that touch by a thread (a ribbon's end on the laptop) are
 // told apart by shrinking the picture until the thread breaks.
-// A new picture goes in a new folder (hero-v5…): the files are cached for a week.
-import { mkdir, rm, stat, writeFile } from "node:fs/promises";
+//
+// Browsers keep these files for a year (next.config.ts), so a picture that has
+// changed must not keep its name: it goes in a new folder (hero-v5…, `out` and
+// `web` below). The script stops at a file that would come out different from
+// the one already there; --replace lets it through, for a file that was never
+// published.
+import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import sharp from "sharp";
@@ -29,6 +34,7 @@ const out = "public/media/hero-v4";
 const web = "/media/hero-v4";
 const data = "src/components/site/home/hero-tableau.ts";
 const debug = process.argv.includes("--debug") ? "shots/hero-tableau" : null;
+const replace = process.argv.includes("--replace");
 
 /** Greener than red and blue by less than LOW: figure. By more than HIGH: backdrop. Between: the edge. */
 const LOW = 14;
@@ -119,6 +125,8 @@ const PACKS = {
 };
 /** The sizes each figure is written at, as shares of its size in the source. */
 const SCALES = [1, 0.5];
+/** One more for a figure the tall arrangement draws much smaller than it was painted: a phone needs a third of the sea god's width. */
+const SMALLER = { "sea-god": [0.34] };
 
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
 const smooth = (value, from, to) => {
@@ -465,32 +473,44 @@ const cuts = figures(keyed);
 const cloud = nearCloud(await read("near-clouds.png"));
 const wideFrame = { W: keyed.W, H: keyed.H };
 
-await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 if (debug) await mkdir(debug, { recursive: true });
 
+const written = [];
+/** Writes one picture of the folder, unless it would change a file browsers may already hold. */
+async function save(image, file) {
+  const bytes = await image.toBuffer();
+  const target = path.join(out, file);
+  const old = await readFile(target).catch(() => null);
+  if (old && !old.equals(bytes) && !replace) {
+    throw new Error(`${file} would change, and browsers keep it for a year: write to a new folder (hero-v5), or pass --replace if it was never published.`);
+  }
+  if (!old || !old.equals(bytes)) await writeFile(target, bytes);
+  written.push(file);
+  return sharp(bytes).metadata();
+}
+
 // Each figure, written once: both packs use the same files.
 const files = {};
-const written = [];
 for (const [id, cut] of Object.entries({ ...cuts, "near-clouds": cloud })) {
   const whole = await png(cut);
   files[id] = [];
-  for (const scale of SCALES) {
+  for (const scale of [...SCALES, ...(SMALLER[id] ?? [])]) {
     const width = Math.round(cut.width * scale);
     const file = `${id}-${width}.webp`;
-    await sharp(whole).resize({ width }).webp({ quality: 84, alphaQuality: 92, effort: 6 }).toFile(path.join(out, file));
+    await save(sharp(whole).resize({ width }).webp({ quality: 84, alphaQuality: 92, effort: 6 }), file);
     files[id].unshift({ src: `${web}/${file}`, width });
-    written.push(file);
   }
   if (debug) await sharp(whole).flatten({ background: "#ff00ff" }).png().toFile(path.join(debug, `${id}.png`));
 }
 
-// The True Online mark of the router's frame, from the owner's own site assets: never a generated one.
-const mark = { src: `${web}/true-online.webp`, width: 372, height: 0 };
+// The True Online mark of the router's frame, from the owner's own site assets: never a generated one. The page
+// shows it at most 15 pixels high on a white tab, so it is laid on white here (a third of the bytes of a
+// transparent one) and is as wide as a sharp screen needs.
+const mark = { src: `${web}/true-online-248.webp`, width: 248, height: 0 };
 {
-  const made = await sharp("design/hero/router/trueonline.png").resize({ width: mark.width }).webp({ quality: 92, alphaQuality: 100 }).toFile(path.join(out, "true-online.webp"));
+  const made = await save(sharp("design/hero/router/trueonline.png").resize({ width: mark.width }).flatten({ background: "#ffffff" }).webp({ quality: 92, effort: 6 }), "true-online-248.webp");
   mark.height = made.height;
-  written.push("true-online.webp");
 }
 
 const packs = {};
@@ -519,9 +539,8 @@ for (const [name, pack] of Object.entries(PACKS)) {
     const height = Math.round(frame.H * scale);
     const skyFile = `${name}-sky-${width}.webp`;
     const ground = await sharp(path.join(source, pack.sky)).resize({ width, height, fit: "fill" }).toBuffer();
-    await sharp(ground).webp({ quality: 80, effort: 6 }).toFile(path.join(out, skyFile));
+    await save(sharp(ground).webp({ quality: 80, effort: 6 }), skyFile);
     skyFiles.push({ src: `${web}/${skyFile}`, width });
-    written.push(skyFile);
     if (!debug || width !== pack.widths[0]) continue;
 
     // To look at: the sky with every layer on it, at rest, as the page lays them.
@@ -569,6 +588,9 @@ const dataModule = `import type { HeroTableau } from "./hero-art";
 export const heroTableau: HeroTableau = ${JSON.stringify({ mark, packs }, null, 2)};
 `;
 await writeFile(data, dataModule);
+
+// What an earlier cut left behind and this one does not use.
+for (const file of await readdir(out)) if (!written.includes(file)) await rm(path.join(out, file));
 
 for (const file of written) console.log(`${file.padEnd(34)} ${await size(path.join(out, file))}`);
 for (const [name, pack] of Object.entries(packs)) {

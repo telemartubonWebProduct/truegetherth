@@ -1,12 +1,12 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+/** How long the panel takes to leave (landing.css, nav-panel-out); it stays in the page that long. */
+const LEAVE = 200;
 
 export type NavLinkView = {
   id: string;
@@ -58,22 +58,31 @@ function NavAnchor({ link, className, newTab, onClick, children }: { link: NavLi
  * The site's navigation on every page: pills that float over the page (the bar
  * itself lets clicks through). The Menu pill opens a panel with the whole
  * menu and the language switch; its name stays the same while aria-expanded
- * and the turning mark say whether it is open. Over a dark section the black pill would
+ * and the turning mark say whether it is open. The panel's entrance and exit
+ * are CSS (landing.css), so the page carries no animation library for them.
+ * Over a dark section the black pill would
  * vanish, so the bar notes what it is over (data-nav on <html>) and the styles
  * turn it white there.
  */
 function NavPills({ view }: { view: NavbarView }) {
   const [open, setOpen] = useState(false);
+  // The panel that has just been closed, still in the page while it fades out.
+  const [leaving, setLeaving] = useState(false);
   const panelId = useId();
   const wrap = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => {
+    setOpen(false);
+    setLeaving(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") close();
     };
     const onPointer = (event: PointerEvent) => {
-      if (!wrap.current?.contains(event.target as Node)) setOpen(false);
+      if (!wrap.current?.contains(event.target as Node)) close();
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("pointerdown", onPointer);
@@ -81,7 +90,13 @@ function NavPills({ view }: { view: NavbarView }) {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointerdown", onPointer);
     };
-  }, [open]);
+  }, [open, close]);
+
+  useEffect(() => {
+    if (!leaving) return;
+    const timer = window.setTimeout(() => setLeaving(false), LEAVE);
+    return () => window.clearTimeout(timer);
+  }, [leaving]);
 
   // Which tone lies under the bar: sections say so with data-tone="ink" (and the footer with tm-on-ink).
   useEffect(() => {
@@ -114,71 +129,62 @@ function NavPills({ view }: { view: NavbarView }) {
     };
   }, []);
 
-  const close = () => setOpen(false);
   const { labels } = view;
 
   return (
     <header className="nav">
       <div className="nav-left">
         <Link className="nav-logo" href={view.brand.href} aria-label={view.brand.name} data-edit={view.brand.binding}>
-          {/* Said how wide it shows, or the optimizer is asked for a picture as wide as the largest screen. */}
-          <Image src={view.brand.logo.src} alt="" width={view.brand.logo.width} height={view.brand.logo.height} sizes="160px" priority />
+          {/* Said how wide it shows, or the optimizer is asked for a picture as wide as the largest screen. Not asked
+              for ahead of the page: the bar fades in, and the first paint is the words' alone. */}
+          <Image src={view.brand.logo.src} alt="" width={view.brand.logo.width} height={view.brand.logo.height} sizes="160px" />
         </Link>
         <div className="nav-menu-wrap" ref={wrap}>
-          <button type="button" className="nav-menu" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}>
+          <button type="button" className="nav-menu" aria-expanded={open} aria-controls={panelId} onClick={() => (open ? close() : (setLeaving(false), setOpen(true)))}>
             <span className="nav-menu-dot" data-open={open || undefined}>
               <Plus size={12} strokeWidth={3} aria-hidden="true" />
             </span>
             <span>{labels.menu}</span>
           </button>
-          <AnimatePresence>
-            {open ? (
-              <motion.nav
-                id={panelId}
-                className="nav-panel"
-                aria-label={labels.navigation}
-                initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.35, ease: EASE }}
-              >
-                <ul role="list">
-                  {view.groups.map((group, index) => (
-                    <motion.li key={group.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.04 * index + 0.05, duration: 0.45, ease: EASE }}>
-                      {group.link ? (
-                        <NavAnchor link={group.link} className="nav-panel-link" newTab={labels.newTab} onClick={close}>
+          {open || leaving ? (
+            <nav id={panelId} className="nav-panel" aria-label={labels.navigation} data-leaving={open ? undefined : ""} inert={!open}>
+              <ul role="list">
+                {view.groups.map((group, index) => (
+                  // Each line comes in a little after the one above it.
+                  <li key={group.id} style={{ "--i": index } as CSSProperties}>
+                    {group.link ? (
+                      <NavAnchor link={group.link} className="nav-panel-link" newTab={labels.newTab} onClick={close}>
+                        <span className="nav-panel-n">{String(index + 1).padStart(2, "0")}</span>
+                        {group.label}
+                      </NavAnchor>
+                    ) : (
+                      <>
+                        <p className="nav-panel-group" data-edit={group.binding}>
                           <span className="nav-panel-n">{String(index + 1).padStart(2, "0")}</span>
                           {group.label}
-                        </NavAnchor>
-                      ) : (
-                        <>
-                          <p className="nav-panel-group" data-edit={group.binding}>
-                            <span className="nav-panel-n">{String(index + 1).padStart(2, "0")}</span>
-                            {group.label}
-                          </p>
-                          <ul role="list" className="nav-panel-children">
-                            {group.children.map((child) => (
-                              <li key={child.id}>
-                                <NavAnchor link={child} className="nav-panel-link nav-panel-child" newTab={labels.newTab} onClick={close}>
-                                  {child.label}
-                                </NavAnchor>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      )}
-                    </motion.li>
-                  ))}
-                </ul>
-                {/* Plain anchors: the two languages are separate root layouts, so a client-side transition cannot cross between them. */}
-                <p className="nav-panel-lang" aria-label={view.languages.label}>
-                  <a href={view.languages.href} lang={view.languages.locale} hrefLang={view.languages.locale}>
-                    {view.languages.name}
-                  </a>
-                </p>
-              </motion.nav>
-            ) : null}
-          </AnimatePresence>
+                        </p>
+                        <ul role="list" className="nav-panel-children">
+                          {group.children.map((child) => (
+                            <li key={child.id}>
+                              <NavAnchor link={child} className="nav-panel-link nav-panel-child" newTab={labels.newTab} onClick={close}>
+                                {child.label}
+                              </NavAnchor>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {/* Plain anchors: the two languages are separate root layouts, so a client-side transition cannot cross between them. */}
+              <p className="nav-panel-lang" aria-label={view.languages.label}>
+                <a href={view.languages.href} lang={view.languages.locale} hrefLang={view.languages.locale}>
+                  {view.languages.name}
+                </a>
+              </p>
+            </nav>
+          ) : null}
         </div>
         {view.shortcuts.length > 0 ? (
           <div className="nav-tags">
@@ -205,11 +211,7 @@ function NavPills({ view }: { view: NavbarView }) {
   );
 }
 
-/** The navigation, with entrances that respect "reduce motion": the bar and its panel still fade in, nothing slides or scales. */
+/** The navigation. With "reduce motion" its panel still fades in and out; nothing slides or scales (landing.css). */
 export function Navbar({ view }: { view: NavbarView }) {
-  return (
-    <MotionConfig reducedMotion="user">
-      <NavPills view={view} />
-    </MotionConfig>
-  );
+  return <NavPills view={view} />;
 }

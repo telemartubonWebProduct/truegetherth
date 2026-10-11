@@ -44,7 +44,8 @@
   /* Type: Inter for Latin letters and figures, Anuphan (a loopless Thai face)
      for Thai, both variable and set light. Thai stacks vowels and tone marks,
      so line heights stay generous. Containers that load the fonts through
-     next/font redeclare this with var(--font-inter) and var(--font-anuphan). */
+     next/font redeclare this with var(--font-inter-more), var(--font-inter) and
+     var(--font-anuphan). */
   --tm-font-sans: "Inter", "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* Headlines, prices and speeds use the same pair. */
   --tm-font-display: var(--tm-font-sans);

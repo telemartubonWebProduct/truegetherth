@@ -20,7 +20,7 @@ async function violations(page: Page) {
   await page.evaluate(() => document.fonts.ready);
   // The navigation, its open menu and the home page's opening fade in; contrast is measured once they are there.
   await expect
-    .poll(() => page.evaluate(() => [...document.querySelectorAll(".nav, .nav-panel, .nav-panel li, .hero-art-inner, .hero-foot, .hero-foot > * > *")].every((element) => getComputedStyle(element).opacity === "1")), { timeout: 15_000 })
+    .poll(() => page.evaluate(() => [...document.querySelectorAll(".nav, .nav-panel, .nav-panel li, .hero-scene, .hero-foot, .hero-foot > * > *")].every((element) => getComputedStyle(element).opacity === "1")), { timeout: 15_000 })
     .toBe(true);
   const { violations: found } = await new AxeBuilder({ page }).withTags(tags).analyze();
   return found.map((violation) => ({

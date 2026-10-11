@@ -63,7 +63,7 @@ const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><re
   ring: PAPER,
 })}</svg>\n`;
 
-const font = readFileSync(at("src/fonts/inter-latin-wght-normal.woff2")).toString("base64");
+const font = readFileSync(at("scripts/fonts/source/inter-latin-wght-normal.woff2")).toString("base64");
 const fontFace = `@font-face{font-family:"Inter";src:url(data:font/woff2;base64,${font}) format("woff2");font-weight:100 900}`;
 
 // The lockup, drawn large and scaled down afterwards.
