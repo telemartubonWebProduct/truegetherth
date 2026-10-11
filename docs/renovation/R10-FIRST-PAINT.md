@@ -57,7 +57,7 @@ Home on a desktop: 100. Accessibility, best practices and SEO: 100 on every page
 
 Counted before the largest paint on the home page now: the page 33, stylesheets 18, fonts 45, scripts 162; 259 KiB, no picture.
 
-**What decides between 97 and 100.** The scripts are held back by the browser until the stylesheets have arrived, and the first paint needs the same stylesheets: the two start together, the scripts with a network round trip to make and the paint with a layout. If the paint is first, no script is counted and the estimate is 1.6 to 2.1 s (99 to 100); if a script runs first, it is counted. On this machine the two are a few milliseconds apart. With the footer laid out on demand as well, the paint won four runs of five (99, 100, 100, 100, 100); that was taken out again (below), and now the scripts win about four runs of five. Which way it goes on Google's machines cannot be known from here: their report of the page is the only measurement, and a preview deployment is behind Vercel's sign-in. Expect 95 or more, not a promised 100.
+**What decides between 97 and 100.** The scripts are held back by the browser until the stylesheets have arrived, and the first paint needs the same stylesheets: the two start together, the scripts with a network round trip to make and the paint with a layout. If the paint is first, no script is counted and the estimate is 1.6 to 2.1 s (99 to 100); if a script runs first, it is counted. On this machine the two are a few milliseconds apart. With the footer laid out on demand as well, the paint won four runs of five (99, 100, 100, 100, 100); that was taken out again (below), and now the scripts win about four runs of five. Which way it goes on Google's machines could not be known before the deploy (a preview deployment is behind Vercel's sign-in); section 7 has what they said afterwards.
 
 ## 4. Tried and left out
 
@@ -84,7 +84,19 @@ None of these costs points; they are listed so nobody chases them twice.
 - `scripts/perf/delay-proxy.mjs`: the local server from a distance. Measure through it.
 - `scripts/perf/first-paint.mjs <url>`: how long the first layout takes, whether the scripts ran before the first paint, and what the browser names as the largest paint; `--late <file>=<ms>` holds files back, `--css` tries a rule without a build.
 
-## 7. For the owner
+## 7. On Google's machines, after the deploy
 
-- After the merge, run PageSpeed on the live home page two or three times: the number moves from run to run, and only Google's own run says where it lands.
+Merged to `main` on 12 Oct 2026 (00:23 in Thailand) together with the steps' pictures (R11) and Next.js 16.4.0, and deployed a minute later. PageSpeed Insights, home page:
+
+| Run (Thailand time) | Phone | Largest paint | What it saw | Desktop |
+| --- | --- | --- | --- | --- |
+| 00:30, seven minutes after the merge | 89 | 3.2 s | A slow load: the page took 462 ms to arrive and the first paint came at 2.6 s, so everything fetched by then was counted | 98 |
+| 00:34 | 100 | 1.5 s | First paint at 280 ms, before the scripts ran: only the page, its styles and its fonts counted | 99 |
+| 00:38 | 97 | 2.6 s | First paint at 300 ms, after the scripts had run: they were counted | 99 |
+
+Accessibility, best practices and SEO were 100 in every run, and the element timed was the headline each time. So the two outcomes of section 3 are what Google's machines give as well, 97 and 100, and which one depends on a few milliseconds in their run. Before the change the same report said 82 and 90.
+
+## 8. For the owner
+
+- The number moves from run to run: a single run of 97 or of 100 is the same page.
 - The 0.4 s wait of the painting is one line (`landing.css`, `html[data-motion] .hero-scene`). It is what keeps the score from depending on which picture arrives when; taking it out means asking for the sky ahead of the page again (67 KiB counted) and living with a score that moves by eight points between runs.
