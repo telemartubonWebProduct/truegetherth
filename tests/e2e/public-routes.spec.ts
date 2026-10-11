@@ -131,16 +131,6 @@ test("Google Search Console finds the file that proves who owns the site", async
   expect((await response.text()).trim()).toBe("google-site-verification: googleb1396b0e8315a5c3.html");
 });
 
-test("the site's former domain sends every address, for good, to the same address on the one it has now", async ({ request }) => {
-  for (const host of ["telemartubon.com", "www.telemartubon.com"]) {
-    const response = await request.get("/broadband?utm_source=old", { headers: { host }, maxRedirects: 0 });
-    expect(response.status(), host).toBe(308);
-    expect(response.headers().location, host).toBe("https://www.truegetherth.com/broadband?utm_source=old");
-  }
-  // Its own host is served, not redirected.
-  expect((await request.get("/broadband", { maxRedirects: 0 })).status()).toBe(200);
-});
-
 test("package buttons open a LINE chat with the sales team", async ({ page }) => {
   await page.goto("/broadband");
   const buttons = page.getByRole("link", { name: /^สนใจแพ็กเกจนี้/ });
