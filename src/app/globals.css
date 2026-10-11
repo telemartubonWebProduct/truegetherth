@@ -18,8 +18,9 @@
 /* Back office (src/app/admin), built on the same tokens. */
 @layer components {
   .tm-admin {
-    /* Declared here, where next/font sets its variables, so they resolve. */
-    --tm-font-sans: var(--font-inter), var(--font-anuphan), system-ui, -apple-system, "Segoe UI", sans-serif;
+    /* Declared here, where next/font sets its variables, so they resolve. Inter's rarer characters come from a
+       file of their own (src/fonts), named first: it answers for those characters alone. */
+    --tm-font-sans: var(--font-inter-more), var(--font-inter), var(--font-anuphan), system-ui, -apple-system, "Segoe UI", sans-serif;
     min-height: 100dvh;
     background: var(--tm-color-canvas);
     color: var(--tm-color-ink);
@@ -43,7 +44,7 @@
    src/styles/landing.css; this file holds what every page shares. */
 @layer components {
   .tm-site {
-    --tm-font-sans: var(--font-inter), var(--font-anuphan), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --tm-font-sans: var(--font-inter-more), var(--font-inter), var(--font-anuphan), system-ui, -apple-system, "Segoe UI", sans-serif;
     --tm-font-display: var(--tm-font-sans);
     /* The theme's own colours, kept for elements that sit on a dark tone but
        need the page's normal palette (menus, cards, the slip). */

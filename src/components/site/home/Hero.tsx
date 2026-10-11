@@ -5,6 +5,12 @@ import { type CSSProperties, type ReactNode, useEffect, useRef } from "react";
 
 import type { Files, HeroLayer, HeroPack, HeroTableau } from "./hero-art";
 
+// Nothing of the painting is asked for ahead of the first paint. A page is
+// timed by what it fetches before its largest paint, which here is the headline
+// (the painting waits a moment and then fades in, landing.css, and a browser
+// does not time what it first paints unseen): an early request for a layer
+// only stood in the words' way. docs/renovation/R10-FIRST-PAINT.md.
+
 /** Marks an element as the view of one content field in the Mirror editor; empty on the public site. */
 type Binding = { "data-edit"?: string };
 
@@ -40,22 +46,6 @@ const srcSet = (files: Files) => files.map((file) => `${file.src} ${file.width}w
  * file on an ordinary phone.
  */
 const layerSizes = (layer: HeroLayer, pack: "wide" | "tall") => `${Math.ceil(layer.w * (pack === "wide" ? 125 : layer.w > 1 ? 75 : 96))}vw`;
-
-/**
- * Asks for the largest layer of an arrangement with the page itself, when the
- * screen is the one that arrangement is for. The sky fills the screen, which a
- * browser takes for a background, so the layer that covers most of the picture
- * is what it times as the page's largest picture; left to lazy loading it
- * would be found last. A layer wider than the picture (the cloud bank on a
- * phone) counts for the part that shows. Measured on the live site: on a phone
- * that layer is the cloud bank, not a figure.
- */
-function LargestLayer({ pack, name }: { pack: HeroPack; name: "wide" | "tall" }) {
-  if (pack.layers.length === 0) return null;
-  const shown = (layer: HeroLayer) => Math.min(layer.w, 1) * layer.h;
-  const largest = pack.layers.reduce((a, b) => (shown(b) > shown(a) ? b : a));
-  return <link rel="preload" as="image" href={largest.files[largest.files.length - 1].src} imageSrcSet={srcSet(largest.files)} imageSizes={layerSizes(largest, name)} media={name === "tall" ? TALL : `not all and ${TALL}`} fetchPriority="high" />;
-}
 
 /** One cut-out of the painting, with the signal frame hung on it. */
 function Layer({ layer, index, pack, art }: { layer: HeroLayer; index: number; pack: "wide" | "tall"; art: HeroTableau }) {
@@ -180,14 +170,14 @@ function HeroStage({ view }: { view: HeroView }) {
 
   return (
     <div className="hero" id="top">
-      <LargestLayer pack={wide} name="wide" />
-      <LargestLayer pack={tall} name="tall" />
       <div className="hero-art">
         <div className="hero-art-inner">
           <div className="hero-scene" ref={scene} style={shapes}>
             <picture>
-              <source media={TALL} srcSet={srcSet(tall.sky)} sizes="100vw" />
-              {/* The page's first picture, at its own sizes: the image optimizer has nothing to add. */}
+              {/* A hair under the screen's width: a 412-pixel phone at 1.75 takes the 720 file instead of missing it by a pixel. */}
+              <source media={TALL} srcSet={srcSet(tall.sky)} sizes="99vw" />
+              {/* At its own sizes: the image optimizer has nothing to add. Asked for once the page has painted, like the
+                  figures: the words are read first, and the box the sky fades into is already dark. */}
               <img
                 className="hero-sky"
                 src={view.picture.src}
@@ -196,6 +186,7 @@ function HeroStage({ view }: { view: HeroView }) {
                 alt={view.picture.alt}
                 width={view.picture.width}
                 height={view.picture.height}
+                loading="lazy"
                 fetchPriority="high"
                 decoding="async"
                 {...view.picture.bind}

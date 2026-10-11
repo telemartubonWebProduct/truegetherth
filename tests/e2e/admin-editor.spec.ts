@@ -383,7 +383,7 @@ test("the preview is the public page, pixel for pixel", async ({ browser, baseUR
       }
       window.scrollTo(0, 0);
       // The navigation and the home page's opening fade in (also with reduced motion): wait until they are there.
-      const fading = () => [...document.querySelectorAll(".nav, .hero-art-inner, .hero-foot, .hero-foot > * > *")].some((element) => getComputedStyle(element).opacity !== "1");
+      const fading = () => [...document.querySelectorAll(".nav, .hero-scene, .hero-foot, .hero-foot > * > *")].some((element) => getComputedStyle(element).opacity !== "1");
       for (let tries = 0; tries < 100 && fading(); tries++) await new Promise((resolve) => setTimeout(resolve, 50));
       // Lazy pictures in closed tabs, or scrolled sideways off screen in a row
       // of cards, load only when they come into view; neither page shows them.

@@ -8,7 +8,7 @@ import type { NextConfig } from "next";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL) : null;
 const localSupabase = supabaseUrl !== null && ["127.0.0.1", "localhost"].includes(supabaseUrl.hostname);
 
-const week = [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }];
+const forGood = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -38,8 +38,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       // The home page's picture (the painting's sky and its cut-out figures). A
-      // new version goes in a new folder (hero-v5), so visitors can keep these a week.
-      { source: "/media/:cut(hero-v\\d+)/:path*", headers: week },
+      // picture that changes goes in a new folder (hero-v5) and no file here is
+      // written again under its name (scripts/media/hero-tableau.mjs refuses to),
+      // so visitors keep these for good, as they do the build's own files.
+      { source: "/media/:cut(hero-v\\d+)/:path*", headers: forGood },
     ];
   },
   async redirects() {

@@ -5,9 +5,9 @@ import type { HeroTableau } from "./hero-art";
 // and run it again.
 export const heroTableau: HeroTableau = {
   "mark": {
-    "src": "/media/hero-v4/true-online.webp",
-    "width": 372,
-    "height": 59
+    "src": "/media/hero-v4/true-online-248.webp",
+    "width": 248,
+    "height": 39
   },
   "packs": {
     "wide": {
@@ -27,6 +27,10 @@ export const heroTableau: HeroTableau = {
         {
           "id": "sea-god",
           "files": [
+            {
+              "src": "/media/hero-v4/sea-god-358.webp",
+              "width": 358
+            },
             {
               "src": "/media/hero-v4/sea-god-527.webp",
               "width": 527
@@ -242,6 +246,10 @@ export const heroTableau: HeroTableau = {
         {
           "id": "sea-god",
           "files": [
+            {
+              "src": "/media/hero-v4/sea-god-358.webp",
+              "width": 358
+            },
             {
               "src": "/media/hero-v4/sea-god-527.webp",
               "width": 527

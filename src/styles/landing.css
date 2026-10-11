@@ -257,6 +257,65 @@ html[data-nav="ink"] .nav-menu-dot {
   color: var(--ink-56);
 }
 
+/* The panel opens from under its pill and its lines come in one after
+   another; closed, it stays in the page for as long as it takes to leave
+   (Navbar.tsx, LEAVE). With "reduce motion" it only fades. */
+.nav-panel {
+  animation: nav-panel-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.nav-panel[data-leaving] {
+  animation: nav-panel-out 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.nav-panel > ul > li {
+  animation: nav-line-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 40ms + 50ms) backwards;
+}
+
+@keyframes nav-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+}
+
+@keyframes nav-panel-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+@keyframes nav-line-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes nav-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes nav-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-panel,
+  .nav-panel > ul > li {
+    animation-name: nav-fade-in;
+  }
+
+  .nav-panel[data-leaving] {
+    animation-name: nav-fade-out;
+  }
+}
+
 @media (min-width: 768px) {
   .nav {
     padding: 24px 32px;
@@ -307,6 +366,30 @@ html[data-motion] .pin {
   top: 0;
   height: 100svh;
   overflow: hidden;
+}
+
+/* Where the page is choreographed, what lies below the opening is not laid out
+   until it comes near the screen: the first paint has little more than the
+   opening to lay out, and is on the screen before the page's scripts have
+   arrived. A stage's height is set (--len), so nothing moves when it is laid
+   out. The two sections after the stages have no set height: they hold a
+   screen's until they are laid out and keep their own once it is known, which
+   moves what lies under them. So only where the browser keeps the visitor's
+   place when something above the screen grows (Safari does not: there a jump
+   to the questions would land short). Not the contact band and the footer:
+   until such a section is laid out its box is a guess, and an accessibility
+   checker that looks for the colour behind words lying beyond the guess finds
+   the page's white instead of the footer's ink. And not on the flat page
+   (reduced motion, a short screen, the editor's preview). */
+html[data-motion] .stage:not(.stage-hero) {
+  content-visibility: auto;
+}
+
+@supports (overflow-anchor: auto) {
+  html[data-motion] .band {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 100svh;
+  }
 }
 
 /* 1. Hero ---------------------------------------------------------------------- */
@@ -772,10 +855,16 @@ html[data-motion] .dot::after {
 }
 
 /* The entrance, in CSS so that nothing waits for script: the navigation drops
-   in, the picture settles from a little larger, and the context line, the
-   buttons and the side notes rise in one after another. The headline is not
-   part of it: it is the largest thing on the screen and is there from the
-   first paint. Only under data-motion; otherwise everything simply shows. */
+   in, and the context line, the buttons and the side notes rise in one after
+   another. The headline is not part of it: it is the largest thing on the
+   screen and is there from the first paint, white on the painting's box, which
+   is dark from the start. The painting waits a moment in that dark and then
+   comes out of it whole, settling from a little larger: its pictures are
+   asked for after the first paint, and on an ordinary connection all of them
+   have arrived by then, so none pops in on its own. (A browser times a page by
+   its largest paint and does not count what it first paints unseen: with the
+   wait that paint is the headline, not a picture that came later.) Only under
+   data-motion; otherwise everything simply shows. */
 @keyframes nav-drop {
   from {
     opacity: 0;
@@ -801,8 +890,8 @@ html[data-motion] .nav {
   animation: nav-drop 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-html[data-motion] .hero-art-inner {
-  animation: hero-settle 1.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+html[data-motion] .hero-scene {
+  animation: hero-settle 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;
 }
 
 html[data-motion] .hero-sub {

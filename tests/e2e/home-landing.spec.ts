@@ -102,7 +102,7 @@ const shift = (page: Page, id: string) =>
 const composition = async (page: Page) => {
   // Measured once the picture's entrance (it settles from slightly enlarged) is over.
   await expect
-    .poll(() => page.locator(".hero-art-inner").evaluate((element) => getComputedStyle(element).transform), { timeout: 10_000 })
+    .poll(() => page.locator(".hero-scene").evaluate((element) => getComputedStyle(element).transform), { timeout: 10_000 })
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
   return page.evaluate(() => {
     type Box = { left: number; top: number; right: number; bottom: number };
@@ -266,7 +266,9 @@ test("the counted prices land on the catalog's own numbers", async ({ page }) =>
     await page.waitForTimeout(120);
   }
   await expect.poll(() => shown.allTextContents(), { timeout: 8000 }).toEqual(cards.map((item) => item.price.amount.toLocaleString("en-US")));
+  // The table counts row by row as it comes into view, and may be taller than the screen: down to its last row.
   await page.locator("#prices").scrollIntoViewIfNeeded();
+  await page.locator("#prices .col-price .num").last().scrollIntoViewIfNeeded();
   const listed = publicPackagesIn(content, home.prices.category, home.prices.group, today);
   await expect.poll(() => page.locator("#prices .col-price .num").allTextContents(), { timeout: 8000 }).toEqual(listed.map((item) => item.price.amount.toLocaleString("en-US")));
 });
