@@ -13,6 +13,7 @@ import { Hero } from "./Hero";
 import { heroArt } from "./hero-art";
 import { Plate } from "./Plate";
 import { RailTabs } from "./RailTabs";
+import { stepPictures } from "./step-pictures";
 import { Words } from "./Words";
 
 const doc = "page:home" as const;
@@ -228,6 +229,25 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
                   </div>
                   <div className="slip-plate">
                     <Plate kind="field" />
+                    {/* A small painting for each step, over the plate: the scroll shows the one of the step just done
+                        (ScrollDriver), and the flat page the last, like the slip's lines. Asked for when the stage comes near. */}
+                    {stepPictures.slice(0, phases.length - 1).map((picture, index) => (
+                      // eslint-disable-next-line @next/next/no-img-element -- already at the sizes the slip needs (scripts/media/step-pictures.mjs)
+                      <img
+                        key={picture.id}
+                        className="slip-picture"
+                        data-slip-picture={index}
+                        data-shown={index === phases.length - 2 ? "" : undefined}
+                        alt=""
+                        src={picture.files[picture.files.length - 1].src}
+                        srcSet={picture.files.map((file) => `${file.src} ${file.width}w`).join(", ")}
+                        sizes="(min-width: 900px) 344px, 264px"
+                        width={picture.width}
+                        height={picture.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ))}
                   </div>
                   <dl className="slip-rows">
                     {slipRows.map((row, index) => (

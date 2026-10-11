@@ -1259,10 +1259,42 @@ html[data-motion] .cue[data-now] {
 }
 
 .slip-plate {
+  position: relative;
   aspect-ratio: 16 / 7;
   overflow: hidden;
   border-radius: 12px;
   background: #f3efe6;
+}
+
+/* A small painting for each step lies over the plate, and one shows: the one of
+   the step just done (ScrollDriver sets data-shown), the last on the flat page.
+   Before the first step none does, and the plate's strokes are all there is. */
+.slip-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  /* The slip is lower on a phone than the pictures are: what is lost comes off the bottom more than the top. */
+  object-position: 50% 40%;
+  opacity: 0;
+}
+
+.slip-picture[data-shown] {
+  opacity: 1;
+}
+
+/* One gives way to the next, settling from a little larger. */
+html[data-motion] .slip-picture {
+  scale: 1.08;
+  transition:
+    opacity 0.7s ease,
+    scale 1.4s var(--ease);
+}
+
+html[data-motion] .slip-picture[data-shown] {
+  scale: 1;
 }
 
 .plate {

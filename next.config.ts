@@ -37,11 +37,12 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      // The home page's picture (the painting's sky and its cut-out figures). A
-      // picture that changes goes in a new folder (hero-v5) and no file here is
-      // written again under its name (scripts/media/hero-tableau.mjs refuses to),
-      // so visitors keep these for good, as they do the build's own files.
-      { source: "/media/:cut(hero-v\\d+)/:path*", headers: forGood },
+      // The home page's pictures: the painting's sky and its cut-out figures, and
+      // the small paintings of the steps. A picture that changes goes in a new
+      // folder (hero-v5, steps-v2) and no file here is written again under its
+      // name (the scripts in scripts/media refuse to), so visitors keep these
+      // for good, as they do the build's own files.
+      { source: "/media/:cut((?:hero|steps)-v\\d+)/:path*", headers: forGood },
     ];
   },
   async redirects() {
