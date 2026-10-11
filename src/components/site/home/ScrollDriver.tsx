@@ -68,6 +68,7 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     const cues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-cue]") ?? []);
     const slipStatus = ticket?.querySelector<HTMLElement>("[data-slip-status]");
     const slipValues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-value]") ?? []);
+    const slipPictures = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-picture]") ?? []);
     const phases: SlipPhase[] = JSON.parse(ticket?.dataset.phases ?? "[]");
     const chapters = Array.from(season?.querySelectorAll<HTMLElement>("[data-chapter]") ?? []);
     const motion = root.hasAttribute("data-motion");
@@ -92,6 +93,8 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       phase = next;
       cues.forEach((cue, index) => cue.toggleAttribute("data-lit", index < next));
       cues.forEach((cue, index) => cue.toggleAttribute("data-now", index === next - 1));
+      // The slip's picture is the one of the step just done; before the first step, the bare plate.
+      slipPictures.forEach((picture, index) => picture.toggleAttribute("data-shown", index === next - 1));
       const current = phases[Math.min(next, phases.length - 1)];
       if (slipStatus) slipStatus.textContent = current.status;
       slipValues.forEach((value, index) => {

@@ -323,9 +323,12 @@ test("the slip prints one step at a time and tears at the end", async ({ page })
   await open(page);
   const lit = () => page.locator(".cue[data-lit]").count();
   const status = page.locator("[data-slip-status]");
+  // The slip's picture: the one of the step just done, none before the first step.
+  const shown = page.locator("[data-slip-picture][data-shown]");
 
   await scrub(page, "ticket", 0);
   expect(await lit()).toBe(0);
+  await expect(shown).toHaveCount(0);
   const first = await status.textContent();
   expect(Number(await variable(page, "--packet-alpha"))).toBe(0);
 
@@ -335,10 +338,17 @@ test("the slip prints one step at a time and tears at the end", async ({ page })
   await expect(page.locator(".cue[data-now]")).toHaveCount(1);
   expect(await status.textContent()).not.toBe(first);
   expect(Number(await variable(page, "--packet-cut"))).toBe(0);
+  await expect(shown).toHaveCount(1);
+  await expect(shown).toHaveAttribute("data-slip-picture", String((await lit()) - 1));
+  // Where the slip has room for its picture (not on a short phone), the picture has loaded and is seen.
+  if (await page.locator(".slip-plate").isVisible()) {
+    await expect.poll(() => shown.evaluate((picture: HTMLImageElement) => picture.complete && picture.naturalWidth > 0 && getComputedStyle(picture).opacity === "1")).toBe(true);
+  }
 
   await scrub(page, "ticket", 1);
   expect(await lit()).toBe(4);
   await expect(page.locator("[data-slip-value][data-set]")).toHaveCount(3);
+  await expect(shown).toHaveAttribute("data-slip-picture", "3");
   expect(Number(await variable(page, "--packet-cut"))).toBe(1);
 });
 
@@ -456,8 +466,9 @@ test.describe("with reduced motion", () => {
     expectClear(await composition(page));
     await expect(page.locator(".hero-title")).toBeVisible();
     await expect(page.locator("[data-rail-panel]:not([hidden]) .card").last()).toBeVisible();
-    // The slip shows its finished state rather than an empty form.
+    // The slip shows its finished state rather than an empty form, with the last step's picture.
     await expect(page.locator("[data-slip-value][data-set]")).toHaveCount(3);
+    await expect(page.locator("[data-slip-picture][data-shown]")).toHaveAttribute("data-slip-picture", "3");
   });
 });
 
@@ -524,6 +535,7 @@ test.describe("on a screen too short to pin a stage", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-motion", "");
     await expect(page.locator(".cue[data-now]")).toHaveCount(0);
     await expect(page.locator("[data-slip-value][data-set]")).toHaveCount(3);
+    await expect(page.locator("[data-slip-picture][data-shown]")).toHaveAttribute("data-slip-picture", "3");
     expect(await variable(page, "--manifesto-wipe")).toBe("");
   });
 });
