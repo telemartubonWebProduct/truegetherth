@@ -78,6 +78,10 @@ In the Google Ads account, for the owner: the action's category should be a lead
 
 Pull request 4 was merged and deployed. Lighthouse from this machine against https://www.truegetherth.com, phone profile: home 84 (it was 51), /broadband 99, /monthy 100; desktop home 99, /broadband 100; SEO, accessibility and best practices 100 on each. The read-only smoke suite against production: 51 passed, 1 passed on a second try (the first request to every package page, just after the deploy, took longer than the test allows).
 
+## 7c. Search Console
+
+On 2026-10-11 the owner had the property `https://www.truegetherth.com/` added in Google Search Console (a URL-prefix property, in the owner's own Google account, through the owner's browser). It is verified by the file `public/googleb1396b0e8315a5c3.html`, whose name and one line are Google's: the file must stay, or the verification lapses. `tests/e2e/public-routes.spec.ts` checks that it is served.
+
 ## 8. Checks
 
 `npm run lint`, `npm run typecheck`, `npm test` (177), `npm run build`. The browser suites against the production build: 181 passed, 68 skipped (the ones that need the database). The back-office, call-back form, conversion and consent suites against the local Supabase stack: 79 passed, 3 skipped, 1 failed, 4 did not run; the failure is the password-recovery test, which fails on this machine only (the local stack mails links to port 3000, where another app runs), and the four that did not run follow it in the same file. New or changed: `tests/unit/seo.test.ts` (the domain, the organization's data, breadcrumbs, no price), the parity of the form's two validations in `tests/unit/leads.test.ts`, `tests/e2e/ads-conversion.spec.ts` (no conversion for opening a page; one for LINE, one for a call, none for e-mail or Facebook; none on another host; nothing at all without advertising cookies), and in `tests/e2e/leads.spec.ts` a stored request is one conversion.
