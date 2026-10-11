@@ -5,9 +5,11 @@ import { t } from "./catalog/helpers";
 
 const page = (path: string, hash?: string): LinkTarget => (hash ? { kind: "page", path, hash } : { kind: "page", path });
 
-// Contact details come from the old footer, service page and package buttons.
-// The old site used two LINE links: package buttons opened lineSales and the
-// service page opened lineService. Which account is @341tmfte is unconfirmed.
+// Contact details are the ones the company's other site shows (truefiberhome.com,
+// read 2026-10-11, on the owner's word that this site follows it). That site
+// uses two LINE links: its package buttons open lineSales, and its other
+// buttons, with the LINE ID it shows, open lineService; the QR picture is made
+// from lineService.
 export const site: SiteSettings = {
   brand: {
     name: t("truegetherth", "truegetherth"),
@@ -15,17 +17,16 @@ export const site: SiteSettings = {
     logo: "truegetherth-logo",
   },
   contact: {
-    lineSales: "https://lin.ee/blqnOJow",
-    lineService: "https://lin.ee/eMhqQpj",
-    lineId: "@341tmfte",
+    lineSales: "https://lin.ee/vWV2aFT",
+    lineService: "https://lin.ee/V4hnwC4",
+    lineId: "@truefiberhome",
     lineQr: "line-qr",
     phones: [
-      { number: "0910192552", label: t("ฝ่ายขาย", "Sales") },
-      { number: "0902518964", label: t("ฝ่ายขาย", "Sales") },
-      { number: "0841041506", label: t("ฝ่ายขาย", "Sales") },
+      { number: "0639274977", label: t("เจ้าหน้าที่", "Our team") },
+      { number: "0639234798", label: t("เจ้าหน้าที่", "Our team") },
     ],
-    email: "Truetelemart@hotmail.com",
-    facebook: "https://www.facebook.com/profile.php?id=61571963492436",
+    email: "telemartcommu@gmail.com",
+    facebook: "https://www.facebook.com/profile.php?id=61558200500505",
     // The head office, its map and the hours are as the company's other site states them (truefiberhome.com, read 2026-10-11).
     office: t("สำนักงานใหญ่ จังหวัดอุบลราชธานี", "Head office in Ubon Ratchathani"),
     mapUrl: "https://maps.app.goo.gl/rHnXppgYGqKn9aD97",

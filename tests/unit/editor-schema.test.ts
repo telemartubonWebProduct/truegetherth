@@ -86,7 +86,7 @@ describe("field messages and bindings", () => {
     for (const url of ["javascript:alert(1)", "data:text/html,hi", "http://lin.ee/abc", "https://localhost/x"]) {
       expect(httpsUrl.safeParse(url).success, url).toBe(false);
     }
-    expect(httpsUrl.safeParse("https://lin.ee/blqnOJow").success).toBe(true);
+    expect(httpsUrl.safeParse("https://lin.ee/vWV2aFT").success).toBe(true);
     const site = structuredClone(content.site);
     site.contact.lineSales = "javascript:alert(1)";
     const parsed = parseDocument("site", site);

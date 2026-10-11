@@ -124,12 +124,22 @@ test("old in-page anchors still land on their sections", async ({ page }) => {
   }
 });
 
+test("the site's former domain sends every address, for good, to the same address on the one it has now", async ({ request }) => {
+  for (const host of ["telemartubon.com", "www.telemartubon.com"]) {
+    const response = await request.get("/broadband?utm_source=old", { headers: { host }, maxRedirects: 0 });
+    expect(response.status(), host).toBe(308);
+    expect(response.headers().location, host).toBe("https://www.truegetherth.com/broadband?utm_source=old");
+  }
+  // Its own host is served, not redirected.
+  expect((await request.get("/broadband", { maxRedirects: 0 })).status()).toBe(200);
+});
+
 test("package buttons open a LINE chat with the sales team", async ({ page }) => {
   await page.goto("/broadband");
   const buttons = page.getByRole("link", { name: /^สนใจแพ็กเกจนี้/ });
   expect(await buttons.count()).toBeGreaterThan(3);
   const first = buttons.first();
-  await expect(first).toHaveAttribute("href", "https://lin.ee/blqnOJow");
+  await expect(first).toHaveAttribute("href", content.site.contact.lineSales);
   await expect(first).toHaveAttribute("target", "_blank");
   await expect(first).toHaveAttribute("rel", /noopener/);
   await expect(first).toHaveAttribute("data-cta", "broadband-new-interest");

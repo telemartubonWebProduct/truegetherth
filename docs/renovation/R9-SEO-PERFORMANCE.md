@@ -8,7 +8,7 @@ The owner asked for the site to be looked at as a whole (theme, speed on desktop
 
 `siteUrl()` (`src/lib/seo/metadata.ts`) fell back to `https://www.telemartubon.com`. Production has no `NEXT_PUBLIC_SITE_URL`, so on truegetherth.com every canonical address, the language alternates, the share card, `robots.txt` and the sitemap named the old domain, which still serves the old site: two sites telling Google the same pages are the other's. The same host decided where Google Analytics and the Ads conversion count, so neither ran on truegetherth.com at all. The fallback is now `https://www.truegetherth.com`.
 
-Still to do, by the owner (Vercel and DNS are not touched from here): a permanent redirect of telemartubon.com and www.telemartubon.com to `https://www.truegetherth.com`, so what the old domain has earned in search moves over; then Search Console for truegetherth.com with its sitemap. In Supabase Auth, Site URL and Redirect URLs must name truegetherth.com for the back office's e-mails (`M6-LAUNCH.md` still lists the old domain).
+The redirect is in `next.config.ts`: any address on telemartubon.com or www.telemartubon.com goes permanently to the same address on `https://www.truegetherth.com`, so what the old domain has earned in search moves over. It takes effect once those two domains are attached to this Vercel project (they belong to the former site's project now), which is done in Vercel; then Search Console for truegetherth.com with its sitemap. In Supabase Auth, Site URL and Redirect URLs must name truegetherth.com for the back office's e-mails (`M6-LAUNCH.md` still lists the old domain).
 
 ## 2. Who runs the site
 
@@ -16,7 +16,9 @@ The footer of every page, section 4 of the terms and the structured data say: tr
 
 From the same site (read 2026-10-11): the head office is in Ubon Ratchathani, with a map link, and the team answers Monday to Saturday, 9:00 to 18:00. These are new contact fields (`site.contact.office`, `mapUrl`, `hours`), shown in the footer. No street address is published there, so none is here.
 
-The phone numbers, the LINE account and the e-mail address of this site were **not** changed. The other site shows its own LINE account (@truefiberhome), two other numbers and a Gmail address in its footer, and this site's number 091-019-2552 and Hotmail address in its privacy section, so both sets are the company's. Which this site should show is the owner's to say; they are edited in site settings.
+The phone numbers, the LINE links and ID, the e-mail address and the Facebook page were at first left as they were. Later the same day the owner said that this site follows the other one, so they are now the ones truefiberhome.com shows: 063-927-4977 and 063-923-4798, telemartcommu@gmail.com, LINE ID @truefiberhome. That site uses two LINE links, and so does this one: package buttons open `lineSales` (lin.ee/vWV2aFT, which leads to the same LINE account this site's package buttons opened before), and every other LINE button opens `lineService` (lin.ee/V4hnwC4), the account of the ID and the QR picture shown. The QR picture was made from that link and read back. Whether "@truefiberhome" resolves as a LINE ID by itself was not established; the links are the ones the other site uses.
+
+The owner also said to forget the site's former name and domain: its domain is redirected (see §1), the code and the project notes no longer name it, and a 3.6 MB remote-desktop installer and the former LINE QR, both left in `public/assets/etc` from that site and used by nothing, were removed (an executable on a site that advertises is something Google's reviewers act on).
 
 ## 3. Structured data
 

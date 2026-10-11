@@ -44,6 +44,14 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // The site's former domain: every address goes, for good, to the same address on the one domain the site
+      // has now. It takes effect when the former domain is attached to this project on Vercel.
+      ...["telemartubon.com", "www.telemartubon.com"].map((host) => ({
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        destination: "https://www.truegetherth.com/:path*",
+        permanent: true,
+      })),
       // /th/... would duplicate the unprefixed Thai URLs.
       { source: "/th", destination: "/", permanent: true },
       { source: "/th/:path*", destination: "/:path*", permanent: true },

@@ -24,7 +24,7 @@ export function ContactBand({ ctx }: { ctx: RenderContext }) {
         <div className="flex flex-wrap gap-3">
           <ContactLink
             ctx={ctx}
-            channel="line-sales"
+            channel="line-service"
             ctaId="contact-band-line"
             className="tm-button tm-button-primary"
             bind={ctx.bind("site", "ui", "chatOnLine")}

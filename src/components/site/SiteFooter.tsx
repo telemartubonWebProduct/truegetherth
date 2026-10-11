@@ -75,10 +75,10 @@ export function SiteFooter({ ctx, path }: { ctx: RenderContext; path: string }) 
               </p>
               <ContactLink
                 ctx={ctx}
-                channel="line-sales"
+                channel="line-service"
                 ctaId="footer-line"
                 className="tm-button tm-button-secondary mt-2"
-                bind={ctx.bind("site", "contact", "lineSales")}
+                bind={ctx.bind("site", "contact", "lineService")}
               >
                 {ctx.t(ui.chatOnLine)}
               </ContactLink>

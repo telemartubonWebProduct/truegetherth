@@ -136,7 +136,7 @@ test("each package has its own page, in both languages", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: ui.breadcrumb.th }).getByRole("link", { name: home.pageTitle.th })).toHaveAttribute("href", `${home.path}#${home.hash}`);
   await expect(page.locator("[data-package-notes]")).toContainText(ui.unverifiedNote.th);
   for (const note of home.notes) await expect(page.locator("[data-package-notes]")).toContainText(note.th);
-  await expect(page.getByRole("link", { name: new RegExp(`^${home.cta.label.th}`) })).toHaveAttribute("href", "https://lin.ee/blqnOJow");
+  await expect(page.getByRole("link", { name: new RegExp(`^${home.cta.label.th}`) })).toHaveAttribute("href", content.site.contact.lineSales);
   await expect(page.getByRole("link", { name: ui.callSales.th })).toHaveAttribute("href", /^tel:/);
 
   await page.goto(`/en${packageDetailPath(item.id)}`);

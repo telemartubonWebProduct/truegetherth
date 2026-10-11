@@ -22,13 +22,11 @@ export const contactPage: ContactPage = {
   },
   channels: {
     heading: t("ช่องทางติดต่อ", "Ways to reach us"),
-    // The old contact page's LINE button opened lineService; the footer paired
-    // lineSales with the @341tmfte QR code. Which account the business wants here
-    // is on the review list (docs/renovation/M2-PUBLIC-SITE.md).
+    // The LINE here is the general one (lineService): the account whose ID and QR code the site shows.
     items: [
       {
         id: "line",
-        channel: "line-sales",
+        channel: "line-service",
         title: t("LINE", "LINE"),
         description: t(
           "สอบถามแพ็กเกจ ขอคำแนะนำ หรือขอให้เจ้าหน้าที่ติดต่อกลับ",
@@ -39,7 +37,7 @@ export const contactPage: ContactPage = {
         id: "phone",
         channel: "phone-sales",
         title: t("โทรศัพท์", "Phone"),
-        description: t("โทรคุยกับฝ่ายขายได้โดยตรง", "Call our sales team directly."),
+        description: t("โทรคุยกับเจ้าหน้าที่ได้โดยตรง", "Call our team directly."),
       },
       {
         id: "email",
@@ -286,8 +284,8 @@ export const termsPage: LegalPage = {
       heading: t("11. การติดต่อ", "11. Contact"),
       paragraphs: [
         t(
-          "หากท่านมีคำถามเกี่ยวกับเงื่อนไขการให้บริการหรือนโยบายความเป็นส่วนตัว ติดต่อได้ที่อีเมล Truetelemart@hotmail.com หรือโทร 091-019-2552 ในเวลาทำการ",
-          "If you have questions about these terms or our privacy policy, email Truetelemart@hotmail.com or call 091-019-2552 during business hours.",
+          "หากท่านมีคำถามเกี่ยวกับเงื่อนไขการให้บริการหรือนโยบายความเป็นส่วนตัว ติดต่อได้ที่อีเมล telemartcommu@gmail.com หรือโทร 063-927-4977 ในเวลาทำการ",
+          "If you have questions about these terms or our privacy policy, email telemartcommu@gmail.com or call 063-927-4977 during business hours.",
         ),
       ],
       list: [],

@@ -7,8 +7,8 @@ import { defaultLocale, localizePath, locales, type Locale } from "@/lib/i18n/lo
 
 /**
  * Public origin for canonical URLs, sitemaps and social cards, and the host on
- * which Google Analytics and the Ads conversions count. The owner's one
- * domain since 2026-10-11 (telemartubon.com is no longer used).
+ * which Google Analytics and the Ads conversions count. The site has one
+ * domain.
  */
 export function siteUrl(): URL {
   return new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.truegetherth.com");

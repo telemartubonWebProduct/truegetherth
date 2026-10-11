@@ -137,13 +137,13 @@ describe("cookie consent", () => {
 
 describe("GA4 contact events", () => {
   it("tells LINE, phone, email and Facebook links apart", () => {
-    expect(contactEventFor("tel:0910192552")).toBe("contact_phone");
+    expect(contactEventFor("tel:0639274977")).toBe("contact_phone");
     expect(contactEventFor(new URL("tel:*900*1234#", "https://x.test").href)).toBeNull();
     expect(contactEventFor(content.site.contact.lineSales)).toBe("contact_line");
-    expect(contactEventFor("https://line.me/R/ti/p/@341tmfte")).toBe("contact_line");
-    expect(contactEventFor("mailto:Truetelemart@hotmail.com")).toBe("contact_email");
+    expect(contactEventFor("https://line.me/R/ti/p/@truefiberhome")).toBe("contact_line");
+    expect(contactEventFor("mailto:telemartcommu@gmail.com")).toBe("contact_email");
     expect(contactEventFor(content.site.contact.facebook)).toBe("contact_facebook");
-    expect(contactEventFor("https://www.telemartubon.com/broadband")).toBeNull();
+    expect(contactEventFor("https://www.truegetherth.com/broadband")).toBeNull();
     expect(contactEventFor("https://notline.me.example.com")).toBeNull();
   });
 });

@@ -115,7 +115,8 @@ test("clicks on LINE and phone links reach GA4 as their own events, with the but
   await page.evaluate(() => window.addEventListener("click", (event) => event.preventDefault(), { capture: true }));
 
   const channels = page.getByRole("region", { name: content.pages.contact.channels.heading.th });
-  await channels.locator(`a[href="${contact.lineSales}"]`).first().click();
+  // The contact page's LINE is the general account, the one whose ID and QR code the site shows.
+  await channels.locator(`a[href="${contact.lineService}"]`).first().click();
   await channels.locator(`a[href="${telHref(contact.phones[0].number)}"]`).first().click();
   const events = (await gtagCalls(page)).filter(([command]) => command === "event");
   expect(events).toEqual([

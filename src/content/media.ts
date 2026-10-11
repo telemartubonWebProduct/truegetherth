@@ -40,12 +40,13 @@ export const media = {
   "line-logo": asset("/assets/IcoSocialMedia/LINE_APP_iOS.png", 1001, 1000, "brand", "LINE", "LINE"),
   "facebook-logo": asset("/assets/IcoSocialMedia/facebook.png", 512, 512, "brand", "Facebook", "Facebook"),
   "line-qr": asset(
-    "/assets/etc/lineScanAddFriend.webp",
+    // Made from site.contact.lineService and read back (a QR generator, 2026-10-11); make it again if that link changes.
+    "/assets/etc/line-qr-truefiberhome.webp",
     540,
     540,
     "brand",
-    "คิวอาร์โค้ดเพิ่มเพื่อน LINE @341tmfte",
-    "QR code to add LINE @341tmfte",
+    "คิวอาร์โค้ดเพิ่มเพื่อน LINE @truefiberhome",
+    "QR code to add LINE @truefiberhome",
   ),
 
   // Home internet benefits (icons from the old package cards)
