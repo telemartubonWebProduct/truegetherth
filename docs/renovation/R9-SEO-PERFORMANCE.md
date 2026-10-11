@@ -47,7 +47,7 @@ Desktop: home 98 before, 99 after; /broadband 100. The live site, which is still
 What changed:
 
 - **The headline is in the first paint.** The opening's entrance was run by script: navigation, picture and words started invisible and appeared once the scripts had loaded. It is CSS now (`landing.css`, under `data-motion`), and the headline is not part of it.
-- **The largest figure of the painting is asked for with the page.** The sky fills the screen, which a browser takes for a background, so it times the largest figure instead; lazily loaded, that one was found last. `Hero.tsx` preloads it for the arrangement the screen will show.
+- **The largest layer of the painting is asked for with the page.** The sky fills the screen, which a browser takes for a background, so it times the layer that covers most of the picture instead; lazily loaded, that one was found last. `Hero.tsx` preloads it for the arrangement the screen will show. Measured on the live site after the first deploy, that layer on a phone was the cloud bank, not the goddess as first assumed; the choice now goes by the area that shows.
 - **The cookie banner is in the page's HTML.** It appeared after the scripts, and on a page of small text it was the largest thing painted. For a visitor who has already chosen, a script in the head marks the document before first paint and CSS keeps the banner out of sight.
 - **The call-back form no longer brings the validation library** (83 kB compressed, on every page with the form). The browser's checks are plain code (`src/lib/leads/fields.ts`); the server decides with the schema as before, and a unit test holds the two to the same answers.
 - Phones take the smaller file of each figure, and the logo is asked for at the size it shows (it was asked for at 3840 pixels wide).
@@ -73,6 +73,10 @@ In the Google Ads account, for the owner: the action's category should be a lead
 - **The theme between the home page and the rest.** The painting is on the home page only; the package pages are black on white, and the photographs on the home page's cards are not in the painting's manner. Bringing a figure of the painting to each category's page, and new card pictures, need pictures from the owner.
 - **In the accounts**: the redirect of the old domain, Search Console, a Google Business Profile, the conversion action's settings, negative keywords and campaign structure.
 - The name "truegetherth" contains "true". Whether True's agreement with a partner allows that in a name and a domain is for the owner to confirm with True; Google's reviewers look at it too.
+
+## 7b. The live site after the deploy (2026-10-11)
+
+Pull request 4 was merged and deployed. Lighthouse from this machine against https://www.truegetherth.com, phone profile: home 84 (it was 51), /broadband 99, /monthy 100; desktop home 99, /broadband 100; SEO, accessibility and best practices 100 on each. The read-only smoke suite against production: 51 passed, 1 passed on a second try (the first request to every package page, just after the deploy, took longer than the test allows).
 
 ## 8. Checks
 
