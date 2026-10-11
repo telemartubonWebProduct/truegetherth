@@ -8,7 +8,7 @@ The owner asked for the site to be looked at as a whole (theme, speed on desktop
 
 `siteUrl()` (`src/lib/seo/metadata.ts`) fell back to `https://www.telemartubon.com`. Production has no `NEXT_PUBLIC_SITE_URL`, so on truegetherth.com every canonical address, the language alternates, the share card, `robots.txt` and the sitemap named the old domain, which still serves the old site: two sites telling Google the same pages are the other's. The same host decided where Google Analytics and the Ads conversion count, so neither ran on truegetherth.com at all. The fallback is now `https://www.truegetherth.com`.
 
-The redirect is in `next.config.ts`: any address on telemartubon.com or www.telemartubon.com goes permanently to the same address on `https://www.truegetherth.com`, so what the old domain has earned in search moves over. It takes effect once those two domains are attached to this Vercel project (they belong to the former site's project now), which is done in Vercel; then Search Console for truegetherth.com with its sitemap. In Supabase Auth, Site URL and Redirect URLs must name truegetherth.com for the back office's e-mails (`M6-LAUNCH.md` still lists the old domain).
+No redirect from the former domain: a rule for it was added and then removed the same day, on the owner's word that the former site is outside this project and its domain is being left to expire. For the owner, in the accounts: in Supabase Auth, Site URL and Redirect URLs must name truegetherth.com for the back office's e-mails (`M6-LAUNCH.md` still lists the old domain).
 
 ## 2. Who runs the site
 
@@ -18,7 +18,7 @@ From the same site (read 2026-10-11): the head office is in Ubon Ratchathani, wi
 
 The phone numbers, the LINE links and ID, the e-mail address and the Facebook page were at first left as they were. Later the same day the owner said that this site follows the other one, so they are now the ones truefiberhome.com shows: 063-927-4977 and 063-923-4798, telemartcommu@gmail.com, LINE ID @truefiberhome. That site uses two LINE links, and so does this one: package buttons open `lineSales` (lin.ee/vWV2aFT, which leads to the same LINE account this site's package buttons opened before), and every other LINE button opens `lineService` (lin.ee/V4hnwC4), the account of the ID and the QR picture shown. The QR picture was made from that link and read back. Whether "@truefiberhome" resolves as a LINE ID by itself was not established; the links are the ones the other site uses.
 
-The owner also said to forget the site's former name and domain: its domain is redirected (see §1), the code and the project notes no longer name it, and a 3.6 MB remote-desktop installer and the former LINE QR, both left in `public/assets/etc` from that site and used by nothing, were removed (an executable on a site that advertises is something Google's reviewers act on).
+The owner also said to forget the site's former name and domain: the code and the project notes no longer name it, and nothing is done about its domain (see §1), and a 3.6 MB remote-desktop installer and the former LINE QR, both left in `public/assets/etc` from that site and used by nothing, were removed (an executable on a site that advertises is something Google's reviewers act on).
 
 ## 3. Structured data
 
