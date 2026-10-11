@@ -22,13 +22,11 @@ export const contactPage: ContactPage = {
   },
   channels: {
     heading: t("ช่องทางติดต่อ", "Ways to reach us"),
-    // The old contact page's LINE button opened lineService; the footer paired
-    // lineSales with the @341tmfte QR code. Which account the business wants here
-    // is on the review list (docs/renovation/M2-PUBLIC-SITE.md).
+    // The LINE here is the general one (lineService): the account whose ID and QR code the site shows.
     items: [
       {
         id: "line",
-        channel: "line-sales",
+        channel: "line-service",
         title: t("LINE", "LINE"),
         description: t(
           "สอบถามแพ็กเกจ ขอคำแนะนำ หรือขอให้เจ้าหน้าที่ติดต่อกลับ",
@@ -39,7 +37,7 @@ export const contactPage: ContactPage = {
         id: "phone",
         channel: "phone-sales",
         title: t("โทรศัพท์", "Phone"),
-        description: t("โทรคุยกับฝ่ายขายได้โดยตรง", "Call our sales team directly."),
+        description: t("โทรคุยกับเจ้าหน้าที่ได้โดยตรง", "Call our team directly."),
       },
       {
         id: "email",
@@ -186,8 +184,8 @@ export const termsPage: LegalPage = {
       heading: t("4. ลิขสิทธิ์และทรัพย์สินทางปัญญา", "4. Copyright and intellectual property"),
       paragraphs: [
         t(
-          "เว็บไซต์นี้เป็นลูกข่ายและ/หรือพันธมิตรของ True เนื้อหา ข้อความ รูปภาพ โลโก้ หรือสื่ออื่น ๆ บนเว็บไซต์อาจเป็นทรัพย์สินทางปัญญาที่ได้รับอนุญาตให้ใช้อย่างถูกต้อง ทั้งจากบริษัทเราเอง หรือจาก True และ/หรือพันธมิตรอื่นตามสัญญา ห้ามทำซ้ำ ดัดแปลง หรือเผยแพร่เนื้อหาดังกล่าวไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษรจากเจ้าของสิทธิ์หรือผู้ที่ได้รับสิทธิ์อย่างถูกต้อง",
-          "This website is a dealer and/or partner of True. Content, text, images, logos and other media on it may be intellectual property licensed to us, whether our own or from True and/or other partners under contract. Do not copy, adapt or publish any of it, in whole or in part, without written permission from the rights holder or an authorised licensee.",
+          "เว็บไซต์นี้ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) ซึ่งเป็นพาร์ทเนอร์และตัวแทนจำหน่ายที่ได้รับการแต่งตั้งอย่างเป็นทางการ (Authorized Dealer) ของ True จัดทำขึ้นเพื่อนำเสนอแพ็กเกจและบริการติดตั้ง ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย เนื้อหา ข้อความ รูปภาพ โลโก้ หรือสื่ออื่น ๆ บนเว็บไซต์อาจเป็นทรัพย์สินทางปัญญาที่ได้รับอนุญาตให้ใช้อย่างถูกต้อง ทั้งจากบริษัทเราเอง หรือจาก True และ/หรือพันธมิตรอื่นตามสัญญา ห้ามทำซ้ำ ดัดแปลง หรือเผยแพร่เนื้อหาดังกล่าวไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษรจากเจ้าของสิทธิ์หรือผู้ที่ได้รับสิทธิ์อย่างถูกต้อง",
+          "This website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed partner and Authorized Dealer of True. It presents packages and the installation service; it is not the main website of True Corporation Public Company Limited, and we are not the network operator. Content, text, images, logos and other media on it may be intellectual property licensed to us, whether our own or from True and/or other partners under contract. Do not copy, adapt or publish any of it, in whole or in part, without written permission from the rights holder or an authorised licensee.",
         ),
       ],
       list: [],
@@ -239,8 +237,8 @@ export const termsPage: LegalPage = {
           "If these cookies collect data that could identify you, or are used for marketing or advertising, we will tell you and ask for your consent as the law requires. You can refuse or delete cookies in your browser settings.",
         ),
         t(
-          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) คุกกี้โฆษณา (Google Ads) และแชตสด (Tawk) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
-          "The website uses analytics cookies (Google Analytics), advertising cookies (Google Ads) and live chat (Tawk) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
+          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) และคุกกี้โฆษณา (Google Ads) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
+          "The website uses analytics cookies (Google Analytics) and advertising cookies (Google Ads) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
         ),
       ],
       list: [
@@ -253,19 +251,8 @@ export const termsPage: LegalPage = {
       ],
     },
     {
-      id: "tawk",
-      heading: t("9. การเชื่อมต่อกับ Tawk Live Chat", "9. Tawk live chat"),
-      paragraphs: [
-        t(
-          "เว็บไซต์ของเราอาจใช้ปลั๊กอินหรือ API ของ Tawk Live Chat เพื่อให้ท่านสื่อสารและติดต่อสอบถามได้สะดวกขึ้น เมื่อท่านใช้ฟีเจอร์ดังกล่าว ข้อมูลบางส่วน เช่น ข้อความหรือรหัสผู้ใช้ อาจถูกส่งไปยัง Tawk.to ตามเงื่อนไขการใช้บริการและนโยบายความเป็นส่วนตัวของ Tawk.to (https://www.tawk.to/privacy-policy/) หากท่านไม่ต้องการให้มีการประมวลผลข้อมูลผ่าน Tawk Live Chat กรุณาไม่ใช้บริการดังกล่าว",
-          "Our website may use the Tawk live chat plug-in or API so you can message us more easily. When you use it, some data, such as your messages or a user ID, may be sent to Tawk.to under its terms of service and privacy policy (https://www.tawk.to/privacy-policy/). If you do not want your data processed through Tawk, please do not use the chat.",
-        ),
-      ],
-      list: [],
-    },
-    {
       id: "disclosure",
-      heading: t("10. การเปิดเผยข้อมูลให้บุคคลภายนอก", "10. Sharing data with third parties"),
+      heading: t("9. การเปิดเผยข้อมูลให้บุคคลภายนอก", "9. Sharing data with third parties"),
       paragraphs: [
         t(
           "เราจะไม่เปิดเผยข้อมูลส่วนบุคคลของท่านแก่บุคคลภายนอก เว้นแต่",
@@ -273,17 +260,17 @@ export const termsPage: LegalPage = {
         ),
       ],
       list: [
-        t("10.1 ได้รับความยินยอมจากท่าน", "10.1 You have given your consent."),
-        t("10.2 เป็นคำสั่งหรือข้อบังคับทางกฎหมาย", "10.2 The law or a legal order requires it."),
+        t("9.1 ได้รับความยินยอมจากท่าน", "9.1 You have given your consent."),
+        t("9.2 เป็นคำสั่งหรือข้อบังคับทางกฎหมาย", "9.2 The law or a legal order requires it."),
         t(
-          "10.3 จำเป็นต่อการดำเนินงานของบริการภายนอกที่เกี่ยวข้อง (เช่น บริการชำระเงิน ผู้ให้บริการ Messenger)",
-          "10.3 It is needed to run a related outside service (for example payment services or messaging providers).",
+          "9.3 จำเป็นต่อการดำเนินงานของบริการภายนอกที่เกี่ยวข้อง (เช่น บริการชำระเงิน ผู้ให้บริการ Messenger)",
+          "9.3 It is needed to run a related outside service (for example payment services or messaging providers).",
         ),
       ],
     },
     {
       id: "your-rights",
-      heading: t("11. สิทธิ์ของท่านเกี่ยวกับข้อมูลส่วนบุคคล", "11. Your rights over your personal data"),
+      heading: t("10. สิทธิ์ของท่านเกี่ยวกับข้อมูลส่วนบุคคล", "10. Your rights over your personal data"),
       paragraphs: [
         t(
           "ท่านมีสิทธิ์ขอเข้าถึง แก้ไข หรือลบข้อมูลส่วนบุคคลของท่าน หากกฎหมายในเขตอำนาจของท่านรองรับ หากต้องการใช้สิทธิ์ดังกล่าว กรุณาติดต่อเราผ่านช่องทางที่ระบุในเว็บไซต์",
@@ -294,11 +281,11 @@ export const termsPage: LegalPage = {
     },
     {
       id: "contact",
-      heading: t("12. การติดต่อ", "12. Contact"),
+      heading: t("11. การติดต่อ", "11. Contact"),
       paragraphs: [
         t(
-          "หากท่านมีคำถามเกี่ยวกับเงื่อนไขการให้บริการหรือนโยบายความเป็นส่วนตัว ติดต่อได้ที่อีเมล Truetelemart@hotmail.com หรือโทร 091-019-2552 ในเวลาทำการ",
-          "If you have questions about these terms or our privacy policy, email Truetelemart@hotmail.com or call 091-019-2552 during business hours.",
+          "หากท่านมีคำถามเกี่ยวกับเงื่อนไขการให้บริการหรือนโยบายความเป็นส่วนตัว ติดต่อได้ที่อีเมล telemartcommu@gmail.com หรือโทร 063-927-4977 ในเวลาทำการ",
+          "If you have questions about these terms or our privacy policy, email telemartcommu@gmail.com or call 063-927-4977 during business hours.",
         ),
       ],
       list: [],

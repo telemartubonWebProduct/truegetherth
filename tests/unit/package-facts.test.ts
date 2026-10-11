@@ -4,7 +4,7 @@ import { content } from "@/lib/content";
 import { benefitOptions, downloadMbps, matches, packageFacts, priceLimits, ranks, speedOptions } from "@/lib/content/package-facts";
 import { publicPackagesIn } from "@/lib/content/lookup";
 
-const broadband = publicPackagesIn(content, "broadband-new", "new-customer");
+const broadband = publicPackagesIn(content, "broadband-new", "new-customer", "2026-10-09");
 const byId = (id: string) => content.catalog.find((item) => item.id === id)!;
 
 describe("package facts", () => {

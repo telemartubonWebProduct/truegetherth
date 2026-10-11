@@ -2,20 +2,10 @@
 
 import { startTransition, useActionState, useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 
-import { trackEvent } from "@/lib/analytics/tags";
+import { trackEvent, trackLeadConversion } from "@/lib/analytics/tags";
 import { submitLead, type LeadFormState } from "@/lib/leads/actions";
-import {
-  fieldErrors,
-  formValues,
-  HONEYPOT_FIELD,
-  leadFields,
-  leadInput,
-  leadServices,
-  preferredTimes,
-  type LeadField,
-  type LeadFieldError,
-  type LeadService,
-} from "@/lib/leads/form";
+// fields.ts, not form.ts: the schema's validation library stays out of what the page downloads.
+import { checkLead, formValues, HONEYPOT_FIELD, leadFields, leadServices, preferredTimes, type LeadField, type LeadFieldError, type LeadService } from "@/lib/leads/fields";
 import type { LeadFormCopy } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
 
@@ -92,6 +82,8 @@ function LeadFormRound({ text, binds, locale, provinces, packages, policyHref, m
       if (!state.duplicate && reported.current !== state) {
         reported.current = state;
         trackEvent("generate_lead", { form_id: formId, lead_service: submitted.current.service, package_id: submitted.current.packageId });
+        // The same moment is the Google Ads conversion: a stored request to be contacted.
+        trackLeadConversion();
       }
     }
     if (state?.status === "invalid") focusFirstInvalid(formRef.current, state.fields);
@@ -104,15 +96,15 @@ function LeadFormRound({ text, binds, locale, provinces, packages, policyHref, m
     keyRef.current ||= newKey();
     data.set("idempotencyKey", keyRef.current);
     data.set("source", `${location.pathname}${location.search}`);
-    const parsed = leadInput.safeParse(formValues(data));
-    if (!parsed.success) {
-      const fields = fieldErrors(parsed.error);
+    const values = formValues(data);
+    const fields = checkLead(values);
+    if (Object.keys(fields).length > 0) {
       setClientErrors(fields);
       focusFirstInvalid(event.currentTarget, fields);
       return;
     }
     setClientErrors({});
-    submitted.current = { service: parsed.data.service, packageId: parsed.data.packageId };
+    submitted.current = { service: values.service as LeadService, packageId: values.packageId || undefined };
     startTransition(() => dispatch(data));
   };
 

@@ -9,6 +9,8 @@ import { createServiceClient } from "@/lib/supabase/service";
 
 import { fieldErrors, formValues, HONEYPOT_FIELD, leadInput, requestSource, type LeadField, type LeadFieldError } from "./form";
 import { clientAddress, clientHash } from "./intake";
+import { todayInThailand } from "@/lib/content/dates";
+
 import { requestablePackages } from "./packages";
 
 // The call-back form's Server Action (M5). It is a public endpoint: it checks
@@ -34,7 +36,7 @@ export async function submitLead(_previous: LeadFormState, form: FormData): Prom
 
   const input = parsed.data;
   const content = await getPublishedContent();
-  const packageId = input.packageId && requestablePackages(content).some((item) => item.id === input.packageId) ? input.packageId : undefined;
+  const packageId = input.packageId && requestablePackages(content, todayInThailand()).some((item) => item.id === input.packageId) ? input.packageId : undefined;
   const { path, utm } = requestSource(input.source);
 
   const { data, error } = await service.client

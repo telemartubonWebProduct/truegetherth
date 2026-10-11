@@ -1,5 +1,7 @@
 # Hero picture: sources and prompts
 
+**Since 9 Oct 2026 the home page opens with a layered oil painting instead: see `tableau/README.md`.** What follows is the first hero, a 3D router and a robot arm, kept as the record of how it was made. Its files are no longer on the site (`public/models`, `public/media/hero-v3` and the scripts `hero-arm.mjs` and `hero-poster.mjs` were removed; `scripts/blender/router.py` still builds the model). `router/poster-v3.webp` is its still: the share picture (`scripts/brand/logo.mjs`) and the router reference for the painting (`tableau/reference/router-plain.png`) come from it.
+
 ## What the site uses now
 
 - `router/reference-true-wifi7.webp` — the photo of the True "Smart Home Router" (Wi-Fi 7) the owner gave as the reference for the 3D model (`scripts/blender/router.py`). `router/trueonline.png` is the True Online mark from the owner's own site, used as the logo on the model.

@@ -13,16 +13,17 @@ describe("publishing drafts (M4)", () => {
     const home = structuredClone(content.pages.home);
     home.faq.heading.th = "คำถามใหม่";
     const fresh = { ...content.catalog[0], id: "fresh", review: { status: "hidden" as const, notes: ["ใหม่"] } };
-    const unused = content.catalog.find((item) => !content.pages.home.promos.tabs.some((tab) => tab.items.some((card) => card.packageId === item.id)))!;
-    const shown = content.pages.home.promos.tabs[0].items[0].packageId;
+    const unused = content.catalog.find((item) => !content.featured.includes(item.id))!;
+    // A benefit that packages still list cannot be removed.
+    const used = content.catalog.find((item) => item.benefits.length > 0)!.benefits[0];
     const pending = pendingPublish(content, [
       draft("page:home", home, 4),
       draft("package:fresh", fresh),
       draft(`package:${unused.id}`, { $deleted: true }),
-      draft(`package:${shown}`, { $deleted: true }),
+      draft(`benefit:${used}`, { $deleted: true }),
     ]);
 
-    expect(pending.problems.map((problem) => problem.documentId)).toEqual([`package:${shown}`]);
+    expect(pending.problems.map((problem) => problem.documentId)).toEqual([`benefit:${used}`]);
     expect(pending.drafts.map((entry) => [entry.documentId, entry.revision, entry.change?.kind])).toEqual([
       ["page:home", 4, "changed"],
       ["package:fresh", 1, "new"],
@@ -30,7 +31,7 @@ describe("publishing drafts (M4)", () => {
     ]);
     expect(pending.drafts[0].change?.fields).toEqual(["คำถามที่พบบ่อย › หัวเรื่อง › ไทย"]);
     expect(pending.content.pages.home.faq.heading.th).toBe("คำถามใหม่");
-    expect(pending.content.catalog.some((item) => item.id === shown)).toBe(true);
+    expect(used in pending.content.benefits).toBe(true);
   });
 
   it("compares two releases document by document", () => {
@@ -46,7 +47,7 @@ describe("publishing drafts (M4)", () => {
     expect(usableRelease({ number: 1, schemaVersion: CONTENT_SCHEMA_VERSION - 1, content })).toBeNull();
     expect(usableRelease({ number: 1, schemaVersion: CONTENT_SCHEMA_VERSION, content: { ...content, site: {} } })).toBeNull();
     const broken = structuredClone(content);
-    broken.pages.home.promos.tabs[0].items[0].packageId = "no-such-package";
+    broken.catalog[0].benefits.push("no-such-benefit");
     expect(usableRelease({ number: 1, schemaVersion: CONTENT_SCHEMA_VERSION, content: broken })).toBeNull();
   });
 });

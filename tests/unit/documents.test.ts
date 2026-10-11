@@ -12,7 +12,7 @@ describe("content documents", () => {
     expect(ids).toContain("site");
     expect(ids).toContain("page:home");
     expect(ids).toContain("package:fiber-500-499");
-    expect(ids).toContain("media:hero-router-still");
+    expect(ids).toContain("media:hero-tableau-sky");
     expect(ids).toContain("catalog");
     expect(ids.length).toBe(2 + 9 + content.catalog.length + Object.keys(content.media).length + Object.keys(content.benefits).length);
     for (const id of ids) {
@@ -49,17 +49,27 @@ describe("content documents", () => {
 
   it("reorder the catalog through its own document", () => {
     const [first, second, ...rest] = content.catalog.map((entry) => entry.id);
-    const swapped = writeDocument(content, "catalog", { order: [second, first] });
+    const swapped = writeDocument(content, "catalog", { order: [second, first], featured: content.featured });
     expect(swapped.catalog.map((entry) => entry.id)).toEqual([second, first, ...rest]);
-    expect(readDocument(swapped, "catalog")).toEqual({ order: [second, first, ...rest] });
+    expect(readDocument(swapped, "catalog")).toEqual({ order: [second, first, ...rest], featured: content.featured });
+  });
+
+  it("keep the home page's recommended packages in the catalog document", () => {
+    const [first, second] = content.featured;
+    const turned = writeDocument(content, "catalog", { order: content.catalog.map((entry) => entry.id), featured: [second, first] });
+    expect(turned.featured).toEqual([second, first]);
+    expect(turned.catalog.map((entry) => entry.id)).toEqual(content.catalog.map((entry) => entry.id));
+    // One object while neither list changes: the editor's autosave tells a changed document by identity.
+    expect(readDocument(turned, "catalog")).toBe(readDocument(turned, "catalog"));
+    expect(readDocument(turned, "catalog")).not.toBe(readDocument(content, "catalog"));
   });
 
   it("apply a tombstone, a new document and the order together, the order last", () => {
-    const victim = content.catalog.find((entry) => !content.pages.home.promos.tabs.some((tab) => tab.items.some((card) => card.packageId === entry.id)))!;
+    const victim = content.catalog.find((entry) => !content.featured.includes(entry.id))!;
     const fresh = { ...content.catalog[0], id: "fresh", review: { status: "hidden" as const, notes: ["ใหม่"] } };
     const draft = (documentId: string, body: unknown) => ({ documentId, body, schemaVersion: CONTENT_SCHEMA_VERSION, revision: 1, updatedAt: "", updatedBy: null }) as never;
     const { content: next, problems } = applyDrafts(content, [
-      draft("catalog", { order: ["fresh"] }),
+      draft("catalog", { order: ["fresh"], featured: content.featured }),
       draft(`package:${victim.id}`, { $deleted: true }),
       draft("package:fresh", fresh),
     ]);
@@ -68,12 +78,17 @@ describe("content documents", () => {
     expect(next.catalog.some((entry) => entry.id === victim.id)).toBe(false);
   });
 
-  it("refuse to remove what the site still shows", () => {
-    const shown = content.pages.home.promos.tabs[0].items[0].packageId;
-    const checked = validateDraft(content, `package:${shown}`, { $deleted: true });
+  it("refuse to remove what the site still uses", () => {
+    const used = content.catalog.find((entry) => entry.benefits.length > 0)!.benefits[0];
+    const checked = validateDraft(content, `benefit:${used}`, { $deleted: true });
     expect(checked.ok).toBe(false);
-    expect(!checked.ok && checked.messages.join(" ")).toContain(shown);
+    expect(!checked.ok && checked.messages.join(" ")).toContain(used);
     expect(validateDraft(content, "page:home", { $deleted: true }).ok).toBe(false);
+  });
+
+  it("let a recommended package go: its card simply goes with it", () => {
+    const [recommended] = content.featured;
+    expect(validateDraft(content, `package:${recommended}`, { $deleted: true }).ok).toBe(true);
   });
 
   it("reject ids that are not documents", () => {

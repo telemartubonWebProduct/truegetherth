@@ -19,7 +19,7 @@ export function CallbackSection({ ctx, page }: { ctx: RenderContext; page: Conta
   const { callback } = page;
   const { site } = ctx;
   const phone = site.contact.phones[0];
-  const packages = Object.fromEntries(requestablePackages(ctx.content).map((item) => [item.id, { name: ctx.t(item.name), service: serviceOf(item) }]));
+  const packages = Object.fromEntries(requestablePackages(ctx.content, ctx.today).map((item) => [item.id, { name: ctx.t(item.name), service: serviceOf(item) }]));
 
   return (
     <section id="callback" aria-labelledby="callback-heading" data-tone={callback.tone} {...ctx.bind("page:contact", "callback")}>
@@ -32,7 +32,7 @@ export function CallbackSection({ ctx, page }: { ctx: RenderContext; page: Conta
             {ctx.t(callback.description)}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <ContactLink ctx={ctx} channel="line-sales" ctaId="callback-line" className="tm-button tm-button-secondary" bind={ctx.bind("site", "ui", "chatOnLine")}>
+            <ContactLink ctx={ctx} channel="line-service" ctaId="callback-line" className="tm-button tm-button-secondary" bind={ctx.bind("site", "ui", "chatOnLine")}>
               {ctx.t(site.ui.chatOnLine)}
             </ContactLink>
             <a href={telHref(phone.number)} data-cta="callback-call" className="tm-button tm-button-secondary" {...ctx.bind("site", "contact", "phones", 0)}>

@@ -40,12 +40,13 @@ export const media = {
   "line-logo": asset("/assets/IcoSocialMedia/LINE_APP_iOS.png", 1001, 1000, "brand", "LINE", "LINE"),
   "facebook-logo": asset("/assets/IcoSocialMedia/facebook.png", 512, 512, "brand", "Facebook", "Facebook"),
   "line-qr": asset(
-    "/assets/etc/lineScanAddFriend.webp",
+    // Made from site.contact.lineService and read back (a QR generator, 2026-10-11); make it again if that link changes.
+    "/assets/etc/line-qr-truefiberhome.webp",
     540,
     540,
     "brand",
-    "คิวอาร์โค้ดเพิ่มเพื่อน LINE @341tmfte",
-    "QR code to add LINE @341tmfte",
+    "คิวอาร์โค้ดเพิ่มเพื่อน LINE @truefiberhome",
+    "QR code to add LINE @truefiberhome",
   ),
 
   // Home internet benefits (icons from the old package cards)
@@ -152,30 +153,31 @@ export const media = {
   "solar-knowledge-7": asset("/assets/wEnergy/knowledge/install7.webp", 300, 236, "photo", "หน้าจอแอปติดตามการผลิตไฟฟ้า", "Monitoring app showing power production"),
   "solar-knowledge-8": asset("/assets/wEnergy/knowledge/install8.webp", 300, 170, "photo", "การล้างทำความสะอาดแผงโซลาร์เซลล์", "Cleaning solar panels"),
 
-  // The home page's opening: a True fibre router modelled for this site and
-  // drawn live in 3D (scripts/blender/router.py). This is the same view as a
-  // still (scripts/media/hero-poster.mjs): what shows first, and all that shows where
-  // nothing may move. Its logo is the True Online mark above.
-  "hero-router-still": {
-    src: "/media/hero-v3/poster-2560.webp",
+  // The home page's opening: an oil painting made with an image generator for
+  // this site and cut into layers (design/hero/tableau/README.md,
+  // scripts/media/hero-tableau.mjs). This is its sky; the figures are laid over
+  // it by the page (src/components/site/home/hero-art.ts), so its description
+  // is of the whole picture.
+  "hero-tableau-sky": {
+    src: "/media/hero-v4/wide-sky-2560.webp",
     width: 2560,
-    height: 1440,
-    kind: "illustration",
+    height: 1429,
+    kind: "generated",
     alt: {
-      th: "ภาพจำลอง 3 มิติของเราเตอร์ไฟเบอร์ทรูสีขาว มีเสาอากาศหกต้น",
-      en: "3D model of a white True fibre router with six antennas",
+      th: "ภาพวาดสีน้ำมันแนวคลาสสิก: เทพีชูเราเตอร์ไวไฟสีขาวหกเสาเหนือศีรษะกลางหมู่เมฆ รอบตัวมีกามเทพถือมือถือ จอยเกม และแล็ปท็อป เทพทะเลอ่านแท็บเล็ต และนางฟ้าสวมหูฟัง",
+      en: "Classical-style oil painting: a goddess lifts a white six-antenna Wi-Fi router over her head among the clouds, with cherubs holding a phone, a game controller and a laptop, a sea god reading a tablet and a muse wearing headphones",
     },
-    source: "โมเดล 3 มิติที่สร้างสำหรับเว็บนี้ (scripts/blender/router.py) ถ่ายเป็นภาพนิ่งด้วย scripts/media/hero-poster.mjs",
+    source: "ภาพสร้างด้วย AI สำหรับเว็บนี้ (Nano Banana Pro, 9 ต.ค. 2026) ตัดเป็นชั้นด้วย scripts/media/hero-tableau.mjs; ต้นฉบับและ prompt อยู่ใน design/hero/tableau/",
   },
 
   "og-image": {
-    src: "/media/og-image.png",
+    src: "/media/og-image-v2.png",
     width: 1200,
     height: 630,
     kind: "illustration",
     alt: {
-      th: "โลโก้ truegetherth กับภาพจำลองเราเตอร์ไฟเบอร์ทรู",
-      en: "The truegetherth logo with a model of a True fibre router",
+      th: "โลโก้ truegetherth บนภาพวาดสีน้ำมัน เทพธิดาชูเราเตอร์ทรูเหนือศีรษะ ท่ามกลางคิวปิดและเทพที่ถืออุปกรณ์ออนไลน์",
+      en: "The truegetherth logo over an oil painting of a goddess lifting the True router over her head, among cherubs and gods holding online devices",
     },
     source: "สร้างจากโลโก้และภาพนิ่งของเราเตอร์ (scripts/brand/logo.mjs)",
   },

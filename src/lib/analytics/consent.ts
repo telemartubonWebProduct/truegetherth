@@ -1,6 +1,6 @@
 // The visitor's cookie choices (PDPA), kept in a first-party cookie for 180
-// days. Analytics (GA4), advertising (Google Ads) and live chat (Tawk) load
-// only when the visitor agreed to them; a choice made under an older policy
+// days. Analytics (GA4) and advertising (Google Ads) load only when the
+// visitor agreed to them; a choice made under an older policy
 // version counts as no choice, so changing site.consent.policyVersion asks
 // everyone again. The cookie is only ever read in the browser.
 
@@ -12,23 +12,24 @@ export const CONSENT_OPEN_EVENT = "tm:consent-open";
 
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
 
-export type ConsentChoice = { analytics: boolean; ads: boolean; chat: boolean };
+export type ConsentChoice = { analytics: boolean; ads: boolean };
 export type StoredConsent = ConsentChoice & { version: string; at: number };
 
-export const allGranted: ConsentChoice = { analytics: true, ads: true, chat: true };
-export const noneGranted: ConsentChoice = { analytics: false, ads: false, chat: false };
+export const allGranted: ConsentChoice = { analytics: true, ads: true };
+export const noneGranted: ConsentChoice = { analytics: false, ads: false };
 
 const bit = (value: boolean) => (value ? "1" : "0");
 
-/** "2026-10-02.101.1759390000": policy version, analytics/ads/chat, and when (Unix seconds). */
+/** "2026-10-02.10.1759390000": policy version, analytics/ads, and when (Unix seconds). */
 export function serializeConsent(consent: StoredConsent): string {
-  return `${consent.version}.${bit(consent.analytics)}${bit(consent.ads)}${bit(consent.chat)}.${consent.at}`;
+  return `${consent.version}.${bit(consent.analytics)}${bit(consent.ads)}.${consent.at}`;
 }
 
 export function parseConsent(value: string | undefined, version: string): StoredConsent | null {
-  const match = /^(\d{4}-\d{2}-\d{2})\.([01])([01])([01])\.(\d{1,12})$/.exec(value ?? "");
+  // A third digit is the live chat the site had until October 2026: such a choice still stands for the other two.
+  const match = /^(\d{4}-\d{2}-\d{2})\.([01])([01])[01]?\.(\d{1,12})$/.exec(value ?? "");
   if (!match || match[1] !== version) return null;
-  return { version, analytics: match[2] === "1", ads: match[3] === "1", chat: match[4] === "1", at: Number(match[5]) };
+  return { version, analytics: match[2] === "1", ads: match[3] === "1", at: Number(match[4]) };
 }
 
 /** The choice in a Cookie header or document.cookie, if it is for this policy version. */
@@ -55,7 +56,7 @@ export function writeConsent(choice: ConsentChoice, version: string): StoredCons
 /** True when a category the visitor had agreed to is now refused. */
 export function withdrawsConsent(previous: ConsentChoice | null, next: ConsentChoice): boolean {
   if (!previous) return false;
-  return (previous.analytics && !next.analytics) || (previous.ads && !next.ads) || (previous.chat && !next.chat);
+  return (previous.analytics && !next.analytics) || (previous.ads && !next.ads);
 }
 
 /** Removes Google's measurement cookies from this site and its parent domains. */

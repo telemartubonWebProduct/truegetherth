@@ -7,17 +7,17 @@ import { content } from "./src/lib/content";
 // against production after every deploy. They send no form, sign nobody in, and block every
 // request to other sites, so Google Analytics and Ads count nothing.
 //
-//   npm run test:smoke                                          https://www.telemartubon.com
+//   npm run test:smoke                                          https://www.truegetherth.com
 //   SMOKE_BASE_URL=https://<preview>.vercel.app npm run test:smoke
 //
 // A preview behind Vercel Deployment Protection needs SMOKE_BYPASS_SECRET (Vercel's "Protection
 // Bypass for Automation" secret) in the environment, never in a file.
-const baseURL = process.env.SMOKE_BASE_URL ?? "https://www.telemartubon.com";
+const baseURL = process.env.SMOKE_BASE_URL ?? "https://www.truegetherth.com";
 const { hostname, protocol } = new URL(baseURL);
 const bypass = process.env.SMOKE_BYPASS_SECRET;
 
 // A visitor who chose "necessary only", so the consent banner stays out of the way.
-const consent = serializeConsent({ analytics: false, ads: false, chat: false, version: content.site.consent.policyVersion, at: Math.floor(Date.now() / 1000) });
+const consent = serializeConsent({ analytics: false, ads: false, version: content.site.consent.policyVersion, at: Math.floor(Date.now() / 1000) });
 
 export default defineConfig({
   testDir: "tests/smoke",

@@ -7,8 +7,8 @@ import { siteUrl } from "../../../src/lib/seo/metadata";
 // so the banner stays out of the way; the consent suite starts without one,
 // and suites that check Google tags agree to them.
 
-export const necessaryOnly: ConsentChoice = { analytics: false, ads: false, chat: false };
-export const everything: ConsentChoice = { analytics: true, ads: true, chat: true };
+export const necessaryOnly: ConsentChoice = { analytics: false, ads: false };
+export const everything: ConsentChoice = { analytics: true, ads: true };
 
 /** Hosts the suites open: the server under test and the production domain served by serveAt(). */
 const hosts = ["127.0.0.1", "localhost", siteUrl().hostname];

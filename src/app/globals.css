@@ -267,8 +267,8 @@
     font-family: var(--font-inter), var(--tm-font-sans);
   }
 
-  /* Package comparison: every card in a row of cards shares the same row
-     tracks (subgrid), so name, speed, price, contract and benefits line up
+  /* Package cards: every card in a row of cards shares the same row tracks
+     (subgrid), so figure, name, terms, benefits and the price stub line up
      across packages whatever their lengths. */
   .tm-compare {
     display: grid;
@@ -291,13 +291,249 @@
     }
   }
 
-  .tm-compare-card > * + * {
+  /* The card is a slip of paper (docs/renovation/R8-PROMO-CARDS.md): a
+     hairline edge, what the package gives in figures at the top, ruled lines
+     between what it lists, and a perforation above the stub that carries the
+     price. A row a package has nothing for is empty and takes no room. */
+  .tm-slip {
+    border-radius: var(--tm-radius-panel);
+    background: var(--tm-color-canvas);
+    box-shadow: inset 0 0 0 1px var(--tm-color-line);
+    transition: box-shadow var(--tm-duration-base) var(--tm-ease-out);
+  }
+
+  @media (hover: hover) {
+    .tm-slip:hover {
+      box-shadow: inset 0 0 0 1px var(--tm-color-ink);
+    }
+  }
+
+  .tm-slip > [data-row] {
+    min-width: 0;
+    padding-inline: 1.25rem;
+  }
+
+  .tm-compare-compact .tm-slip > [data-row] {
+    padding-inline: 1rem;
+  }
+
+  .tm-slip-head {
+    padding-top: 1.25rem;
+  }
+
+  .tm-compare-compact .tm-slip-head {
+    padding-top: 1rem;
+  }
+
+  .tm-slip-kicker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 1.25rem;
+    font-size: var(--tm-text-caption);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--tm-color-ink-muted);
+  }
+
+  /* Recommended: a red dot and the word, never a red panel. */
+  .tm-slip-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--tm-color-ink);
+  }
+
+  /* With no figure above the name, the mark is the card's eyebrow. */
+  .tm-slip-mark:only-child {
+    margin-left: 0;
+  }
+
+  .tm-slip-mark::before {
+    content: "";
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: var(--tm-color-red);
+  }
+
+  .tm-slip-figure {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.125rem 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .tm-slip-figure > .tm-num {
+    font-size: 2.75rem;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .tm-compare-compact .tm-slip-figure > .tm-num {
+    font-size: 2.25rem;
+  }
+
+  .tm-slip-figure > :last-child {
+    font-size: var(--tm-text-small);
+    font-weight: 500;
+    color: var(--tm-color-ink-muted);
+  }
+
+  /* What a package gives when it is not a speed: a phrase, set as the card's lead. */
+  .tm-slip-lead {
+    margin-top: 0.5rem;
+    font-size: var(--tm-text-h4);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  .tm-compare-compact .tm-slip-lead {
+    font-size: var(--tm-text-lead);
+  }
+
+  .tm-slip-meter {
+    height: 3px;
+    margin-top: 0.875rem;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--tm-color-surface);
+  }
+
+  .tm-slip-meter > span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--tm-color-red);
+  }
+
+  .tm-slip-name {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-block: 0.875rem 1rem;
+  }
+
+  /* Alone at the top of the card (a package with no figure to lead with). */
+  .tm-slip > [data-row="name"]:first-child > .tm-slip-name,
+  .tm-slip > [data-row="figure"]:empty + [data-row="name"] > .tm-slip-name {
+    padding-top: 1.25rem;
+  }
+
+  .tm-slip-thumb {
+    flex: none;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 0.875rem;
+    object-fit: cover;
+  }
+
+  .tm-slip-line {
+    padding-block: 0.75rem;
     border-top: 1px solid var(--tm-color-line);
   }
 
-  /* A package without a field keeps the row, without drawing an empty box. */
-  .tm-compare-card > :empty {
-    border-top-color: transparent;
+  .tm-slip-pair {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: var(--tm-text-small);
+  }
+
+  .tm-slip-pair > :first-child {
+    color: var(--tm-color-ink-muted);
+  }
+
+  .tm-slip-pair > :last-child {
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* The perforation, then the stub: price, the way to ask, compare and details. */
+  .tm-slip-stub {
+    display: grid;
+    gap: 0.875rem;
+    padding-block: 1rem 1.25rem;
+    border-top: 1px dashed color-mix(in srgb, var(--tm-color-ink) 34%, transparent);
+  }
+
+  @supports not (grid-template-rows: subgrid) {
+    .tm-slip > [data-row="stub"] {
+      margin-top: auto;
+    }
+  }
+
+  /* What comes with a package, each with its picture in a tile of one size. */
+  .tm-benefits {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .tm-benefits > li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: var(--tm-text-small);
+    line-height: 1.4;
+  }
+
+  /* White whatever the tone around it: the logos are drawn for white. */
+  .tm-benefit-tile {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.3125rem;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px var(--tm-color-line);
+  }
+
+  .tm-benefit-tile > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* The tiles alone, in a row (the home page's cards). */
+  .tm-benefits[data-dense] {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+  }
+
+  .tm-benefits[data-dense] > li {
+    gap: 0;
+  }
+
+  .tm-benefits[data-dense] .tm-benefit-tile {
+    width: 2.125rem;
+    height: 2.125rem;
+    padding: 0.25rem;
+    border-radius: 0.625rem;
+  }
+
+  .tm-benefits > .tm-benefit-more {
+    justify-content: center;
+    min-width: 2.125rem;
+    height: 2.125rem;
+    padding-inline: 0.375rem;
+    border-radius: 0.625rem;
+    background: var(--tm-color-surface);
+    font-size: var(--tm-text-caption);
+    font-weight: 600;
+    color: var(--tm-color-ink-muted);
   }
 
   .tm-compare-compact {
@@ -591,6 +827,12 @@
     height: 1.375rem;
     margin-top: 0.1rem;
     accent-color: var(--tm-color-ink);
+  }
+
+  /* A visitor who has already chosen: the banner in the page's HTML stays out
+     of sight until the component reads the cookie and removes it. */
+  html[data-consent] .tm-consent {
+    display: none;
   }
 
   .tm-consent {

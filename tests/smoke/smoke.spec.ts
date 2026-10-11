@@ -125,7 +125,7 @@ test("the back office asks to sign in and is kept out of search engines", async 
 
 test("the home page's opening picture loads", async ({ page }) => {
   await page.goto("/");
-  const poster = page.locator(".hero-poster");
-  await expect(poster).toBeVisible();
-  await expect.poll(() => poster.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+  const sky = page.locator(".hero-sky");
+  await expect(sky).toBeVisible();
+  await expect.poll(() => sky.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
 });

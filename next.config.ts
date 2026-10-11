@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
     // Picture uploads (8 MB at most, see media-actions.ts) plus the form's own bytes.
     serverActions: { bodySizeLimit: "9mb" },
+    // inlineCss was tried (2026-10-11) and left off: on a throttled phone it brought the first paint 0.1 s forward
+    // and added 200 to 370 ms of blocked main thread to every page measured.
   },
   images: {
     remotePatterns: supabaseUrl
@@ -35,15 +37,21 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      // The home page's picture (the router's still and the robot arm) and the
-      // router's model with its baked shading. A new version goes in a new
-      // folder or name (hero-v4, router-v2), so visitors can keep these a week.
+      // The home page's picture (the painting's sky and its cut-out figures). A
+      // new version goes in a new folder (hero-v5), so visitors can keep these a week.
       { source: "/media/:cut(hero-v\\d+)/:path*", headers: week },
-      { source: "/models/:path*", headers: week },
     ];
   },
   async redirects() {
     return [
+      // The site's former domain: every address goes, for good, to the same address on the one domain the site
+      // has now. It takes effect when the former domain is attached to this project on Vercel.
+      ...["telemartubon.com", "www.telemartubon.com"].map((host) => ({
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        destination: "https://www.truegetherth.com/:path*",
+        permanent: true,
+      })),
       // /th/... would duplicate the unprefixed Thai URLs.
       { source: "/th", destination: "/", permanent: true },
       { source: "/th/:path*", destination: "/:path*", permanent: true },

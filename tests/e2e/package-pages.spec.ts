@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { content, getPackagePage, packageById } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn, packageHomeIn, publicPackagesIn } from "@/lib/content/lookup";
 import { benefitOptions, downloadMbps, packageDetailPath, priceLimits } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
@@ -11,7 +12,8 @@ import { blockThirdParty, settle } from "./support/network";
 // comparison over the page's packages, and a page for each package.
 
 const { ui } = content.site;
-const broadband = publicPackagesIn(content, "broadband-new", "new-customer");
+const today = todayInThailand();
+const broadband = publicPackagesIn(content, "broadband-new", "new-customer", today);
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
@@ -57,6 +59,27 @@ test("speed, price and benefit filters leave only matching packages, and clear a
   await expect.poll(() => visibleCards(page)).toEqual(broadband.filter((item) => item.benefits.includes(benefit)).map((item) => item.id));
 });
 
+test("a card leads with what the package gives, marks the recommended, and shows each benefit with its picture", async ({ page }) => {
+  const recommended = broadband.find((item) => content.featured.includes(item.id) && item.benefits.length > 0)!;
+  const plain = broadband.find((item) => !content.featured.includes(item.id))!;
+  await page.goto("/broadband");
+  const card = page.locator(`[data-package="${recommended.id}"]`);
+  const speed = recommended.speed!;
+  await expect(card.locator('[data-row="figure"]')).toContainText(`${formatNumber(speed.download.value, "th")}/${formatNumber(speed.upload.value, "th")}`);
+  await expect(card.locator(".tm-slip-mark")).toHaveText(ui.recommended.th);
+  await expect(page.locator(`[data-package="${plain.id}"] .tm-slip-mark`)).toHaveCount(0);
+  // The price is on the stub, below everything the package lists.
+  await expect(card.locator('[data-row="stub"]')).toContainText(formatNumber(recommended.price.amount, "th"));
+
+  const benefits = card.locator('[data-row="benefits"] li');
+  await expect(benefits).toHaveText(recommended.benefits.map((id) => content.benefits[id].label.th));
+  await benefits.last().scrollIntoViewIfNeeded();
+  // Every one has its picture, and the picture arrived.
+  await expect
+    .poll(() => benefits.evaluateAll((items) => items.map((item) => item.querySelector("img")?.naturalWidth ?? 0).every((width) => width > 0)))
+    .toBe(true);
+});
+
 test("sorting reorders the cards on screen", async ({ page }) => {
   await page.goto("/broadband");
   await page.getByLabel(ui.sortBy.th).selectOption("price-low");
@@ -71,7 +94,7 @@ test("sorting reorders the cards on screen", async ({ page }) => {
 test("a section left empty by the filters says so and keeps its anchor", async ({ page }) => {
   const doc = getPackagePage("/monthy");
   await page.goto("/monthy");
-  const items = doc.sections.flatMap((section) => section.groups.flatMap((group) => publicPackagesIn(content, group.category, group.group)));
+  const items = doc.sections.flatMap((section) => section.groups.flatMap((group) => publicPackagesIn(content, group.category, group.group, today)));
   await page.getByLabel(ui.filterPrice.th).selectOption(String(priceLimits(items)[0]));
   await expect(page.getByText(ui.noMatches.th).first()).toBeVisible();
   for (const section of doc.sections) await expect(page.locator(`section[id="${section.id}"]`)).toBeAttached();
@@ -113,7 +136,7 @@ test("each package has its own page, in both languages", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: ui.breadcrumb.th }).getByRole("link", { name: home.pageTitle.th })).toHaveAttribute("href", `${home.path}#${home.hash}`);
   await expect(page.locator("[data-package-notes]")).toContainText(ui.unverifiedNote.th);
   for (const note of home.notes) await expect(page.locator("[data-package-notes]")).toContainText(note.th);
-  await expect(page.getByRole("link", { name: new RegExp(`^${home.cta.label.th}`) })).toHaveAttribute("href", "https://lin.ee/blqnOJow");
+  await expect(page.getByRole("link", { name: new RegExp(`^${home.cta.label.th}`) })).toHaveAttribute("href", content.site.contact.lineSales);
   await expect(page.getByRole("link", { name: ui.callSales.th })).toHaveAttribute("href", /^tel:/);
 
   await page.goto(`/en${packageDetailPath(item.id)}`);
@@ -123,7 +146,7 @@ test("each package has its own page, in both languages", async ({ page }) => {
 
 test("every package page renders, and hidden packages have none", async ({ page, request, isMobile }) => {
   test.skip(isMobile, "the same pages as desktop");
-  for (const item of detailPackagesIn(content)) {
+  for (const item of detailPackagesIn(content, today)) {
     const response = await request.get(packageDetailPath(item.id));
     expect(response.status(), item.id).toBe(200);
   }

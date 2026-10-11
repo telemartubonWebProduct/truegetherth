@@ -17,12 +17,12 @@ export function isCurrent(target: LinkTarget, path: string): boolean {
   return target.kind === "page" && target.path === path && !target.hash;
 }
 
-/** Local mobile number (0910192552) as an international tel: URL. */
+/** Local mobile number (0639274977) as an international tel: URL. */
 export function telHref(number: string): string {
   return `tel:+66${number.replace(/^0/, "")}`;
 }
 
-/** 0910192552 -> 091-019-2552, 021234567 -> 02-123-4567 */
+/** 0639274977 -> 063-927-4977, 021234567 -> 02-123-4567 */
 export function formatPhone(number: string): string {
   if (/^0[689]\d{8}$/.test(number)) return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6)}`;
   if (/^0\d{8}$/.test(number)) return `${number.slice(0, 2)}-${number.slice(2, 5)}-${number.slice(5)}`;

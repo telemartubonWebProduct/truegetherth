@@ -1,16 +1,22 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { heroArt } from "@/components/site/home/hero-art";
 import { content } from "@/lib/content";
-import { packagePageIn, publicPackagesIn } from "@/lib/content/lookup";
+import { todayInThailand } from "@/lib/content/dates";
+import { featuredIn, packagePageIn, publicPackagesIn } from "@/lib/content/lookup";
 
 import { blockThirdParty, settle } from "./support/network";
 
 // The home page's scroll choreography (docs/renovation/R5-LANDING.md), checked
-// where it can go wrong silently: a stage that does not move, a duplicate that
-// drifts off its original, a row that stops short, and the page without motion
-// or scripts.
+// where it can go wrong silently: a stage that does not move, a painting whose
+// router slides under the navigation or the headline, a duplicate that drifts
+// off its original, a row that stops short, and the page without motion or
+// scripts.
 
 const home = content.pages.home;
+const today = todayInThailand();
+/** The cards of a tab of recommended packages: the catalog's recommended packages of the tab's categories. */
+const cardsOf = (tab: number) => featuredIn(content, home.promos.tabs[tab].categories, today);
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
@@ -80,145 +86,125 @@ test("the hero headline is drawn above the picture and lifts away on scroll", as
   expect(Number(await variable(page, "--hero-art-scale"))).toBeLessThan(1);
 });
 
-/** How far the pointing fingertip is from the antenna it touches (0 = on it), in shares of the arm's width. */
-const armOffset = (page: Page) =>
-  page.evaluate(() => {
-    const frame = document.querySelector<HTMLElement>(".hero-frame")!;
-    const arm = document.querySelector<HTMLElement>(".hero-arm")!;
-    const style = getComputedStyle(frame);
-    const box = frame.getBoundingClientRect();
-    const limb = arm.getBoundingClientRect();
-    const touch = box.left + (box.width * parseFloat(style.getPropertyValue("--touch-x"))) / 100;
-    const tip = limb.left + limb.width * Number(style.getPropertyValue("--arm-tip-x"));
-    return (tip - touch) / limb.width;
-  });
+/** The arrangement of the painting the screen shows (landing.css shows one of the two). */
+const pack = (page: Page) => page.locator(".hero-pack").filter({ visible: true });
 
-/** Where the router and the arm (with its finger on the antenna) are in the picture, as shares of it. */
-const ROUTER = [0.41, 0.2, 0.95, 0.69] as const;
-const ARM = [-0.14, 0.33, 0.43, 0.6] as const;
+/** How far a layer of the shown arrangement is shifted from its place, in pixels. */
+const shift = (page: Page, id: string) =>
+  pack(page)
+    .locator(`[data-layer="${id}"]`)
+    .evaluate((layer) => {
+      const [x = "0", y = "0"] = getComputedStyle(layer).translate.replace("none", "0px").split(" ");
+      return { x: parseFloat(x), y: parseFloat(y) };
+    });
 
-/** The headline, the router and the arm on the screen, and whether the headline is clear of both. */
+/** The router's frame with its True Online mark, the headline and the navigation on the screen. */
 const composition = async (page: Page) => {
   // Measured once the picture's entrance (it settles from slightly enlarged) is over.
   await expect
     .poll(() => page.locator(".hero-art-inner").evaluate((element) => getComputedStyle(element).transform), { timeout: 10_000 })
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
-  return page.evaluate(
-    ([router, arm]) => {
-      const frame = document.querySelector(".hero-frame")!.getBoundingClientRect();
-      const share = ([x0, y0, x1, y1]: readonly number[]) => ({
-        left: frame.left + frame.width * x0,
-        top: frame.top + frame.height * y0,
-        right: frame.left + frame.width * x1,
-        bottom: frame.top + frame.height * y1,
-      });
-      const title = document.querySelector(".hero-title")!.getBoundingClientRect();
-      const overlap = (a: { left: number; top: number; right: number; bottom: number }, b: typeof a) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-      const boxes = { router: share(router), arm: share(arm) };
-      return {
-        ...boxes,
-        overRouter: overlap(title, boxes.router),
-        overArm: overlap(title, boxes.arm),
-        width: window.innerWidth,
-        height: window.innerHeight,
-        page: document.documentElement.scrollWidth,
-      };
-    },
-    [ROUTER, ARM] as const,
-  );
+  return page.evaluate(() => {
+    type Box = { left: number; top: number; right: number; bottom: number };
+    const box = (element: Element): Box => {
+      const { left, top, right, bottom } = element.getBoundingClientRect();
+      return { left, top, right, bottom };
+    };
+    const overlap = (a: Box, b: Box) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+    const shown = [...document.querySelectorAll(".hero-pack")].find((element) => element.checkVisibility())!;
+    const router = box(shown.querySelector(".hero-box[data-mark]")!);
+    const mark = box(shown.querySelector(".hero-mark")!);
+    const title = box(document.querySelector(".hero-title")!);
+    const pills = [...document.querySelectorAll(".nav-logo, .nav-menu, .nav-tags, .nav-right")].filter((element) => element.checkVisibility()).map(box);
+    return {
+      arrangement: shown.classList.contains("hero-pack-tall") ? ("tall" as const) : ("wide" as const),
+      layers: [...shown.querySelectorAll(".hero-layer")].map((layer) => layer.getAttribute("data-layer")),
+      router,
+      mark,
+      overRouter: overlap(title, router),
+      underNavigation: pills.some((pill) => overlap(pill, mark)),
+      width: window.innerWidth,
+      height: window.innerHeight,
+      page: document.documentElement.scrollWidth,
+    };
+  });
 };
 
 function expectClear(layout: Awaited<ReturnType<typeof composition>>) {
-  expect(layout.overArm, "headline over the arm").toBe(false);
+  expect(layout.layers).toEqual(heroArt.packs[layout.arrangement].layers.map((layer) => layer.id));
   expect(layout.overRouter, "headline over the router").toBe(false);
-  // The fingertip is on screen, and so is the whole router.
-  expect(layout.arm.right).toBeGreaterThan(0);
-  expect(layout.arm.right).toBeLessThan(layout.width);
+  expect(layout.underNavigation, "the True Online mark under the navigation").toBe(false);
+  // The whole router, with its mark, is on the screen.
   expect(layout.router.left).toBeGreaterThanOrEqual(0);
   expect(layout.router.right).toBeLessThanOrEqual(layout.width * 1.01);
+  expect(layout.mark.top).toBeGreaterThanOrEqual(0);
   expect(layout.router.bottom).toBeLessThan(layout.height);
   expect(layout.page).toBeLessThanOrEqual(layout.width);
 }
 
-test("the router is drawn live over its still", async ({ page }) => {
-  // A test browser draws WebGL in software, where the page keeps the still (see Hero.tsx).
-  // data-hero-still asks for the scene's one unmoving frame regardless: enough to see it load and draw.
-  await page.addInitScript(() => {
-    new MutationObserver((_, observer) => {
-      if (!document.documentElement) return;
-      document.documentElement.setAttribute("data-hero-still", "");
-      observer.disconnect();
-    }).observe(document, { childList: true });
-  });
+test("the painting is laid in layers over its sky, and the figures float", async ({ page }) => {
   await open(page);
-  await expect(page.locator(".hero-frame")).toHaveAttribute("data-live", "scene", { timeout: 45_000 });
-  await expect(page.locator(".hero-canvas")).toHaveCSS("opacity", "1");
-  const drawn = await page.locator(".hero-canvas").evaluate((canvas: HTMLCanvasElement) => ({ width: canvas.width, height: canvas.height }));
-  expect(drawn.width).toBeGreaterThan(300);
-  expect(drawn.width / drawn.height).toBeCloseTo(16 / 9, 1);
-  // The scene says where the antenna is, and the arm hangs on it.
-  const touch = await page.locator(".hero-frame").evaluate((frame: HTMLElement) => parseFloat(frame.style.getPropertyValue("--touch-x")));
-  expect(touch).toBeGreaterThan(30);
-  expect(touch).toBeLessThan(60);
+  // Pictures only: no film, and nothing drawn by script.
+  await expect(page.locator(".hero video, .hero canvas")).toHaveCount(0);
+  const sky = page.locator(".hero-sky");
+  await expect(sky).toHaveAttribute("alt", /.+/);
+  await expect.poll(() => sky.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0), { timeout: 15_000 }).toBe(true);
+
+  // Every figure of the arrangement in view has its picture; the figures say nothing to a screen reader.
+  const figures = pack(page).locator(".hero-float > img:not(.hero-mark)");
+  const layout = await composition(page);
+  await expect(figures).toHaveCount(heroArt.packs[layout.arrangement].layers.length);
+  await expect.poll(() => figures.evaluateAll((images: HTMLImageElement[]) => images.every((image) => image.complete && image.naturalWidth > 0)), { timeout: 15_000 }).toBe(true);
+  expect(await figures.evaluateAll((images) => images.every((image) => image.getAttribute("alt") === "" && image.closest("[aria-hidden]") !== null))).toBe(true);
+  // The mark on the router's frame is the owner's own file, not part of a generated picture.
+  await expect(pack(page).locator(".hero-mark")).toHaveAttribute("src", heroArt.mark.src);
+
+  // Each floats on its own, and a cherub is not where it was a moment ago.
+  expect(await pack(page).locator(".hero-float").evaluateAll((floats) => floats.every((float) => getComputedStyle(float).animationName === "hero-float"))).toBe(true);
+  const cherub = pack(page).locator('[data-layer="cherub-phone"] .hero-float');
+  const before = (await cherub.boundingBox())!;
+  await expect.poll(async () => Math.abs((await cherub.boundingBox())!.y - before.y), { timeout: 5_000, intervals: [200] }).toBeGreaterThan(0.3);
 });
 
-test("the arm reaches in, touches the antenna and taps", async ({ page }) => {
+test("the pointer shifts the layers, the nearer the more", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "a phone has no pointer to follow");
   await open(page);
-  await expect(page.locator("video")).toHaveCount(0);
-  const still = page.locator(".hero-poster");
-  await expect(still).toHaveAttribute("alt", /.+/);
-  await expect.poll(() => still.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0), { timeout: 15_000 }).toBe(true);
-  for (const pose of [".hero-arm-open", ".hero-arm-point"]) await expect(page.locator(pose)).toHaveAttribute("alt", "");
-
-  // The reach starts once the picture is settled: the live scene, or here the still.
-  const frame = page.locator(".hero-frame");
-  await expect(frame).toHaveAttribute("data-live", /scene|still/, { timeout: 30_000 });
-  const moving = await page.evaluate(() => ({
-    arm: getComputedStyle(document.querySelector(".hero-arm")!).animationName,
-    rings: getComputedStyle(document.querySelector(".hero-rings span")!).animationName,
-  }));
-  expect(moving).toEqual({ arm: "reach, tap", rings: "ring" });
-
-  // The finger arrives on the antenna, the hand by then pointing; that is what switches the router on.
-  await expect.poll(async () => Math.abs(await armOffset(page)), { timeout: 15_000, intervals: [150] }).toBeLessThan(0.004);
-  await expect(frame).toHaveAttribute("data-touched", "");
-  await expect(page.locator(".hero-arm-point")).toHaveCSS("opacity", "1");
-  await expect(page.locator(".hero-arm-open")).toHaveCSS("opacity", "0");
-  // A tap never pushes the finger past the antenna, and never draws it back far.
-  const seen: number[] = [];
-  for (let sample = 0; sample < 40; sample++) {
-    seen.push(await armOffset(page));
-    await page.waitForTimeout(160);
-  }
-  expect(Math.max(...seen)).toBeLessThan(0.004);
-  expect(Math.min(...seen)).toBeGreaterThan(-0.03);
-  expect(Math.min(...seen), "the finger draws back before it taps").toBeLessThan(-0.008);
+  expect(await shift(page, "near-clouds")).toEqual({ x: 0, y: 0 });
+  await page.mouse.move(30, 30);
+  await page.mouse.move(40, 40);
+  await expect.poll(() => page.locator(".hero-scene").evaluate((scene: HTMLElement) => Number(scene.style.getPropertyValue("--px"))), { timeout: 5_000 }).toBeLessThan(-0.8);
+  const far = await shift(page, "sea-god");
+  const near = await shift(page, "near-clouds");
+  // The pointer is at the top left: everything leans right and down, the near cloud furthest.
+  expect(far.x).toBeGreaterThan(0.5);
+  expect(near.x).toBeGreaterThan(far.x * 2);
+  expect(near.y).toBeGreaterThan(far.y);
 });
 
-test("scrolling draws the arm back while the camera turns over the router", async ({ page }) => {
+test("scrolling parts the layers while the picture draws back into its frame", async ({ page }) => {
   await open(page);
-  const rig = page.locator(".hero-arm-rig");
-  await expect(rig).toHaveCSS("opacity", "1");
   await scrub(page, "hero", 0.5);
   expect(Number(await variable(page, "--hero-progress"))).toBeGreaterThan(0.4);
-  await expect(rig).toHaveCSS("opacity", "0");
+  const far = await shift(page, "sea-god");
+  const near = await shift(page, "near-clouds");
+  expect(far.y).toBeLessThan(-2);
+  expect(near.y).toBeLessThan(far.y * 2);
   await scrub(page, "hero", 0);
-  await expect(rig).toHaveCSS("opacity", "1");
+  expect((await shift(page, "sea-god")).y).toBeGreaterThan(-1);
 });
 
-test("the arm and the router stay clear of the headline", async ({ page }) => {
+test("the router and its mark stay clear of the headline and the navigation", async ({ page }) => {
   await open(page);
   expectClear(await composition(page));
 });
 
 test("the hero stops moving once it has scrolled off the screen", async ({ page }) => {
   await open(page);
-  await expect(page.locator(".hero-frame")).toHaveAttribute("data-live", /.+/, { timeout: 30_000 });
-  const state = () => page.locator(".hero-arm").evaluate((element) => getComputedStyle(element).animationPlayState);
-  expect((await state()).split(", ").every((value) => value === "running")).toBe(true);
+  const state = () => pack(page).locator(".hero-float").evaluateAll((floats) => floats.map((float) => getComputedStyle(float).animationPlayState));
+  expect((await state()).every((value) => value === "running")).toBe(true);
   await scrub(page, "rail", 0.5);
   await expect(page.locator("html")).toHaveAttribute("data-hero-away", "");
-  expect((await state()).split(", ").every((value) => value === "paused")).toBe(true);
+  expect((await state()).every((value) => value === "paused")).toBe(true);
   await scrub(page, "hero", 0.2);
   await expect(page.locator("html")).not.toHaveAttribute("data-hero-away", "");
 });
@@ -271,7 +257,7 @@ test("the package row walks its whole overflow and stops flush with the margin",
 test("the counted prices land on the catalog's own numbers", async ({ page }) => {
   await open(page);
   await scrub(page, "rail", 0);
-  const cards = home.promos.tabs[0].items.map((card) => content.catalog.find((item) => item.id === card.packageId)!);
+  const cards = cardsOf(0);
   const shown = page.locator("[data-rail-panel]:not([hidden]) .card-price > .num");
   await expect(shown).toHaveCount(cards.length);
   // A card counts when it comes into view, so the row is walked along first, as a visitor's scroll does.
@@ -281,8 +267,19 @@ test("the counted prices land on the catalog's own numbers", async ({ page }) =>
   }
   await expect.poll(() => shown.allTextContents(), { timeout: 8000 }).toEqual(cards.map((item) => item.price.amount.toLocaleString("en-US")));
   await page.locator("#prices").scrollIntoViewIfNeeded();
-  const listed = publicPackagesIn(content, home.prices.category, home.prices.group);
+  const listed = publicPackagesIn(content, home.prices.category, home.prices.group, today);
   await expect.poll(() => page.locator("#prices .col-price .num").allTextContents(), { timeout: 8000 }).toEqual(listed.map((item) => item.price.amount.toLocaleString("en-US")));
+});
+
+test("a card shows what its package gives over its picture, and a picture for each benefit", async ({ page }) => {
+  await open(page);
+  await scrub(page, "rail", 0);
+  const [first] = cardsOf(0);
+  const card = page.locator(`[data-rail-panel]:not([hidden]) [data-package="${first.id}"]`);
+  await expect(card.locator(".card-figure")).toContainText(`${first.speed!.download.value}/${first.speed!.upload.value}`);
+  await expect(card.locator(".card-perks .tm-benefit-tile img")).toHaveCount(Math.min(first.benefits.length, 4));
+  // Only the pictures show, but every benefit is named for a screen reader.
+  await expect(card.getByRole("list", { name: content.site.ui.benefits.th }).getByRole("listitem")).toHaveText(first.benefits.map((id) => content.benefits[id].label.th));
 });
 
 test("each tab shows its own row of packages, and that row is the one that walks", async ({ page }) => {
@@ -298,8 +295,8 @@ test("each tab shows its own row of packages, and that row is the one that walks
   await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
   const panel = page.getByRole("tabpanel");
   await expect(panel).toHaveCount(1);
-  await expect(panel.locator(".card")).toHaveCount(second.items.length);
-  await expect(panel.locator(".card").first()).toHaveAttribute("data-package", second.items[0].packageId);
+  await expect(panel.locator(".card")).toHaveCount(cardsOf(1).length);
+  await expect(panel.locator(".card").first()).toHaveAttribute("data-package", cardsOf(1)[0].id);
   // The button under the row follows the tab.
   await expect(page.locator(".rail-more a")).toHaveAttribute("data-cta", second.viewAll.id);
 
@@ -438,22 +435,23 @@ test.describe("with reduced motion", () => {
       wipe: getComputedStyle(document.querySelector(".manifesto-fill")!).clipPath,
       page: document.documentElement.scrollWidth,
       width: window.innerWidth,
-      moving: [".hero-arm", ".hero-arm-point", ".hero-rings span"].map((selector) => getComputedStyle(document.querySelector(selector)!).animationName),
+      moving: [".hero-float", ".hero-sky", ".hero-glow", ".hero-box"].map((selector) => getComputedStyle(document.querySelector(selector)!).animationName),
+      shifted: [...document.querySelectorAll(".hero-layer")].filter((layer) => getComputedStyle(layer).translate !== "none").length,
       active: document.querySelectorAll(".cue").length,
     }));
     expect(state.pinned).toBe(false);
     expect(state.hiddenWords).toBe(0);
     expect(state.wipe).toMatch(/inset\(0(px|%)?/);
     expect(state.page).toBeLessThanOrEqual(state.width);
-    expect(state.moving).toEqual(["none", "none", "none"]);
-    // The router is its still (no live scene is started), and the arm does not travel:
-    // it is already where the reach ends, its hand pointing.
-    await expect(page.locator(".hero-poster")).toBeVisible();
-    await expect(page.locator(".hero-frame")).not.toHaveAttribute("data-live", /.*/);
-    await expect(page.locator(".hero-canvas")).toHaveCSS("opacity", "0");
-    expect(Math.abs(await armOffset(page))).toBeLessThan(0.004);
-    await expect(page.locator(".hero-arm-point")).toHaveCSS("opacity", "1");
-    await expect(page.locator(".hero-arm-open")).toHaveCSS("opacity", "0");
+    expect(state.moving).toEqual(["none", "none", "none", "none"]);
+    expect(state.shifted).toBe(0);
+    // The painting is all there, every figure in its place, and nothing follows the pointer.
+    await expect(page.locator(".hero-sky")).toBeVisible();
+    await expect(pack(page).locator('[data-layer="goddess"] .hero-float > img:not(.hero-mark)')).toBeVisible();
+    await page.mouse.move(40, 40);
+    await page.waitForTimeout(300);
+    expect(await page.locator(".hero-scene").evaluate((scene: HTMLElement) => scene.style.getPropertyValue("--px"))).toBe("");
+    expectClear(await composition(page));
     await expect(page.locator(".hero-title")).toBeVisible();
     await expect(page.locator("[data-rail-panel]:not([hidden]) .card").last()).toBeVisible();
     // The slip shows its finished state rather than an empty form.
@@ -467,9 +465,9 @@ test.describe("without scripts", () => {
   test("the page reads top to bottom with nothing left hidden", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator(".hero-title")).toBeVisible();
-    await expect(page.locator(".hero-poster")).toBeVisible();
-    await expect(page.locator(".hero-arm-point")).toBeVisible();
-    await expect(page.locator(".hero-arm-open")).toHaveCSS("opacity", "0");
+    await expect(page.locator(".hero-sky")).toBeVisible();
+    await expect(pack(page).locator('[data-layer="goddess"] .hero-float > img:not(.hero-mark)')).toBeVisible();
+    await expect(pack(page).locator(".hero-mark")).toBeVisible();
     await expect(page.locator(".nav-menu")).toBeVisible();
     await expect(page.locator("#prices-heading")).toBeVisible();
     // The tabs cannot switch, so every row shows under its title.
@@ -483,20 +481,24 @@ test.describe("without scripts", () => {
   });
 });
 
-// The picture must keep clear of the headline on every shape of screen, not only the two the projects use.
+// The router must keep clear of the headline and the navigation on every shape of screen, not only the two the projects use.
 for (const [width, height] of [
   [1920, 1080],
   [1280, 720],
   [1024, 768],
   [768, 1024],
+  [900, 700],
   [360, 640],
+  [375, 667],
   [412, 915],
 ] as const) {
-  test(`at ${width}x${height} the hand and the router are in view and clear of the headline`, async ({ page }, testInfo) => {
+  test(`at ${width}x${height} the router is in view, clear of the headline and the navigation`, async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "one project is enough: the test sets its own screen size");
     await page.setViewportSize({ width, height });
     await open(page);
-    expectClear(await composition(page));
+    const layout = await composition(page);
+    expect(layout.arrangement).toBe(width < height ? "tall" : "wide");
+    expectClear(layout);
   });
 }
 

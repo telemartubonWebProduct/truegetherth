@@ -3,6 +3,7 @@ import { randomInt } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { requestablePackages, serviceOf } from "@/lib/leads/packages";
 import { siteUrl } from "@/lib/seo/metadata";
 
@@ -115,7 +116,7 @@ test("a request is stored once, however often it is sent", async ({ page }) => {
 });
 
 test("from a package page, the package is filled in, and a repeat joins the open request", async ({ page }) => {
-  const item = requestablePackages(content).find((entry) => serviceOf(entry) === "broadband")!;
+  const item = requestablePackages(content, todayInThailand()).find((entry) => serviceOf(entry) === "broadband")!;
   const phone = uniquePhone();
   await page.goto(`/packages/${item.id}`);
   await page.getByRole("link", { name: content.site.ui.requestCallback.th }).click();
@@ -185,7 +186,7 @@ test.describe("on desktop", () => {
   test("GA4 hears generate_lead only once the request is stored, without personal data", async ({ page, context, baseURL }) => {
     const production = siteUrl().origin;
     await serveAt(context, baseURL!, production);
-    await context.addCookies(consentState({ analytics: true, ads: false, chat: false }).cookies);
+    await context.addCookies(consentState({ analytics: true, ads: false }).cookies);
     const phone = uniquePhone();
     await page.goto(`${production}/service#callback`);
     await expect
@@ -203,6 +204,26 @@ test.describe("on desktop", () => {
     expect(all.map(([, name]) => name)).toEqual(["lead_form_start", "generate_lead"]);
     expect(all[1][2]).toEqual({ form_id: "contact-callback", lead_service: "broadband", send_to: content.site.integrations.ga4MeasurementId });
     expect(JSON.stringify(all)).not.toContain(phone.slice(-4));
+    expect(await leadsFor(phone)).toHaveLength(1);
+  });
+
+  test("with advertising cookies, a stored request is one Google Ads conversion", async ({ page, context, baseURL }) => {
+    const production = siteUrl().origin;
+    await serveAt(context, baseURL!, production);
+    await context.addCookies(consentState({ analytics: false, ads: true }).cookies);
+    const phone = uniquePhone();
+    await page.goto(`${production}/service#callback`);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __tmTags?: { ads: boolean } }).__tmTags?.ads ?? false)).toBe(true);
+    await fill(page, { name: "ทดสอบ Ads", phone });
+    const events = () =>
+      page.evaluate(() =>
+        Array.from((window as unknown as { dataLayer: ArrayLike<unknown>[] }).dataLayer, (entry) => Array.from(entry)).filter(([command]) => command === "event"),
+      );
+    // Opening the page and filling the form in are not conversions.
+    expect(await events()).toEqual([]);
+    await page.locator("form[data-lead-form]").getByRole("button", { name: form.submit.th }).click();
+    await expect(sent(page)).toBeVisible();
+    expect(await events()).toEqual([["event", "conversion", { send_to: content.site.integrations.googleAdsLeadConversion }]]);
     expect(await leadsFor(phone)).toHaveLength(1);
   });
 });

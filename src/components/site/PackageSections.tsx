@@ -75,6 +75,8 @@ export function PackageSections({ ctx, page }: { ctx: RenderContext; page: Packa
             <div className="mt-8 grid gap-12">
               <NoMatches packageIds={section.groups.flatMap((group) => ctx.packages(group.category, group.group).map((item) => item.id))} />
               {section.groups.map((group) => {
+                // A group with no package at all is one just made in the back office: nothing to show yet.
+                if (!ctx.content.catalog.some((item) => item.category === group.category && item.group === group.group)) return null;
                 const items = ctx.packages(group.category, group.group);
                 return (
                   <ExplorableGroup key={group.id} packageIds={items.map((item) => item.id)}>

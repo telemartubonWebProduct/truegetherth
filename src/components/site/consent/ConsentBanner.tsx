@@ -41,7 +41,7 @@ function cookieValue(): string {
   return "";
 }
 
-const categories = ["analytics", "ads", "chat"] as const;
+const categories = ["analytics", "ads"] as const;
 
 /**
  * Cookie consent (PDPA). Shown until the visitor chooses, for this version of
@@ -49,11 +49,19 @@ const categories = ["analytics", "ads", "chat"] as const;
  * optional loads before a choice. "Cookie settings" in the footer opens it
  * again to change or withdraw consent; withdrawing reloads the page so the
  * tags already loaded are gone, and removes Google's cookies.
+ *
+ * The banner is in the page's HTML from the start, so a new visitor sees it
+ * with the first paint instead of after the scripts have run (it is a large
+ * block of text, and a late one would count as the page's slowest paint). The
+ * server cannot read the cookie of a cached page, so for a visitor who has
+ * chosen, a script in the head (src/app/_site/layout.tsx) marks the document
+ * before first paint and CSS keeps the banner out of sight until this
+ * component has read the cookie and taken it out of the page.
  */
 export function ConsentBanner({ text, policyHref, policyVersion }: ConsentBannerProps) {
   const stored = useSyncExternalStore(subscribe, cookieValue, () => SERVER);
   const current = stored === SERVER ? null : parseConsent(stored, policyVersion);
-  const needsChoice = stored !== SERVER && current === null;
+  const needsChoice = stored === SERVER || current === null;
 
   const [reopened, setReopened] = useState(false);
   const [customizing, setCustomizing] = useState(false);
@@ -71,6 +79,11 @@ export function ConsentBanner({ text, policyHref, policyVersion }: ConsentBanner
     window.addEventListener(CONSENT_OPEN_EVENT, onOpen);
     return () => window.removeEventListener(CONSENT_OPEN_EVENT, onOpen);
   }, [policyVersion]);
+
+  // From here on this component decides whether the banner shows: the head script's mark has done its work.
+  useEffect(() => {
+    document.documentElement.removeAttribute("data-consent");
+  }, []);
 
   // Opened on purpose: take the visitor to it. Shown on arrival: do not steal focus.
   useEffect(() => {
@@ -92,8 +105,8 @@ export function ConsentBanner({ text, policyHref, policyVersion }: ConsentBanner
     returnFocus.current?.focus();
   };
 
-  const titles = { analytics: text.analyticsTitle, ads: text.adsTitle, chat: text.chatTitle };
-  const bodies = { analytics: text.analyticsBody, ads: text.adsBody, chat: text.chatBody };
+  const titles = { analytics: text.analyticsTitle, ads: text.adsTitle };
+  const bodies = { analytics: text.analyticsBody, ads: text.adsBody };
 
   return (
     <section aria-labelledby="tm-consent-heading" className="tm-consent" data-consent-banner="">

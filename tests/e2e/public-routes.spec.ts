@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 import { localizePath, locales } from "@/lib/i18n/locales";
@@ -123,12 +124,22 @@ test("old in-page anchors still land on their sections", async ({ page }) => {
   }
 });
 
+test("the site's former domain sends every address, for good, to the same address on the one it has now", async ({ request }) => {
+  for (const host of ["telemartubon.com", "www.telemartubon.com"]) {
+    const response = await request.get("/broadband?utm_source=old", { headers: { host }, maxRedirects: 0 });
+    expect(response.status(), host).toBe(308);
+    expect(response.headers().location, host).toBe("https://www.truegetherth.com/broadband?utm_source=old");
+  }
+  // Its own host is served, not redirected.
+  expect((await request.get("/broadband", { maxRedirects: 0 })).status()).toBe(200);
+});
+
 test("package buttons open a LINE chat with the sales team", async ({ page }) => {
   await page.goto("/broadband");
   const buttons = page.getByRole("link", { name: /^สนใจแพ็กเกจนี้/ });
   expect(await buttons.count()).toBeGreaterThan(3);
   const first = buttons.first();
-  await expect(first).toHaveAttribute("href", "https://lin.ee/blqnOJow");
+  await expect(first).toHaveAttribute("href", content.site.contact.lineSales);
   await expect(first).toHaveAttribute("target", "_blank");
   await expect(first).toHaveAttribute("rel", /noopener/);
   await expect(first).toHaveAttribute("data-cta", "broadband-new-interest");
@@ -176,7 +187,7 @@ test("search engines get a sitemap of both languages and robots rules", async ({
   const xml = await sitemap.text();
   const listed = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname).sort();
   // Every public page and every package page (docs/renovation/R3-PACKAGE-PAGES.md), in both languages.
-  const pages = [...publicPaths, ...detailPackagesIn(content).map((item) => packageDetailPath(item.id))];
+  const pages = [...publicPaths, ...detailPackagesIn(content, todayInThailand()).map((item) => packageDetailPath(item.id))];
   const expected = pages.flatMap((path) => locales.map((locale) => localizePath(path, locale))).sort();
   expect(listed).toEqual(expected);
   expect(xml).toContain('hreflang="x-default"');

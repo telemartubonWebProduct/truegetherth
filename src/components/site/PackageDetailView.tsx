@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { packageHomeIn, packageImageIn } from "@/lib/content/lookup";
+import { packageHomeIn } from "@/lib/content/lookup";
 import { packageDetailPath } from "@/lib/content/package-facts";
 import type { CatalogPackage } from "@/lib/content/schema";
 import { localizePath } from "@/lib/i18n/locales";
@@ -18,7 +18,7 @@ import { PageShell } from "./PageShell";
 export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: CatalogPackage }) {
   const { ui } = ctx.site;
   const home = packageHomeIn(ctx.content, item);
-  const imageId = packageImageIn(ctx.content, item);
+  const imageId = item.image ?? null;
   const image = imageId ? ctx.media(imageId) : null;
   const term = item.contract ?? item.validity;
   const own = (field: string) => ctx.bind(`package:${item.id}`, field);

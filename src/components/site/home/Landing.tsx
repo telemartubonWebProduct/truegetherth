@@ -7,7 +7,7 @@ import type { CatalogPackage, HomePage } from "@/lib/content/schema";
 
 import type { RenderContext } from "../context";
 import { CtaLink, TargetLink } from "../links";
-import { speedText } from "../PackageCompare";
+import { BenefitList, speedText } from "../PackageCompare";
 import CountUp from "./CountUp";
 import { Hero } from "./Hero";
 import { heroArt } from "./hero-art";
@@ -40,7 +40,7 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
   const { ui } = ctx.site;
   const { hero, manifesto, promos, steps, services, prices, faq } = home;
   const bind = (...path: (string | number)[]) => ctx.bind(doc, ...path);
-  const still = ctx.media(hero.visual);
+  const picture = ctx.media(hero.visual);
 
   // The slip's lines at each of its five moments: before any step, and after each of the four.
   const { slip } = steps;
@@ -62,6 +62,8 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
 
   const priced = ctx.packages(prices.category, prices.group);
   const unconfirmed = (items: CatalogPackage[]) => items.some((item) => item.review.status === "unverified");
+  // Each tab's cards: the packages recommended in the catalog that belong to its categories. A tab with none is left out.
+  const rails = promos.tabs.map((tab) => ({ tab, items: ctx.featured(tab.categories) })).filter((rail) => rail.items.length > 0);
 
   return (
     <>
@@ -94,10 +96,9 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
                   </p>
                 </>
               ),
-              still: { src: still.src, width: still.width, height: still.height, alt: ctx.t(still.alt), bind: bind("hero", "visual") },
+              picture: { src: picture.src, width: picture.width, height: picture.height, alt: ctx.t(picture.alt), bind: bind("hero", "visual") },
               art: heroArt,
               next: { href: "#manifesto", label: ctx.t(manifesto.label) },
-              backdrop: ctx.site.theme.surface,
             }}
           />
         </div>
@@ -124,55 +125,57 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
       </section>
 
       {/* 3. Recommended packages: scrolling down walks along the open tab's row */}
-      <section className="stage stage-rail" id="packages" data-stage="rail" style={hold(340)} aria-labelledby="rail-heading" {...bind("promos")}>
-        <div className="pin">
-          <RailTabs
-            label={ctx.t(promos.heading)}
-            stacked={ctx.edit}
-            head={
-              <>
-                <p className="label" data-rev="" {...bind("promos", "label")}>
-                  {ctx.t(promos.label)}
-                </p>
-                <Words as="h2" id="rail-heading" className="display" text={ctx.t(promos.heading)} locale={ctx.locale} bind={bind("promos", "heading")} />
-              </>
-            }
-            hint={
-              <p className="hint" data-rev="" style={delay(2)} {...bind("promos", "description")}>
-                {ctx.t(promos.description)}
-              </p>
-            }
-            tabs={promos.tabs.map((tab) => ({ id: tab.id, title: ctx.t(tab.title), bind: bind("promos", "tabs", tab.id, "title") }))}
-            more={promos.tabs.map((tab) => (
-              <div key={tab.id} className="rail-more-row">
-                {tab.remark ? (
-                  <p className="note" {...bind("promos", "tabs", tab.id, "remark")}>
-                    {ctx.t(tab.remark)}
+      {rails.length > 0 ? (
+        <section className="stage stage-rail" id="packages" data-stage="rail" style={hold(340)} aria-labelledby="rail-heading" {...bind("promos")}>
+          <div className="pin">
+            <RailTabs
+              label={ctx.t(promos.heading)}
+              stacked={ctx.edit}
+              head={
+                <>
+                  <p className="label" data-rev="" {...bind("promos", "label")}>
+                    {ctx.t(promos.label)}
                   </p>
-                ) : (
-                  <span />
-                )}
-                <CtaLink ctx={ctx} cta={tab.viewAll} className="tm-button-small" bind={bind("promos", "tabs", tab.id, "viewAll")} />
-              </div>
-            ))}
-            note={
-              unconfirmed(promos.tabs.flatMap((tab) => tab.items.map((card) => ctx.packageById(card.packageId)))) ? (
-                <p className="note" data-rev="" {...ctx.bind("site", "ui", "unverifiedNote")}>
-                  {ctx.t(ui.unverifiedNote)}
+                  <Words as="h2" id="rail-heading" className="display" text={ctx.t(promos.heading)} locale={ctx.locale} bind={bind("promos", "heading")} />
+                </>
+              }
+              hint={
+                <p className="hint" data-rev="" style={delay(2)} {...bind("promos", "description")}>
+                  {ctx.t(promos.description)}
                 </p>
-              ) : null
-            }
-          >
-            {promos.tabs.map((tab) => (
-              <ul key={tab.id} className="rail-track" role="list" data-rail-track="" aria-label={ctx.t(tab.title)} {...bind("promos", "tabs", tab.id)}>
-                {tab.items.map((card, index) => (
-                  <PackageCard key={card.id} ctx={ctx} tab={tab} card={card} index={index} />
-                ))}
-              </ul>
-            ))}
-          </RailTabs>
-        </div>
-      </section>
+              }
+              tabs={rails.map(({ tab }) => ({ id: tab.id, title: ctx.t(tab.title), bind: bind("promos", "tabs", tab.id, "title") }))}
+              more={rails.map(({ tab }) => (
+                <div key={tab.id} className="rail-more-row">
+                  {tab.remark ? (
+                    <p className="note" {...bind("promos", "tabs", tab.id, "remark")}>
+                      {ctx.t(tab.remark)}
+                    </p>
+                  ) : (
+                    <span />
+                  )}
+                  <CtaLink ctx={ctx} cta={tab.viewAll} className="tm-button-small" bind={bind("promos", "tabs", tab.id, "viewAll")} />
+                </div>
+              ))}
+              note={
+                unconfirmed(rails.flatMap((rail) => rail.items)) ? (
+                  <p className="note" data-rev="" {...ctx.bind("site", "ui", "unverifiedNote")}>
+                    {ctx.t(ui.unverifiedNote)}
+                  </p>
+                ) : null
+              }
+            >
+              {rails.map(({ tab, items }) => (
+                <ul key={tab.id} className="rail-track" role="list" data-rail-track="" aria-label={ctx.t(tab.title)} {...bind("promos", "tabs", tab.id)}>
+                  {items.map((item, index) => (
+                    <PackageCard key={item.id} ctx={ctx} tab={tab} item={item} index={index} />
+                  ))}
+                </ul>
+              ))}
+            </RailTabs>
+          </div>
+        </section>
+      ) : null}
 
       {/* 4. How it works: the slip fills itself in, one step at a time */}
       <section
@@ -367,30 +370,35 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
   );
 }
 
-/** One recommended package: a picture, what it gives, its price as the catalog has it, and how to ask for it. */
-function PackageCard({ ctx, tab, card, index }: { ctx: RenderContext; tab: Tab; card: Tab["items"][number]; index: number }) {
+/** One recommended package: its picture with what it gives over it, what comes with it, its price as the catalog has it, and how to ask for it. */
+function PackageCard({ ctx, tab, item, index }: { ctx: RenderContext; tab: Tab; item: CatalogPackage; index: number }) {
   const { ui } = ctx.site;
-  const item = ctx.packageById(card.packageId);
-  const image = ctx.media(card.image);
+  // A recommended package always has a picture (ctx.featured leaves out the ones without).
+  const image = ctx.media(item.image!);
   const speed = item.speed ? speedText(item.speed, ctx.locale) : null;
   const term = item.contract ?? item.validity;
   const own = (field: string) => ctx.bind(`package:${item.id}`, field);
   const vat = item.price.vat === "excluded" ? ui.vatExcluded : item.price.vat === "included" ? ui.vatIncluded : null;
   return (
-    <li className="card" data-rev="" style={delay(index)} data-package={item.id} {...ctx.bind(doc, "promos", "tabs", tab.id, "items", card.id)}>
+    <li className="card" data-rev="" style={delay(index)} data-package={item.id} {...ctx.bind(`package:${item.id}`)}>
       <div className="card-plate">
         <Image
           src={image.src}
           alt={ctx.t(image.alt)}
           fill
           sizes="(min-width: 1270px) 330px, (min-width: 885px) 26vw, 230px"
-          {...ctx.bind(doc, "promos", "tabs", tab.id, "items", card.id, "image")}
+          {...own("image")}
         />
         {speed ? (
-          <span className="card-speed" {...own("speed")}>
+          <p className="card-figure" {...own("speed")}>
             <span className="sr-only">{ctx.t(ui.speed)} </span>
-            {speed.figure} {speed.unit}
-          </span>
+            <span className="num">{speed.figure}</span>
+            <span className="card-figure-unit">{speed.unit}</span>
+          </p>
+        ) : item.allowance ? (
+          <p className="card-figure card-figure-text" {...own("allowance")}>
+            {ctx.t(item.allowance)}
+          </p>
         ) : null}
       </div>
       <div className="card-body">
@@ -398,13 +406,13 @@ function PackageCard({ ctx, tab, card, index }: { ctx: RenderContext; tab: Tab; 
           {ctx.t(item.name)}
         </h3>
         <p className="card-meta">
-          {item.allowance && !speed ? <span {...own("allowance")}>{ctx.t(item.allowance)}</span> : null}
           {term ? (
             <span {...own(item.contract ? "contract" : "validity")}>
               {ctx.t(item.contract ? ui.contract : ui.validity)} {ctx.t(term)}
             </span>
           ) : null}
         </p>
+        {item.benefits.length > 0 ? <BenefitList ctx={ctx} ids={item.benefits} dense className="card-perks" /> : null}
         <p className="card-price" {...own("price")}>
           <CountUp to={item.price.amount} separator="," className="num" duration={1.4} />
           <span className="card-unit">{ctx.t(item.price.per === "month" ? ui.perMonth : ui.baht)}</span>

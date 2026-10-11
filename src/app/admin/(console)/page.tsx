@@ -41,11 +41,17 @@ export default async function AdminOverviewPage() {
         </h2>
         <ul className="mt-4 divide-y divide-tm-line border-y border-tm-line">
           <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+            <Link href="/admin/catalog" className={textLink}>
+              แพ็กเกจและโปร
+            </Link>
+            <span className="text-tm-small text-tm-muted">เพิ่ม แก้ ทำสำเนา ย้าย ซ่อน และลบแพ็กเกจ จัดกลุ่ม เลือกโปรแนะนำหน้าแรก และตั้งช่วงวันที่แสดง</span>
+          </li>
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
             <Link href="/admin/editor" className={textLink}>
               แก้ไขหน้าเว็บ (Mirror Editor)
             </Link>
             <span className="text-tm-small text-tm-muted">
-              แก้ข้อความ รูป ปุ่ม สี แพ็กเกจ และอัปโหลดรูป บันทึกเป็นร่างอัตโนมัติ หน้าเว็บจริงยังไม่เปลี่ยนจนกว่าจะเผยแพร่
+              แก้ข้อความ รูป ปุ่ม สี และอัปโหลดรูปของแต่ละหน้า บันทึกเป็นร่างอัตโนมัติ หน้าเว็บจริงยังไม่เปลี่ยนจนกว่าจะเผยแพร่
             </span>
           </li>
           <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">

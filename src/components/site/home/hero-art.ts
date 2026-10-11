@@ -1,52 +1,42 @@
-import type { HeroSceneFiles } from "./scene";
+// The fixed parts of the home page's opening picture: an oil painting cut into
+// layers (design/hero/tableau/README.md). The files and where each layer sits
+// are written by scripts/media/hero-tableau.mjs to hero-tableau.ts. The words,
+// the buttons and the sky's own picture and description are content
+// (pages.home.hero); these are not, because each is tied to the others.
 
-// The fixed parts of the home page's opening picture: files made by the
-// scripts, and the numbers those scripts print. The words, the buttons and the
-// still's own picture and description are content (pages.home.hero); these are
-// not, because each is tied to the others.
-
-/** A picture saved at several widths; the browser takes one. */
+/** A picture saved at several widths, narrowest first; the browser takes one. */
 export type Files = { src: string; width: number }[];
 
-export type HeroArt = {
-  /** The router: the model and its baked shading, from scripts/blender/router.py. */
-  scene: HeroSceneFiles;
-  /**
-   * Where the antenna the finger touches is in the still (scripts/media/hero-poster.mjs
-   * prints it), as shares of the picture. The live scene reports its own.
-   */
-  touch: { x: number; y: number };
-  /** The arm, cut out of its green-screen pictures by scripts/media/hero-arm.mjs: one arm, with the hand open and pointing. */
-  arm: {
-    width: number;
-    height: number;
-    open: Files;
-    point: Files;
-    /** The pointing fingertip, as shares of the arm's picture (the script prints it). */
-    tip: { x: number; y: number };
-    /** The arm's width as a share of the whole picture's: what makes the hand the right size next to the router. */
-    span: number;
-  };
+/** The thin signal frame hung on a layer, in shares of the layer's own box: left, top, width, height. */
+export type HeroFrame = { box: number[]; reading?: string; mark?: boolean };
+
+/** One cut-out, placed in the picture in shares of the picture's width (x, w) and height (y, h). */
+export type HeroLayer = {
+  id: string;
+  files: Files;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** How far it shifts with the pointer and the scroll: more for what is nearer. */
+  depth: number;
+  /** How far it floats up and down on its own (share of the picture's height), tilts (degrees) and drifts sideways (share of the width). */
+  bob: number;
+  turn: number;
+  sway: number;
+  /** One such movement, in seconds. */
+  time: number;
+  frame?: HeroFrame;
 };
 
-export const heroArt: HeroArt = {
-  scene: { model: "/models/router-v1.glb", occlusion: "/models/router-v1-ao.webp", floor: "/models/router-v1-floor.webp" },
-  touch: { x: 0.4235, y: 0.397 },
-  arm: {
-    width: 2471,
-    height: 631,
-    open: [
-      { src: "/media/hero-v3/arm-open-1236.webp", width: 1236 },
-      { src: "/media/hero-v3/arm-open-2471.webp", width: 2471 },
-    ],
-    point: [
-      { src: "/media/hero-v3/arm-point-1236.webp", width: 1236 },
-      { src: "/media/hero-v3/arm-point-2471.webp", width: 2471 },
-    ],
-    tip: { x: 0.9802, y: 0.2266 },
-    span: 0.57,
-  },
+/** One arrangement of the painting: the sky, and the layers over it from back to front. */
+export type HeroPack = { width: number; height: number; sky: Files; layers: HeroLayer[] };
+
+export type HeroTableau = {
+  /** The True Online mark shown on the router's frame: the owner's own asset, never a generated one. */
+  mark: { src: string; width: number; height: number };
+  /** `wide` covers a desktop screen; `tall` stands above the headline on a phone or an upright tablet. */
+  packs: { wide: HeroPack; tall: HeroPack };
 };
 
-/** The picture's own proportions: the still, the canvas and the arm are all laid out in a box of this shape. */
-export const HERO_ASPECT = 16 / 9;
+export { heroTableau as heroArt } from "./hero-tableau";

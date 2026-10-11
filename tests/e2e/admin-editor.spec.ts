@@ -1,6 +1,8 @@
 import { expect, test, type Browser, type FrameLocator, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { todayInThailand } from "@/lib/content/dates";
+import { featuredIn } from "@/lib/content/lookup";
 
 import {
   createConfirmedUser,
@@ -239,12 +241,9 @@ test("the editor and its preview load no Google Ads tag and report no conversion
   expect(googleRequests).toEqual([]);
 });
 
-test("the editor shows every tab of recommended packages, and a card's package can be swapped", async ({ page }) => {
+test("the editor shows every tab of recommended packages, and a card leads to its package in Packages and promos", async ({ page }) => {
   const tab = content.pages.home.promos.tabs[1];
-  const card = tab.items[0];
-  const replacement = content.catalog.find(
-    (item) => item.category === "mobile-monthly" && item.review.status !== "hidden" && !tab.items.some((entry) => entry.packageId === item.id),
-  )!;
+  const [card] = featuredIn(content, tab.categories, todayInThailand());
   await signIn(page, admin);
   await openEditor(page);
   const frame = preview(page);
@@ -254,20 +253,15 @@ test("the editor shows every tab of recommended packages, and a card's package c
   }
   await expect(frame.getByRole("tablist")).toHaveCount(0);
 
-  await frame.locator(`[data-package="${card.packageId}"]`).getByRole("link", { name: /ดูรายละเอียด/ }).click();
-  const picker = page.getByRole("combobox", { name: "แพ็กเกจ", exact: true });
-  await expect(picker).toHaveValue(card.packageId);
-  await picker.selectOption(replacement.id);
-  await expect(frame.locator(`[data-package="${replacement.id}"]`).getByRole("heading", { level: 3 })).toHaveText(replacement.name.th);
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
-  const { data } = await serviceClient().from("content_drafts").select("body").eq("document_id", "page:home").single();
-  const stored = (data!.body as typeof content.pages.home).promos.tabs[1].items[0];
-  expect(stored).toEqual({ ...card, packageId: replacement.id });
-
-  await page.getByRole("button", { name: "ทิ้งร่างของเอกสารนี้" }).click();
-  await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
-  await expect(frame.locator(`[data-package="${card.packageId}"]`)).toBeVisible();
-  await expect.poll(() => storedDraft("page:home"), saving).toBeNull();
+  // A package is not edited here: the panel says what the card shows and leads to its form.
+  await frame.locator(`[data-package="${card.id}"]`).getByRole("heading", { level: 3 }).click();
+  await expect(page.getByRole("heading", { level: 2, name: `แพ็กเกจ ${card.name.th}` })).toBeVisible();
+  await expect(page.getByLabel("ราคาเสนอ (บาท)")).toHaveCount(0);
+  await page.getByRole("link", { name: "แก้แพ็กเกจนี้ในหน้าแพ็กเกจและโปร" }).click();
+  await expect(page).toHaveURL(new RegExp(`/admin/catalog\\?package=${card.id}$`));
+  await expect(page.getByRole("dialog").getByRole("heading", { level: 2, name: card.name.th })).toBeVisible();
+  await expect(page.getByRole("dialog").getByLabel("ราคาเสนอ (บาท)")).toHaveValue(String(card.price.amount));
+  expect(await draftIds()).not.toContain(`package:${card.id}`);
 });
 
 test("a list grows, moves and shrinks from the editor, within the page's limits", async ({ page }) => {
@@ -303,45 +297,13 @@ test("a list grows, moves and shrinks from the editor, within the page's limits"
   await clearDrafts();
 });
 
-test("packages are added, shown and removed from the package list; a shown package needs a price", async ({ page }) => {
+test("a picture uploaded from the editor joins the library and shows on the page", async ({ page }) => {
   await clearDrafts();
   await signIn(page, admin);
-  await openEditor(page, "/admin/editor?page=broadband-new");
+  await openEditor(page, "/admin/editor?page=solar");
   const frame = preview(page);
-  await page.getByRole("button", { name: "แพ็กเกจและสิทธิประโยชน์" }).click();
-  await page.getByRole("button", { name: "+ เพิ่มแพ็กเกจในกลุ่มนี้" }).first().click();
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
-  const created = (await draftIds()).find((id) => id.startsWith("package:"))!.slice("package:".length);
-  expect(await draftIds()).toContain("catalog");
-
-  // Shown with no price: refused until a price is typed.
-  await page.getByRole("button", { name: "แพ็กเกจและสิทธิประโยชน์" }).click();
-  await page.getByRole("button", { name: "แสดง: แพ็กเกจใหม่" }).click();
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid", saving);
-  await page.getByRole("button", { name: /แพ็กเกจใหม่/ }).first().click();
-  await page.getByLabel("ราคาเสนอ (บาท)").fill("555");
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
-  await expect(frame.locator(`[data-package="${created}"]`)).toBeVisible();
-
-  await page.getByRole("button", { name: "แพ็กเกจและสิทธิประโยชน์" }).click();
-  await page.getByRole("button", { name: "ลบ: แพ็กเกจใหม่" }).click();
-  await expect(frame.locator(`[data-package="${created}"]`)).toHaveCount(0);
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
-
-  // A package a home card shows cannot go.
-  const shown = content.catalog.find((item) => item.id === content.pages.home.promos.tabs[0].items[0].packageId)!;
-  await page.getByRole("button", { name: `ลบ: ${shown.name.th}` }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "การ์ดโปรในหน้าแรกยังใช้อยู่" })).toBeVisible();
-  await clearDrafts();
-});
-
-test("a picture uploaded from the editor joins the library and shows on the card", async ({ page }) => {
-  await clearDrafts();
-  const card = content.pages.home.promos.tabs[0].items[0];
-  await signIn(page, admin);
-  await openEditor(page);
-  const frame = preview(page);
-  await frame.locator(`[data-package="${card.packageId}"] img`).first().click();
+  const picture = frame.locator("main img[data-edit]").first();
+  await picture.click();
   await page.getByRole("button", { name: /^เปลี่ยน/ }).first().click();
   const dialog = page.getByRole("dialog", { name: "เลือกรูปจากคลังสื่อ" });
   await dialog.getByLabel(/ไฟล์รูป/).setInputFiles("public/assets/HomeInternet/home-tol-newcustomer.webp");
@@ -349,29 +311,29 @@ test("a picture uploaded from the editor joins the library and shows on the card
   await dialog.getByLabel("คำอธิบายรูป English").fill("Uploaded test picture");
   await dialog.getByRole("button", { name: "อัปโหลดและเลือกรูปนี้" }).click();
   await expect(dialog).toBeHidden({ timeout: 20_000 });
-  await expect(frame.locator(`[data-package="${card.packageId}"] img`).first()).toHaveAttribute("src", /storage%2Fv1%2Fobject%2Fpublic%2Fmedia%2Fuploads/);
+  await expect(picture).toHaveAttribute("src", /storage%2Fv1%2Fobject%2Fpublic%2Fmedia%2Fuploads/);
   await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
   const ids = await draftIds();
   expect(ids.some((id) => id.startsWith("media:upload-"))).toBe(true);
-  expect(ids).toContain("page:home");
+  expect(ids).toContain("page:solar");
   await clearDrafts();
 });
 
-test("the home conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {
-  const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
+test("the lead conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {
+  const { googleAdsId, googleAdsLeadConversion } = content.site.integrations;
   const storedConversion = async () => {
     const { data, error } = await serviceClient().from("content_drafts").select("body").eq("document_id", "site").maybeSingle();
     if (error) throw error;
-    return data && (data.body as { integrations: { googleAdsHomeConversion: string } }).integrations.googleAdsHomeConversion;
+    return data && (data.body as { integrations: { googleAdsLeadConversion: string } }).integrations.googleAdsLeadConversion;
   };
   await signIn(page, admin);
   await openEditor(page);
   await page.getByRole("button", { name: "ตั้งค่าทั้งเว็บ" }).click();
   await page.getByRole("button", { name: /การเชื่อมต่อ/ }).click();
-  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อเปิดหน้าแรก (send_to)" });
-  await expect(field).toHaveValue(googleAdsHomeConversion);
-  // The tag and the chat script stay fixed.
-  await expect(page.getByRole("textbox", { name: /Google Ads ID|Tawk/ })).toHaveCount(0);
+  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อลูกค้าส่งฟอร์มหรือกดติดต่อ (send_to)" });
+  await expect(field).toHaveValue(googleAdsLeadConversion);
+  // The tag stays fixed.
+  await expect(page.getByRole("textbox", { name: /Google Ads ID/ })).toHaveCount(0);
 
   await field.fill("AW-1/OtherAccount");
   await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid", saving);
@@ -384,7 +346,7 @@ test("the home conversion is edited in the site settings, only for the site's ow
 
   await page.getByRole("button", { name: "ทิ้งร่างของเอกสารนี้" }).click();
   await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
-  await expect(field).toHaveValue(googleAdsHomeConversion);
+  await expect(field).toHaveValue(googleAdsLeadConversion);
   await expect.poll(storedConversion, saving).toBeNull();
 });
 
@@ -403,8 +365,8 @@ test("the preview is the public page, pixel for pixel", async ({ browser, baseUR
   // Six full-page shots of long pages and three comparisons take about half
   // the default timeout.
   test.setTimeout(60_000);
-  // Reduced motion lays the home page's stages flat and keeps the 3D router on
-  // its still in both, so the shots are stable.
+  // Reduced motion lays the home page's stages flat and holds the painting
+  // still in both, so the shots are stable.
   const context = await browser.newContext({ locale: "th-TH", viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
   await blockThirdParty(context, baseURL!);
   const page = await context.newPage();

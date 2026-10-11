@@ -25,6 +25,9 @@ export const mediaRef = z.string().regex(stableIdPattern, "รหัสรูป
 export const benefitRef = z.string().regex(stableIdPattern, "รหัสสิทธิประโยชน์ไม่ถูกต้อง");
 export const packageRef = z.string().regex(stableIdPattern, "รหัสแพ็กเกจไม่ถูกต้อง");
 
+/** A calendar day in Thailand, such as 2026-10-31. */
+export const isoDate = z.iso.date("ใช้วันที่แบบ ปปปป-ดด-วว เช่น 2026-10-31");
+
 /** In-page anchor; some legacy anchors are camelCase (#socialInternet). */
 export const anchorId = z.string().regex(/^[A-Za-z][A-Za-z0-9-]*$/, "ชื่อหมวดในหน้าใช้ a-z ตัวเลข และขีดกลาง");
 
@@ -161,7 +164,11 @@ export const catalogPackage = z.strictObject({
     .string()
     .regex(/^\*[0-9*]+#$/, "รหัสกดขึ้นต้นด้วย * และลงท้ายด้วย # เช่น *900*7129#")
     .optional(),
+  /** Its picture: on its own page, and on its card when it is recommended on the home page. */
   image: mediaRef.optional(),
+  /** Shown to visitors only from this day, and only until this day (both included); either may be left out. */
+  showFrom: isoDate.optional(),
+  showUntil: isoDate.optional(),
   /** Legacy record this package was imported from. */
   source: z.strictObject({ file: z.string().min(1), entry: z.string().min(1) }),
   review: z.strictObject({ status: reviewStatus, notes: z.array(z.string().min(1)) }),
@@ -202,6 +209,7 @@ export const uiKeys = [
   "opensInNewTab",
   "footerContact",
   "packageDetails",
+  "recommended",
   "findPackage",
   "filterSpeed",
   "filterPrice",
@@ -290,8 +298,6 @@ export const consentCopy = z.strictObject({
   analyticsBody: localizedText,
   adsTitle: localizedText,
   adsBody: localizedText,
-  chatTitle: localizedText,
-  chatBody: localizedText,
   settingsLink: localizedText,
 });
 export type ConsentCopy = z.infer<typeof consentCopy>;
@@ -318,6 +324,12 @@ export const siteSettings = z.strictObject({
     ),
     email: z.email(),
     facebook: httpsUrl,
+    /** Where the company's head office is, in a few words (no street address is published). */
+    office: localizedText,
+    /** A map of the head office. */
+    mapUrl: httpsUrl,
+    /** When the team answers. */
+    hours: localizedText,
   }),
   navigation: z.array(navItem),
   headerCta: cta,
@@ -333,22 +345,21 @@ export const siteSettings = z.strictObject({
   seo: z.strictObject({ siteName: localizedText, description: localizedText, image: mediaRef }),
   /** Brand colours; every text/background pair must keep 4.5:1. */
   theme,
-  /** Third-party tags. The editor shows only the home conversion as editable (src/components/editor/schema-walk.ts). */
+  /** Third-party tags. The editor shows only the lead conversion as editable (src/components/editor/schema-walk.ts). */
   integrations: z
     .strictObject({
       googleAdsId: z.string().regex(/^AW-[0-9]+$/),
       /** Google Analytics 4 web stream; reports count the production domain only. */
       ga4MeasurementId: z.string().regex(/^G-[A-Z0-9]+$/).optional(),
-      /** Google Ads `send_to` of the conversion counted each time the home page opens (as on the old site). */
-      googleAdsHomeConversion: z.string().regex(adsConversionPattern, "ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"),
-      tawkSrc: httpsUrl,
+      /** Google Ads `send_to` of the conversion counted when a visitor asks to be contacted: a sent call-back form, or a click on LINE or a phone number. */
+      googleAdsLeadConversion: z.string().regex(adsConversionPattern, "ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"),
     })
     .superRefine((value, context) => {
       // The tag only configures googleAdsId, so a conversion of another account would go nowhere.
       // Zod runs this after field errors too; a malformed value already has its message.
-      const account = adsConversionPattern.exec(String(value.googleAdsHomeConversion))?.[1];
+      const account = adsConversionPattern.exec(String(value.googleAdsLeadConversion))?.[1];
       if (account === undefined || account === value.googleAdsId) return;
-      context.addIssue({ code: "custom", path: ["googleAdsHomeConversion"], message: `ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${value.googleAdsId}/…)` });
+      context.addIssue({ code: "custom", path: ["googleAdsLeadConversion"], message: `ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${value.googleAdsId}/…)` });
     }),
 });
 export type SiteSettings = z.infer<typeof siteSettings>;
@@ -385,18 +396,15 @@ export const packagePage = z.strictObject({
 });
 export type PackagePage = z.infer<typeof packagePage>;
 
-/** A card of the home page's recommended packages: a catalog package with a picture. */
-const promoItem = z.strictObject({
-  id: stableId,
-  /** Price, speed and terms come from the catalog as they are; the card adds no offer of its own. */
-  packageId: packageRef,
-  image: mediaRef,
-});
-
+/**
+ * A tab of the home page's recommended packages. Its cards are the packages
+ * recommended in the catalog (siteContent.featured) that belong to these
+ * categories; price, speed, terms and picture come from each package as it is.
+ */
 const promoTab = z.strictObject({
   id: stableId,
   title: localizedText,
-  items: z.array(promoItem).min(1).max(8),
+  categories: z.array(categoryId).min(1),
   /** Under the cards, such as who provides the service. */
   remark: localizedText.optional(),
   packageCta: cta,
@@ -410,7 +418,7 @@ export const homePage = z.strictObject({
   id: z.literal("home"),
   path: z.literal("/"),
   seo,
-  /** The opening screen: the router drawn live in 3D, and a robot arm that reaches in to touch it. */
+  /** The opening screen: an oil painting in layers, a goddess lifting the router among figures that drift a little. */
   hero: z.strictObject({
     /** Small line over the heading. */
     eyebrow: localizedText,
@@ -420,9 +428,9 @@ export const homePage = z.strictObject({
     secondaryCta: cta,
     /** Pills beside the heading: what the business offers, each a link. */
     tags: z.array(link).max(4),
-    /** The router as a still picture: shown first, and instead of the live scene where nothing may move. */
+    /** The painting's sky; the page lays the figures over it. Its description is of the whole picture. */
     visual: mediaRef,
-    /** Visible line by the picture, such as "3D model, not a photograph". */
+    /** Visible line by the picture, such as "AI-generated illustration, not a photograph". */
     visualNote: localizedText,
   }),
   /** One sentence that fills with ink as visitors scroll. */
@@ -612,6 +620,8 @@ export const siteContent = z.strictObject({
   media: z.record(stableId, mediaAsset),
   benefits: z.record(stableId, benefit),
   catalog: z.array(catalogPackage),
+  /** Packages recommended on the home page, in the order of their cards (ids no longer in the catalog are passed over). */
+  featured: z.array(packageRef),
   pages: z.strictObject({
     home: homePage,
     packages: z.array(packagePage),

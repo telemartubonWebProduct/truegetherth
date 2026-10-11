@@ -1,13 +1,9 @@
 "use client";
 
 import { ArrowDown } from "lucide-react";
-import { motion, MotionConfig } from "motion/react";
 import { type CSSProperties, type ReactNode, useEffect, useRef } from "react";
 
-import { HERO_ASPECT, type Files, type HeroArt } from "./hero-art";
-import type { HeroScene } from "./scene";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
+import type { Files, HeroLayer, HeroPack, HeroTableau } from "./hero-art";
 
 /** Marks an element as the view of one content field in the Mirror editor; empty on the public site. */
 type Binding = { "data-edit"?: string };
@@ -20,204 +16,216 @@ export type HeroView = {
   actions: ReactNode;
   /** The pills and the picture's note beside the heading, rendered by the page. */
   side: ReactNode;
-  /** The router as a still: there from the first paint, under the live scene. */
-  still: { src: string; width: number; height: number; alt: string; bind: Binding };
-  art: HeroArt;
+  /** The painting's sky as the content has it: the picture a visitor is told about, and the one the editor changes. */
+  picture: { src: string; width: number; height: number; alt: string; bind: Binding };
+  art: HeroTableau;
   /** Where the arrow under the opening leads, and its name for screen readers. */
   next: { href: string; label: string };
-  /** The page's backdrop behind the picture: the canvas is cleared to it, so it has no edge. */
-  backdrop: string;
 };
 
-/** If the live scene is not drawn by now, the arm starts its reach over the still instead. */
-const PATIENCE = 2600;
+/** A phone or an upright tablet: the tall arrangement stands above the headline (the same query is in landing.css). */
+const TALL = "(max-aspect-ratio: 4/5)";
+
+type Variables = CSSProperties & Record<`--${string}`, string | number>;
+
+const percent = (share: number) => `${(share * 100).toFixed(2)}%`;
+const srcSet = (files: Files) => files.map((file) => `${file.src} ${file.width}w`).join(", ");
 
 /**
- * Whether this device draws WebGL on a graphics chip. Where it would be drawn in
- * software (no chip, or a blocked driver) the live scene would stutter, so the
- * still stays; three.js is then not even downloaded. The browser is asked to
- * refuse a slow context, and since some hand one out anyway, the renderer's
- * name is checked for the software ones too.
+ * How wide a layer's picture is drawn, for the browser to choose a file by.
+ * The wide arrangement may be wider than the screen. The tall one is at most
+ * as wide as the screen, a little less on most phones; said exactly, a phone
+ * takes the smaller file of each figure instead of missing it by a few pixels.
+ * The cloud bank, wider than the picture and soft, does not need the larger
+ * file on an ordinary phone.
  */
-function drawsOnGraphicsChip() {
-  try {
-    const context = document.createElement("canvas").getContext("webgl2", { failIfMajorPerformanceCaveat: true });
-    if (!context) return false;
-    const names = context.getExtension("WEBGL_debug_renderer_info");
-    const renderer = names ? String(context.getParameter(names.UNMASKED_RENDERER_WEBGL)) : "";
-    context.getExtension("WEBGL_lose_context")?.loseContext();
-    return !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
-  } catch {
-    return false;
-  }
+const layerSizes = (layer: HeroLayer, pack: "wide" | "tall") => `${Math.ceil(layer.w * (pack === "wide" ? 125 : layer.w > 1 ? 75 : 96))}vw`;
+
+/**
+ * Asks for the largest figure of an arrangement with the page itself, when the
+ * screen is the one that arrangement is for. The sky fills the screen, which a
+ * browser takes for a background, so this figure is what it times as the
+ * page's largest picture; left to lazy loading it would be found last.
+ */
+function LargestFigure({ pack, name }: { pack: HeroPack; name: "wide" | "tall" }) {
+  const figures = pack.layers.filter((layer) => layer.id !== "near-clouds");
+  if (figures.length === 0) return null;
+  const largest = figures.reduce((a, b) => (b.w * b.h > a.w * a.h ? b : a));
+  return <link rel="preload" as="image" href={largest.files[largest.files.length - 1].src} imageSrcSet={srcSet(largest.files)} imageSizes={layerSizes(largest, name)} media={name === "tall" ? TALL : `not all and ${TALL}`} fetchPriority="high" />;
 }
 
-const percent = (share: number) => `${(share * 100).toFixed(3)}%`;
+/** One cut-out of the painting, with the signal frame hung on it. */
+function Layer({ layer, index, pack, art }: { layer: HeroLayer; index: number; pack: "wide" | "tall"; art: HeroTableau }) {
+  const place: Variables = {
+    "--x": percent(layer.x),
+    "--y": percent(layer.y),
+    "--w": percent(layer.w),
+    "--h": percent(layer.h),
+    "--depth": layer.depth,
+    "--bob": layer.bob,
+    "--turn": `${layer.turn}deg`,
+    "--sway": layer.sway,
+    "--time": `${layer.time || 8}s`,
+    // Each starts somewhere else in its float, so no two rise together.
+    "--delay": `${(-1.7 * index).toFixed(1)}s`,
+  };
+  const largest = layer.files[layer.files.length - 1];
+  const sizes = layerSizes(layer, pack);
+  const frame = layer.frame;
+  const box: Variables | undefined = frame && { "--bx": percent(frame.box[0]), "--by": percent(frame.box[1]), "--bw": percent(frame.box[2]), "--bh": percent(frame.box[3]) };
+  return (
+    <div className="hero-layer" data-layer={layer.id} style={place}>
+      <div className="hero-float">
+        {frame?.mark ? <span className="hero-glow" style={box} /> : null}
+        {/* eslint-disable-next-line @next/next/no-img-element -- the layers are already the right sizes (scripts/media/hero-tableau.mjs), so the browser picks one from each list; lazy, so the arrangement that is not shown is never downloaded */}
+        <img alt="" src={largest.src} srcSet={srcSet(layer.files)} sizes={sizes} width={largest.width} height={Math.round((largest.width * layer.h * art.packs[pack].height) / (layer.w * art.packs[pack].width))} loading="lazy" decoding="async" />
+        {frame ? (
+          <span className="hero-box" data-mark={frame.mark ? "" : undefined} style={box}>
+            {frame.mark ? (
+              // eslint-disable-next-line @next/next/no-img-element -- a small fixed mark
+              <img className="hero-mark" alt="" src={art.mark.src} width={art.mark.width} height={art.mark.height} loading="lazy" decoding="async" />
+            ) : (
+              <b className="num">{frame.reading}</b>
+            )}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function Pack({ name, pack, art }: { name: "wide" | "tall"; pack: HeroPack; art: HeroTableau }) {
+  return (
+    <div className={`hero-pack hero-pack-${name}`}>
+      {pack.layers.map((layer, index) => (
+        <Layer key={layer.id} layer={layer} index={index} pack={name} art={art} />
+      ))}
+    </div>
+  );
+}
 
 /**
- * The opening screen. Behind: a True fibre router, drawn live in 3D (three.js,
- * loaded only when the page is allowed to move), over a still of the same view
- * that is there from the first paint. In front: a robot arm that slides in from
- * the left, its hand closing from open to pointing, until the finger is on one
- * of the router's antennas; at the touch the router's status lights come on,
- * and it taps again every few seconds. At the bottom, one line of context, the
- * headline and two buttons, each sliding in on its own delay.
+ * The opening screen. Behind: an oil painting in layers, a goddess lifting the
+ * True router over her head with cherubs, a sea god and a muse around her. The
+ * sky is one picture and every figure a cut-out placed over it, so each can
+ * float a little on its own and shift against the sky as the pointer moves
+ * (and, on any screen, as the page scrolls: the --hero-* properties, written by
+ * ScrollDriver). Thin frames with a reading hang on the figures, as if the
+ * router's signal had found them. In front, at the bottom: one line of
+ * context, the headline and two buttons. The entrance is CSS (landing.css,
+ * under data-motion): the picture settles and the smaller parts rise in, while
+ * the headline, the largest thing on the screen, is there from the first
+ * paint and waits for no script.
  *
- * The arm, the spark and the rings are placed on the antenna's position in the
- * picture (--touch-x, --touch-y), which the scene keeps up to date as its camera
- * drifts. Scrolling swings the camera up over the router, draws the arm back,
- * and frames the picture while the headline lifts away (the --hero-*
- * properties, written by ScrollDriver).
- *
- * In the Mirror editor's preview nothing here moves (there is no data-motion):
- * the still, the arm at rest and every word are simply there to be clicked.
+ * There are two arrangements of the same figures, wide and tall; both are in
+ * the page and landing.css shows one. All of it is plain pictures in the page:
+ * without scripts, with reduced motion and in the Mirror editor's preview (no
+ * data-motion) the painting is simply there, still, and every word can be
+ * clicked.
  */
 function HeroStage({ view }: { view: HeroView }) {
   const { art } = view;
-  const frame = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const scene = useRef<HTMLDivElement>(null);
 
+  // The pointer moves the layers a little, nearer ones more (landing.css, under data-motion). Only where there is a pointer that hovers.
   useEffect(() => {
     const root = document.documentElement;
-    const box = frame.current;
-    const surface = canvas.current;
-    if (!box || !surface) return;
-    // data-hero-still is set by scripts/media/hero-poster.mjs: draw one frame, lights on, nothing moving.
-    const still = root.hasAttribute("data-hero-still");
-    // Without motion there is nothing to do: the still shows the router, and the arm rests on it.
-    if (!root.hasAttribute("data-motion") && !still) return;
+    const box = scene.current;
+    if (!box || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
-    let scene: HeroScene | null = null;
-    let gone = false;
-    let touched = false;
-    const arm = box.querySelector<HTMLElement>(".hero-arm");
-    // The arm's own animation says when the finger lands: the lights answer it.
-    const onLanded = (event: AnimationEvent) => {
-      if (event.animationName !== "reach") return;
-      touched = true;
-      box.setAttribute("data-touched", "");
-      scene?.powerOn();
+    let frame = 0;
+    const aim = { x: 0, y: 0 };
+    const now = { x: 0, y: 0 };
+    const step = () => {
+      frame = 0;
+      now.x += (aim.x - now.x) * 0.08;
+      now.y += (aim.y - now.y) * 0.08;
+      box.style.setProperty("--px", now.x.toFixed(4));
+      box.style.setProperty("--py", now.y.toFixed(4));
+      if (Math.abs(aim.x - now.x) + Math.abs(aim.y - now.y) > 0.002) frame = requestAnimationFrame(step);
     };
-    const onTap = (event: AnimationEvent) => {
-      if (event.animationName === "tap") scene?.tap();
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(step);
     };
-    arm?.addEventListener("animationend", onLanded);
-    arm?.addEventListener("animationiteration", onTap);
-
-    const overStill = () => box.setAttribute("data-live", "still");
-    const stop = () => {
-      gone = true;
-      arm?.removeEventListener("animationend", onLanded);
-      arm?.removeEventListener("animationiteration", onTap);
-      scene?.dispose();
-      box.removeAttribute("data-live");
-      box.removeAttribute("data-touched");
-      // Back to where the antenna is in the still (React set these once and will not set them again).
-      box.style.setProperty("--touch-x", percent(art.touch.x));
-      box.style.setProperty("--touch-y", percent(art.touch.y));
+    const onMove = (event: PointerEvent) => {
+      // Nothing to move where the page lies still, or once the opening has scrolled away.
+      if (!root.hasAttribute("data-motion") || root.hasAttribute("data-hero-away")) return;
+      aim.x = (event.clientX / window.innerWidth) * 2 - 1;
+      aim.y = (event.clientY / window.innerHeight) * 2 - 1;
+      request();
     };
-    if (!still && !drawsOnGraphicsChip()) {
-      overStill();
-      return stop;
-    }
-
-    const patience = window.setTimeout(overStill, PATIENCE);
-    import("./scene")
-      .then(({ createHeroScene }) =>
-        createHeroScene(surface, {
-          files: art.scene,
-          backdrop: view.backdrop,
-          still,
-          progress: () => Number(root.style.getPropertyValue("--hero-progress")) || 0,
-          onTouchPoint(x, y) {
-            box.style.setProperty("--touch-x", percent(x));
-            box.style.setProperty("--touch-y", percent(y));
-          },
-        }),
-      )
-      .then((made) => {
-        if (gone) return made.dispose();
-        scene = made;
-        window.clearTimeout(patience);
-        box.setAttribute("data-live", "scene");
-        if (touched) made.powerOn();
-      })
-      // No WebGL after all, or the model did not arrive: the still stays, and the arm reaches over it.
-      .catch(() => {
-        window.clearTimeout(patience);
-        if (!gone) overStill();
-      });
-
+    const onLeave = () => {
+      aim.x = 0;
+      aim.y = 0;
+      request();
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    root.addEventListener("mouseleave", onLeave);
     return () => {
-      window.clearTimeout(patience);
-      stop();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("pointermove", onMove);
+      root.removeEventListener("mouseleave", onLeave);
+      box.style.removeProperty("--px");
+      box.style.removeProperty("--py");
     };
-  }, [art.scene, art.touch.x, art.touch.y, view.backdrop]);
+  }, []);
 
-  // The arm is sized against the picture, and hung by its fingertip on the touch point.
-  const armHeight = art.arm.span * (art.arm.height / art.arm.width) * HERO_ASPECT;
-  const geometry = {
-    "--touch-x": percent(art.touch.x),
-    "--touch-y": percent(art.touch.y),
-    "--arm-width": percent(art.arm.span),
-    "--arm-height": percent(armHeight),
-    "--arm-tip-x": art.arm.tip.x,
-    "--arm-tip-y": art.arm.tip.y,
-  } as CSSProperties;
-  // The arm's files are already the right sizes (scripts/media/hero-arm.mjs), so the browser picks one from each list.
-  const armSizes = `(max-width: 767px) ${Math.round(165 * art.arm.span)}vw, ${Math.round(100 * art.arm.span)}vw`;
-  const armSource = (files: Files) => ({
-    src: files[files.length - 1].src,
-    srcSet: files.map((file) => `${file.src} ${file.width}w`).join(", "),
-    sizes: armSizes,
-    width: art.arm.width,
-    height: art.arm.height,
-    decoding: "async" as const,
-  });
+  const { wide, tall } = art.packs;
+  const shapes: Variables = { "--wide": (wide.width / wide.height).toFixed(4), "--tall": (tall.width / tall.height).toFixed(4) };
+  // The sky comes in the sizes the script wrote as long as the content still names its picture.
+  const ownSky = wide.sky.some((file) => file.src === view.picture.src);
 
   return (
     <div className="hero" id="top">
+      <LargestFigure pack={wide} name="wide" />
+      <LargestFigure pack={tall} name="tall" />
       <div className="hero-art">
-        <motion.div className="hero-art-inner" initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.8, ease: EASE }}>
-          <div className="hero-frame" ref={frame} style={geometry}>
-            {/* eslint-disable @next/next/no-img-element -- the page's first picture, at its own size, and the arm's pre-sized files: the image optimizer has nothing to add */}
-            <img className="hero-poster" src={view.still.src} alt={view.still.alt} width={view.still.width} height={view.still.height} fetchPriority="high" decoding="async" {...view.still.bind} />
-            <canvas className="hero-canvas" ref={canvas} aria-hidden="true" />
-            <div className="hero-arm-rig" aria-hidden="true">
-              <div className="hero-arm">
-                <img className="hero-arm-open" alt="" {...armSource(art.arm.open)} />
-                <img className="hero-arm-point" alt="" {...armSource(art.arm.point)} />
-              </div>
+        <div className="hero-art-inner">
+          <div className="hero-scene" ref={scene} style={shapes}>
+            <picture>
+              <source media={TALL} srcSet={srcSet(tall.sky)} sizes="100vw" />
+              {/* The page's first picture, at its own sizes: the image optimizer has nothing to add. */}
+              <img
+                className="hero-sky"
+                src={view.picture.src}
+                srcSet={ownSky ? srcSet(wide.sky) : undefined}
+                sizes={ownSky ? "(min-aspect-ratio: 16/9) 100vw, 180vh" : undefined}
+                alt={view.picture.alt}
+                width={view.picture.width}
+                height={view.picture.height}
+                fetchPriority="high"
+                decoding="async"
+                {...view.picture.bind}
+              />
+            </picture>
+            <div aria-hidden="true">
+              <Pack name="wide" pack={wide} art={art} />
+              <Pack name="tall" pack={tall} art={art} />
             </div>
-            {/* eslint-enable @next/next/no-img-element */}
-            <span className="hero-rings" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div className="hero-foot" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 1, ease: EASE }}>
+      {/* The ink tone: white words and white buttons, on the painting's shade. */}
+      <div className="hero-foot" data-tone="ink">
         <div className="hero-type">
-          <motion.p className="hero-sub" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.8, ease: EASE }}>
+          <p className="hero-sub">
             <span className="dot" aria-hidden="true" />
             <span {...view.eyebrow.bind}>{view.eyebrow.text}</span>
-          </motion.p>
-          <motion.h1 className="hero-title" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.8, ease: EASE }}>
+          </p>
+          <h1 className="hero-title">
             {view.heading.map((line, index) => (
               <span key={index} className="hero-line" {...line.bind}>
                 {line.text}{" "}
               </span>
             ))}
-          </motion.h1>
-          <motion.div className="hero-actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.8, ease: EASE }}>
+          </h1>
+          <div className="hero-actions">
             {view.actions}
-          </motion.div>
+          </div>
         </div>
         <div className="hero-side">{view.side}</div>
-      </motion.div>
+      </div>
 
       <a className="hero-scroll" href={view.next.href} aria-label={view.next.label}>
         <ArrowDown size={14} strokeWidth={2.5} aria-hidden="true" />
@@ -226,11 +234,7 @@ function HeroStage({ view }: { view: HeroView }) {
   );
 }
 
-/** The hero, with an entrance that respects "reduce motion": things still fade in, nothing slides or scales. */
+/** The hero. With "reduce motion" (no data-motion) it has no entrance: everything is simply there. */
 export function Hero({ view }: { view: HeroView }) {
-  return (
-    <MotionConfig reducedMotion="user">
-      <HeroStage view={view} />
-    </MotionConfig>
-  );
+  return <HeroStage view={view} />;
 }

@@ -5,7 +5,7 @@ import { contactEventFor } from "@/lib/analytics/contact-channel";
 import { content } from "@/lib/content";
 import { csvCell } from "@/lib/leads/csv";
 import { containsPattern, filterLeads, leadFilters } from "@/lib/leads/filters";
-import { fieldErrors, formValues, leadInput, normalizePhone, requestSource } from "@/lib/leads/form";
+import { checkLead, fieldErrors, formValues, leadInput, normalizePhone, requestSource } from "@/lib/leads/form";
 import { requestablePackages, serviceOf } from "@/lib/leads/packages";
 import { provinceName, provinceOptions, provinces } from "@/lib/leads/provinces";
 import { buildLeadReport, percent } from "@/lib/leads/report";
@@ -73,6 +73,24 @@ describe("the call-back form", () => {
     for (const code of ["required", "phone", "consent", "tooLong"] as const) expect(content.site.leadForm.errors[code].th).not.toBe("");
   });
 
+  it("gives the same answers in the browser, which checks without the schema, as on the server", () => {
+    const cases: Record<string, string>[] = [
+      valid,
+      { ...valid, name: " ", phone: "12345", province: "TH-99", service: "", consent: "", message: "ก".repeat(1001) },
+      { ...valid, name: "ก".repeat(101), phone: "", area: "ข".repeat(121), preferredTime: "midnight" },
+      { ...valid, phone: "+66 81 234 5678", area: " ".repeat(200), message: ` ${"ค".repeat(1000)} ` },
+      { ...valid, phone: "0112345678", packageId: "Not An Id", consent: "no" },
+      { ...valid, packageId: "fiber-500-499" },
+      { ...valid, packageId: "a".repeat(65) },
+      {},
+    ];
+    for (const entry of cases) {
+      const values = formValues(form(entry));
+      const parsed = leadInput.safeParse(values);
+      expect(checkLead(values), JSON.stringify(entry).slice(0, 80)).toEqual(parsed.success ? {} : fieldErrors(parsed.error));
+    }
+  });
+
   it("treats a missing field as an empty one, and works without a key from the browser", () => {
     const values = formValues(form({ ...valid, idempotencyKey: "" }));
     expect(leadInput.parse(values).idempotencyKey).toBeUndefined();
@@ -88,7 +106,7 @@ describe("the call-back form", () => {
   });
 
   it("offers the packages that have a page, under the right service", () => {
-    const items = requestablePackages(content);
+    const items = requestablePackages(content, "2026-10-09");
     expect(items.length).toBeGreaterThan(0);
     expect(items.every((item) => item.review.status !== "hidden")).toBe(true);
     expect(new Set(items.map(serviceOf))).toEqual(new Set(["broadband", "mobile", "solar"]));
@@ -99,8 +117,10 @@ describe("cookie consent", () => {
   const version = content.site.consent.policyVersion;
 
   it("round-trips a choice and ignores one made under another policy version", () => {
-    const stored = { version, analytics: true, ads: false, chat: true, at: 1_759_390_000 };
+    const stored = { version, analytics: true, ads: false, at: 1_759_390_000 };
     expect(parseConsent(serializeConsent(stored), version)).toEqual(stored);
+    // A choice saved while the site still had live chat (a third digit) stands for analytics and advertising.
+    expect(parseConsent(`${version}.101.1759390000`, version)).toEqual(stored);
     expect(parseConsent(serializeConsent(stored), "2099-01-01")).toBeNull();
     expect(consentFromCookies(`a=1; tm_consent=${serializeConsent(stored)}; b=2`, version)).toEqual(stored);
     expect(consentFromCookies("a=1", version)).toBeNull();
@@ -108,22 +128,22 @@ describe("cookie consent", () => {
   });
 
   it("knows when a choice withdraws consent", () => {
-    const all = { analytics: true, ads: true, chat: true };
+    const all = { analytics: true, ads: true };
     expect(withdrawsConsent(all, { ...all, ads: false })).toBe(true);
     expect(withdrawsConsent({ ...all, ads: false }, all)).toBe(false);
-    expect(withdrawsConsent(null, { analytics: false, ads: false, chat: false })).toBe(false);
+    expect(withdrawsConsent(null, { analytics: false, ads: false })).toBe(false);
   });
 });
 
 describe("GA4 contact events", () => {
   it("tells LINE, phone, email and Facebook links apart", () => {
-    expect(contactEventFor("tel:0910192552")).toBe("contact_phone");
+    expect(contactEventFor("tel:0639274977")).toBe("contact_phone");
     expect(contactEventFor(new URL("tel:*900*1234#", "https://x.test").href)).toBeNull();
     expect(contactEventFor(content.site.contact.lineSales)).toBe("contact_line");
-    expect(contactEventFor("https://line.me/R/ti/p/@341tmfte")).toBe("contact_line");
-    expect(contactEventFor("mailto:Truetelemart@hotmail.com")).toBe("contact_email");
+    expect(contactEventFor("https://line.me/R/ti/p/@truefiberhome")).toBe("contact_line");
+    expect(contactEventFor("mailto:telemartcommu@gmail.com")).toBe("contact_email");
     expect(contactEventFor(content.site.contact.facebook)).toBe("contact_facebook");
-    expect(contactEventFor("https://www.telemartubon.com/broadband")).toBeNull();
+    expect(contactEventFor("https://www.truegetherth.com/broadband")).toBeNull();
     expect(contactEventFor("https://notline.me.example.com")).toBeNull();
   });
 });

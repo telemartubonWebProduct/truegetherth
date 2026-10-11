@@ -5,9 +5,11 @@ import { t } from "./catalog/helpers";
 
 const page = (path: string, hash?: string): LinkTarget => (hash ? { kind: "page", path, hash } : { kind: "page", path });
 
-// Contact details come from the old footer, service page and package buttons.
-// The old site used two LINE links: package buttons opened lineSales and the
-// service page opened lineService. Which account is @341tmfte is unconfirmed.
+// Contact details are the ones the company's other site shows (truefiberhome.com,
+// read 2026-10-11, on the owner's word that this site follows it). That site
+// uses two LINE links: its package buttons open lineSales, and its other
+// buttons, with the LINE ID it shows, open lineService; the QR picture is made
+// from lineService.
 export const site: SiteSettings = {
   brand: {
     name: t("truegetherth", "truegetherth"),
@@ -15,17 +17,20 @@ export const site: SiteSettings = {
     logo: "truegetherth-logo",
   },
   contact: {
-    lineSales: "https://lin.ee/blqnOJow",
-    lineService: "https://lin.ee/eMhqQpj",
-    lineId: "@341tmfte",
+    lineSales: "https://lin.ee/vWV2aFT",
+    lineService: "https://lin.ee/V4hnwC4",
+    lineId: "@truefiberhome",
     lineQr: "line-qr",
     phones: [
-      { number: "0910192552", label: t("ฝ่ายขาย", "Sales") },
-      { number: "0902518964", label: t("ฝ่ายขาย", "Sales") },
-      { number: "0841041506", label: t("ฝ่ายขาย", "Sales") },
+      { number: "0639274977", label: t("เจ้าหน้าที่", "Our team") },
+      { number: "0639234798", label: t("เจ้าหน้าที่", "Our team") },
     ],
-    email: "Truetelemart@hotmail.com",
-    facebook: "https://www.facebook.com/profile.php?id=61571963492436",
+    email: "telemartcommu@gmail.com",
+    facebook: "https://www.facebook.com/profile.php?id=61558200500505",
+    // The head office, its map and the hours are as the company's other site states them (truefiberhome.com, read 2026-10-11).
+    office: t("สำนักงานใหญ่ จังหวัดอุบลราชธานี", "Head office in Ubon Ratchathani"),
+    mapUrl: "https://maps.app.goo.gl/rHnXppgYGqKn9aD97",
+    hours: t("จันทร์–เสาร์ 09:00–18:00 น.", "Monday to Saturday, 9:00 to 18:00"),
   },
   navigation: [
     {
@@ -55,9 +60,10 @@ export const site: SiteSettings = {
     style: "primary",
   },
   footer: {
+    // Who runs the site, as the owner states it (2026-10-11) and as the company's other site words it: an appointed dealer and partner, not True itself.
     about: t(
-      "แพ็กเกจเน็ตบ้านทรู เน็ตมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ช่วยเลือกและติดต่อกลับ รับเรื่องจากทุกจังหวัด",
-      "True home internet, mobile packages and W&W Energy solar. Our team helps you choose and calls you back, wherever you are in Thailand.",
+      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์และตัวแทนจำหน่ายที่ได้รับการแต่งตั้งอย่างเป็นทางการ (Authorized Dealer) ของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เว็บไซต์นี้ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย",
+      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed partner and Authorized Dealer of True. We take applications for True home internet and arrange installation, wherever you are in Thailand. This is not the main website of True Corporation Public Company Limited, and we are not the network operator.",
     ),
     groups: [
       {
@@ -154,14 +160,14 @@ export const site: SiteSettings = {
       preview: t("ตัวอย่างในหน้าแก้ไข: แบบฟอร์มนี้ไม่ส่งจริง", "Editor preview: this form does not send."),
     },
   },
-  // Cookie banner (PDPA): analytics, advertising and chat load only after the
+  // Cookie banner (PDPA): analytics and advertising load only after the
   // visitor agrees. policyVersion is also recorded with each call-back request.
   consent: {
     policyVersion: "2026-10-02",
     heading: t("เว็บไซต์นี้ใช้คุกกี้", "This website uses cookies"),
     body: t(
-      "เราใช้คุกกี้ที่จำเป็นเพื่อให้เว็บทำงาน และขอความยินยอมก่อนใช้คุกกี้วิเคราะห์การใช้งาน โฆษณา และแชตสด เปลี่ยนใจได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
-      "We use necessary cookies to run the site, and ask before using cookies for analytics, advertising and live chat. You can change your mind any time under “Cookie settings” at the bottom of each page.",
+      "เราใช้คุกกี้ที่จำเป็นเพื่อให้เว็บทำงาน และขอความยินยอมก่อนใช้คุกกี้วิเคราะห์การใช้งานและโฆษณา เปลี่ยนใจได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
+      "We use necessary cookies to run the site, and ask before using cookies for analytics and advertising. You can change your mind any time under “Cookie settings” at the bottom of each page.",
     ),
     policyLink: t("อ่านนโยบายความเป็นส่วนตัว", "Read our privacy policy"),
     acceptAll: t("ยอมรับทั้งหมด", "Accept all"),
@@ -175,8 +181,6 @@ export const site: SiteSettings = {
     analyticsBody: t("นับผู้เข้าชมและหน้าที่ดูด้วย Google Analytics เพื่อปรับปรุงเว็บ", "Count visits and pages viewed with Google Analytics, to improve the site."),
     adsTitle: t("โฆษณา", "Advertising"),
     adsBody: t("วัดผลโฆษณาของเราบน Google ด้วย Google Ads", "Measure our ads on Google with Google Ads."),
-    chatTitle: t("แชตสด", "Live chat"),
-    chatBody: t("แสดงหน้าต่างแชตกับเจ้าหน้าที่ ให้บริการโดย Tawk.to", "Show the chat window to talk to our team, provided by Tawk.to."),
     settingsLink: t("ตั้งค่าคุกกี้", "Cookie settings"),
   },
   ui: {
@@ -213,6 +217,7 @@ export const site: SiteSettings = {
     opensInNewTab: t("เปิดในแท็บใหม่", "opens in a new tab"),
     footerContact: t("ติดต่อ", "Contact"),
     packageDetails: t("ดูรายละเอียด", "See details"),
+    recommended: t("แนะนำ", "Recommended"),
     findPackage: t("ค้นหาแพ็กเกจ", "Find a package"),
     filterSpeed: t("ความเร็ว", "Speed"),
     filterPrice: t("ราคาไม่เกิน", "Price up to"),
@@ -254,7 +259,6 @@ export const site: SiteSettings = {
     googleAdsId: "AW-18007307609",
     // The owner's GA4 property (web stream tag sent 2 Oct 2026).
     ga4MeasurementId: "G-DQGCC5J4YM",
-    googleAdsHomeConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
-    tawkSrc: "https://embed.tawk.to/67c0738b25eb41190eae9189/1il3s6mmf",
+    googleAdsLeadConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
   },
 };

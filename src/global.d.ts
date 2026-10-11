@@ -4,10 +4,7 @@ declare global {
 		dataLayer?: unknown[];
 		gtag?: (...args: unknown[]) => void;
 		/** Which Google tags this page has configured. */
-		__tmTags?: { ads: boolean; analytics: boolean; ga4MeasurementId?: string };
-		/** Tawk live chat, loaded once the visitor agrees to it. */
-		Tawk_API?: Record<string, unknown>;
-		Tawk_LoadStart?: Date;
+		__tmTags?: { ads: boolean; analytics: boolean; ga4MeasurementId?: string; leadConversion?: string };
 	}
 }
 

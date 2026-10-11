@@ -1,11 +1,11 @@
 import type { ConsentChoice } from "./consent";
 
-// Google tags and Tawk chat of the public site, loaded in the browser only
+// Google tags of the public site, loaded in the browser only
 // after the visitor agrees (src/lib/analytics/consent.ts, PDPA): one gtag.js
 // for Google Ads (advertising) and Google Analytics 4 (analytics), with Google
 // consent mode set from the same choice. GA4 is configured on the production
 // domain only, so previews and development add nothing to the reports; the
-// home page's Ads conversion also counts there only (AdsConversion). The
+// Ads conversion (a request to be contacted) also counts there only. The
 // editor and its preview load none of this.
 
 /** Dispatched on window each time a Google tag is configured. */
@@ -17,7 +17,8 @@ export type TagConfig = {
   ga4MeasurementId?: string;
   /** Host whose visits count in Analytics: the site's own domain. */
   productionHost: string;
-  tawkSrc: string;
+  /** Google Ads `send_to` of the conversion a request to be contacted counts as. */
+  adsLeadConversion?: string;
 };
 
 function consentModes(choice: ConsentChoice) {
@@ -40,7 +41,12 @@ export function applyGoogleTags(config: TagConfig, choice: ConsentChoice): void 
     };
     window.gtag("consent", "default", consentModes(choice));
     window.gtag("js", new Date());
-    window.__tmTags = { ads: false, analytics: false, ga4MeasurementId: config.ga4MeasurementId };
+    window.__tmTags = {
+      ads: false,
+      analytics: false,
+      ga4MeasurementId: config.ga4MeasurementId,
+      leadConversion: location.hostname === config.productionHost ? config.adsLeadConversion : undefined,
+    };
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ads ? config.googleAdsId : (config.ga4MeasurementId ?? ""))}`;
@@ -77,6 +83,18 @@ export function whenTagReady(tag: "ads" | "analytics", callback: () => void): ()
 }
 
 /**
+ * Reports one Google Ads conversion: a visitor asked to be contacted (sent the
+ * call-back form, or clicked LINE or a phone number). Only on the production
+ * domain and only when the visitor agreed to advertising cookies; otherwise
+ * nothing. Opening a page is not a conversion.
+ */
+export function trackLeadConversion(): void {
+  const tags = window.__tmTags;
+  if (!tags?.ads || !tags.leadConversion || !window.gtag) return;
+  window.gtag("event", "conversion", { send_to: tags.leadConversion });
+}
+
+/**
  * Sends a GA4 event when Analytics is on for this page, and nothing
  * otherwise. Never pass personal data (names, numbers, free text).
  */
@@ -85,17 +103,4 @@ export function trackEvent(name: string, params: Record<string, string | number 
   if (!tags?.analytics || !window.gtag) return;
   const defined = Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined));
   window.gtag("event", name, { ...defined, send_to: tags.ga4MeasurementId });
-}
-
-/** Loads Tawk live chat once, as the old site's snippet did. */
-export function loadChat(src: string): void {
-  if (window.Tawk_LoadStart) return;
-  window.Tawk_API = window.Tawk_API ?? {};
-  window.Tawk_LoadStart = new Date();
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = src;
-  script.charset = "UTF-8";
-  script.setAttribute("crossorigin", "*");
-  document.body.appendChild(script);
 }

@@ -23,7 +23,7 @@ import {
 //   package:<id>       one catalog package
 //   media:<id>         one media asset (file, size, alt text, provenance)
 //   benefit:<id>       one package benefit (label and icon)
-//   catalog            the order of the packages
+//   catalog            the order of the packages, and which are recommended on the home page
 //
 // Packages, media and benefits can also be added and removed (R4): a draft of
 // one that the published content lacks adds it, and a tombstone removes it.
@@ -57,8 +57,12 @@ export function isCollectionDocument(id: DocumentId): id is CollectionDocumentId
   return collectionPattern.test(id);
 }
 
-/** The order of the packages, as its own document so reordering never rewrites a package. */
-export const catalogOrder = z.strictObject({ order: z.array(packageRef) });
+/**
+ * The order of the packages and the ones recommended on the home page, as its
+ * own document so reordering or recommending never rewrites a package.
+ */
+export const catalogOrder = z.strictObject({ order: z.array(packageRef), featured: z.array(packageRef) });
+export type CatalogOrder = z.infer<typeof catalogOrder>;
 
 /** What a draft stores to remove a package, a picture or a benefit. */
 export const TOMBSTONE = { $deleted: true } as const;
@@ -97,16 +101,17 @@ export function documentSchema(id: DocumentId): ZodType {
   }
 }
 
-// The catalog document is derived from the package list. One object per list,
-// so it keeps its identity while the list does: the editor's autosave compares
-// bodies by identity to tell whether a document changed since it was saved.
-const catalogDocuments = new WeakMap<SiteContent["catalog"], { order: string[] }>();
+// The catalog document is derived from the package list and the recommended
+// list. One object per pair of lists, so it keeps its identity while they do:
+// the editor's autosave compares bodies by identity to tell whether a document
+// changed since it was saved.
+const catalogDocuments = new WeakMap<SiteContent["catalog"], CatalogOrder>();
 
-function catalogDocument(catalog: SiteContent["catalog"]): { order: string[] } {
-  let document = catalogDocuments.get(catalog);
-  if (!document) {
-    document = { order: catalog.map((item) => item.id) };
-    catalogDocuments.set(catalog, document);
+function catalogDocument(content: SiteContent): CatalogOrder {
+  let document = catalogDocuments.get(content.catalog);
+  if (!document || document.featured !== content.featured) {
+    document = { order: content.catalog.map((item) => item.id), featured: content.featured };
+    catalogDocuments.set(content.catalog, document);
   }
   return document;
 }
@@ -114,7 +119,7 @@ function catalogDocument(catalog: SiteContent["catalog"]): { order: string[] } {
 /** The current value of a document in one version of the content, or undefined if it does not exist. */
 export function readDocument(content: SiteContent, id: DocumentId): unknown {
   if (id === "site") return content.site;
-  if (id === "catalog") return catalogDocument(content.catalog);
+  if (id === "catalog") return catalogDocument(content);
   const [kind, key] = id.split(":") as [string, string];
   switch (kind) {
     case "package":
@@ -165,7 +170,10 @@ export function writeDocument(content: SiteContent, id: DocumentId, body: unknow
   if (!exists && !isCollectionDocument(id)) throw new Error(`No document ${id} to replace`);
   if (body === undefined && !isCollectionDocument(id)) throw new Error(`Document ${id} cannot be removed`);
   if (id === "site") return { ...content, site: body as SiteContent["site"] };
-  if (id === "catalog") return { ...content, catalog: reorder(content.catalog, (body as z.infer<typeof catalogOrder>).order) };
+  if (id === "catalog") {
+    const { order, featured } = body as CatalogOrder;
+    return { ...content, catalog: reorder(content.catalog, order), featured };
+  }
   const [kind, key] = id.split(":") as [string, string];
   switch (kind) {
     case "package": {

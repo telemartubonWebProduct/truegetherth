@@ -9,6 +9,7 @@ import { resolveLink, tx } from "@/lib/content/render";
 import { themeVariables } from "@/lib/content/theme";
 import type { Locale } from "@/lib/i18n/locales";
 import { siteUrl } from "@/lib/seo/metadata";
+import { jsonLd, organizationData, websiteData } from "@/lib/seo/structured-data";
 
 import "@/styles/tokens.css";
 import "../globals.css";
@@ -29,8 +30,12 @@ import "@/styles/landing.css";
  * page's scroll choreography (src/styles/landing.css) is keyed on data-motion,
  * so without it every section simply lies in the page, fully visible.
  * ScrollDriver keeps the flag up to date when the screen turns.
+ * data-consent when the visitor has already made a cookie choice for this
+ * version of the policy: the banner, which is in the page's HTML, then stays
+ * out of sight (ConsentBanner removes the mark once it has read the cookie).
  */
-const flags = `(function(){var d=document.documentElement;d.setAttribute("data-js","");if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&matchMedia("(min-height: 560px)").matches)d.setAttribute("data-motion","")})()`;
+const flags = (policyVersion: string) =>
+  `(function(){var d=document.documentElement;d.setAttribute("data-js","");if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&matchMedia("(min-height: 560px)").matches)d.setAttribute("data-motion","");var c=/(?:^|; )tm_consent=([^;]*)/.exec(document.cookie);if(c&&/^[01]{2,3}\\.[0-9]{1,12}$/.test(decodeURIComponent(c[1]).replace(${JSON.stringify(`${policyVersion}.`)},"")))d.setAttribute("data-consent","")})()`;
 
 export async function siteMetadata(locale: Locale): Promise<Metadata> {
   const { seo } = (await getPublishedContent()).site;
@@ -48,8 +53,9 @@ export const siteViewport: Viewport = {
 };
 
 export async function SiteLayout({ locale, children }: { locale: Locale; children: ReactNode }) {
-  const { site } = await getPublishedContent();
-  const { googleAdsId, ga4MeasurementId, tawkSrc } = site.integrations;
+  const content = await getPublishedContent();
+  const { site } = content;
+  const { googleAdsId, ga4MeasurementId, googleAdsLeadConversion } = site.integrations;
   const { policyVersion, ...consentCopy } = site.consent;
   const consentText = Object.fromEntries(Object.entries(consentCopy).map(([key, text]) => [key, tx(text, locale)])) as ConsentText;
   const policyHref = resolveLink({ kind: "page", path: "/termsAndPrivacy", hash: "cookies" }, locale, site).href;
@@ -57,19 +63,17 @@ export async function SiteLayout({ locale, children }: { locale: Locale; childre
   return (
     <html lang={locale} className={fontVariables} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: flags }} />
-        {/* The home page's entrance starts hidden and is revealed by script; without script it must simply show. */}
-        <noscript>
-          <style>{`.nav,.hero-art-inner,.hero-foot,.hero-foot *{opacity:1!important;transform:none!important}`}</style>
-        </noscript>
+        <script dangerouslySetInnerHTML={{ __html: flags(policyVersion) }} />
+        {/* For search engines: who runs the site (an appointed dealer, not True itself) and what the site is. */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([organizationData(content, locale), websiteData(content, locale)]) }} />
       </head>
       {/* Theme colours from site settings; the default theme adds nothing. */}
       <body className="tm-site" style={themeVariables(site.theme)}>
         {/* First, so keyboard and screen-reader users meet the choice before the page. */}
         <ConsentBanner text={consentText} policyHref={policyHref} policyVersion={policyVersion} />
         {children}
-        {/* Google Ads (as on the old site), Google Analytics 4 on the production domain and Tawk chat, each only after consent; the home page reports its Ads conversion (AdsConversion). */}
-        <SiteTags googleAdsId={googleAdsId} ga4MeasurementId={ga4MeasurementId} productionHost={siteUrl().hostname} tawkSrc={tawkSrc} policyVersion={policyVersion} />
+        {/* Google Ads and Google Analytics 4 on the production domain, each only after consent; a request to be contacted is the Ads conversion. */}
+        <SiteTags googleAdsId={googleAdsId} ga4MeasurementId={ga4MeasurementId} adsLeadConversion={googleAdsLeadConversion} productionHost={siteUrl().hostname} policyVersion={policyVersion} />
       </body>
     </html>
   );

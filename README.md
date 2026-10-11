@@ -15,7 +15,7 @@ Each language has its own root layout (`src/app/(th)`, `src/app/(en)`; the page 
 documents, media registry, package catalog) through `src/lib/content` with the shared components in
 `src/components/site`. Every visible string has a Thai and an English version, and a broken reference fails the
 build. `NEXT_PUBLIC_SITE_URL` sets the origin used for canonical links and the sitemap (default
-`https://www.telemartubon.com`).
+`https://www.truegetherth.com`).
 
 ## Requirements
 

@@ -47,7 +47,7 @@ describe("every content value has an editor control", () => {
 
   it("covers every kind of value the pages use", () => {
     const kinds = new Set(fields.map((field) => field.kind));
-    for (const kind of ["localized", "localizedList", "textList", "text", "number", "boolean", "enum", "tone", "theme", "media", "mediaList", "benefitList", "package", "target", "cta", "price", "object", "objectList"] as const) {
+    for (const kind of ["localized", "localizedList", "textList", "text", "number", "boolean", "enum", "tone", "theme", "media", "mediaList", "benefitList", "target", "cta", "price", "object", "objectList"] as const) {
       expect(kinds, kind).toContain(kind);
     }
   });
@@ -58,15 +58,15 @@ describe("every content value has an editor control", () => {
   });
 
   it("keeps structure out of the form", () => {
-    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "ga4MeasurementId", "tawkSrc", "src", "category", "group"].includes(field.key));
+    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "ga4MeasurementId", "src", "category", "group"].includes(field.key));
     expect(structural).toEqual([]);
   });
 
-  it("lets Admins change the home conversion of Google Ads, but not the tag or the chat script", () => {
+  it("lets Admins change the home conversion of Google Ads, but not the tag", () => {
     const integrations = fields.filter((field) => field.path.slice(0, 2).join("/") === "site/integrations");
     expect(integrations.map((field) => [field.path.join("/"), field.kind])).toEqual([
       ["site/integrations", "object"],
-      ["site/integrations/googleAdsHomeConversion", "text"],
+      ["site/integrations/googleAdsLeadConversion", "text"],
     ]);
   });
 });
@@ -86,7 +86,7 @@ describe("field messages and bindings", () => {
     for (const url of ["javascript:alert(1)", "data:text/html,hi", "http://lin.ee/abc", "https://localhost/x"]) {
       expect(httpsUrl.safeParse(url).success, url).toBe(false);
     }
-    expect(httpsUrl.safeParse("https://lin.ee/blqnOJow").success).toBe(true);
+    expect(httpsUrl.safeParse("https://lin.ee/vWV2aFT").success).toBe(true);
     const site = structuredClone(content.site);
     site.contact.lineSales = "javascript:alert(1)";
     const parsed = parseDocument("site", site);
@@ -96,17 +96,17 @@ describe("field messages and bindings", () => {
   it("accepts a Google Ads conversion only for the site's own tag", () => {
     const site = structuredClone(content.site);
     const { googleAdsId } = site.integrations;
-    site.integrations.googleAdsHomeConversion = `${googleAdsId}/Label_2-x`;
+    site.integrations.googleAdsLeadConversion = `${googleAdsId}/Label_2-x`;
     expect(parseDocument("site", site).ok).toBe(true);
 
     const messages = (value: string) => {
-      site.integrations.googleAdsHomeConversion = value;
+      site.integrations.googleAdsLeadConversion = value;
       const parsed = parseDocument("site", site);
       return !parsed.ok && parsed.messages;
     };
-    expect(messages("AW-1/abc")).toEqual([`integrations.googleAdsHomeConversion: ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${googleAdsId}/…)`]);
+    expect(messages("AW-1/abc")).toEqual([`integrations.googleAdsLeadConversion: ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${googleAdsId}/…)`]);
     for (const value of ["", googleAdsId, `${googleAdsId}/`, `${googleAdsId}/a'b`, `'};alert(1);//`]) {
-      expect(messages(value), value).toEqual(["integrations.googleAdsHomeConversion: ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"]);
+      expect(messages(value), value).toEqual(["integrations.googleAdsLeadConversion: ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"]);
     }
   });
 
@@ -133,7 +133,6 @@ describe("field messages and bindings", () => {
 
   it("finds where shared pictures and packages appear", () => {
     expect(mediaUsage(content, content.site.brand.logo)).toContain("site/brand/logo");
-    const featured = content.pages.home.promos.tabs[0].items[0].packageId;
-    expect(packagePages(content, featured)).toContain("home");
+    expect(packagePages(content, content.featured[0])).toContain("home");
   });
 });

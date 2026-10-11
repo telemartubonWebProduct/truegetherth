@@ -118,10 +118,11 @@ function NavPills({ view }: { view: NavbarView }) {
   const { labels } = view;
 
   return (
-    <motion.header className="nav" initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }}>
+    <header className="nav">
       <div className="nav-left">
         <Link className="nav-logo" href={view.brand.href} aria-label={view.brand.name} data-edit={view.brand.binding}>
-          <Image src={view.brand.logo.src} alt="" width={view.brand.logo.width} height={view.brand.logo.height} priority />
+          {/* Said how wide it shows, or the optimizer is asked for a picture as wide as the largest screen. */}
+          <Image src={view.brand.logo.src} alt="" width={view.brand.logo.width} height={view.brand.logo.height} sizes="160px" priority />
         </Link>
         <div className="nav-menu-wrap" ref={wrap}>
           <button type="button" className="nav-menu" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}>
@@ -200,7 +201,7 @@ function NavPills({ view }: { view: NavbarView }) {
         </span>
         <span className="nav-right-label">{view.cta.label}</span>
       </NavAnchor>
-    </motion.header>
+    </header>
   );
 }
 

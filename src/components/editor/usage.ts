@@ -44,12 +44,12 @@ export function benefitUsage(content: SiteContent, id: string): number {
   return content.catalog.filter((item) => item.benefits.includes(id)).length;
 }
 
-/** Pages that show a package: through its group, or on a card of the home page's recommended packages. */
+/** Pages that show a package: through its group, or on the home page when it is recommended there. */
 export function packagePages(content: SiteContent, id: string): PageDocumentId[] {
   const item = content.catalog.find((entry) => entry.id === id);
   if (!item) return [];
   const pages: PageDocumentId[] = [];
-  if (content.pages.home.promos.tabs.some((tab) => tab.items.some((card) => card.packageId === id))) pages.push("home");
+  if (content.featured.includes(id) && content.pages.home.promos.tabs.some((tab) => tab.categories.includes(item.category))) pages.push("home");
   for (const doc of content.pages.packages) {
     const shown = doc.sections.some((section) => section.groups.some((group) => group.category === item.category && group.group === item.group));
     if (shown) pages.push(doc.id as PageDocumentId);

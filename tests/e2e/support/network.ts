@@ -2,9 +2,9 @@ import type { BrowserContext, Page, Request } from "@playwright/test";
 
 /**
  * Blocks every request that leaves the site under test. The public pages load
- * the Google Ads tag and Tawk chat, which these tests do not check; waiting on
- * them made "network idle" depend on third parties, and CI must not send them
- * traffic either.
+ * the Google tags, which these tests do not check; waiting on them made
+ * "network idle" depend on third parties, and CI must not send them traffic
+ * either.
  *
  * It also reports requests that stay unanswered for a while, so a test that
  * times out waiting for the page to load says what it was waiting for.

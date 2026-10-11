@@ -1,5 +1,6 @@
 import { benefits } from "@/content/benefits";
 import { catalog } from "@/content/catalog";
+import { featured } from "@/content/catalog/featured";
 import { media } from "@/content/media";
 import { home } from "@/content/pages/home";
 import { broadbandExistingPage, broadbandNewPage, mobileMonthlyPage, mobilePrepaidPage } from "@/content/pages/packages";
@@ -7,6 +8,7 @@ import { solarPage } from "@/content/pages/solar";
 import { agentPage, contactPage, termsPage } from "@/content/pages/support";
 import { site } from "@/content/site";
 
+import { todayInThailand } from "./dates";
 import { benefitIn, mediaIn, packageIn, packagePageIn, publicPackagesIn } from "./lookup";
 import { siteContent, type Benefit, type CatalogPackage, type CategoryId, type MediaAsset, type PackagePage, type SiteContent } from "./schema";
 import { contentProblems } from "./validate";
@@ -26,6 +28,7 @@ function load(): SiteContent {
     media,
     benefits,
     catalog,
+    featured,
     pages: {
       home,
       packages: [broadbandNewPage, broadbandExistingPage, mobileMonthlyPage, mobilePrepaidPage],
@@ -45,5 +48,5 @@ export const content = load();
 export const getMedia = (id: string): MediaAsset => mediaIn(content, id);
 export const getBenefit = (id: string): Benefit => benefitIn(content, id);
 export const getPackagePage = (path: PackagePage["path"]): PackagePage => packagePageIn(content, path);
-export const publicPackages = (category: CategoryId, group: string): CatalogPackage[] => publicPackagesIn(content, category, group);
+export const publicPackages = (category: CategoryId, group: string): CatalogPackage[] => publicPackagesIn(content, category, group, todayInThailand());
 export const packageById = (id: string): CatalogPackage => packageIn(content, id);

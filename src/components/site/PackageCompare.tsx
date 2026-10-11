@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
-import { packageDetailPath } from "@/lib/content/package-facts";
+import { downloadMbps, packageDetailPath } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 import type { CatalogPackage, Cta, Price } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
@@ -47,6 +47,45 @@ function Label({ children }: { children: ReactNode }) {
   return <p className="text-tm-caption font-medium text-tm-muted">{children}</p>;
 }
 
+/**
+ * What comes with a package, each with its picture: the picture sits in a tile
+ * of one size, so a product photo, a logo and an icon line up whatever their
+ * shapes. `dense` is the row of tiles alone (the home page's cards): the first
+ * few show, the rest are counted, and every name is still read out.
+ */
+export function BenefitList({ ctx, ids, dense = false, className = "" }: { ctx: RenderContext; ids: readonly string[]; dense?: boolean; className?: string }) {
+  const shown = dense ? 4 : ids.length;
+  return (
+    <ul role="list" className={`tm-benefits ${className}`.trim()} data-dense={dense ? "" : undefined} aria-label={dense ? ctx.t(ctx.site.ui.benefits) : undefined}>
+      {ids.map((id, index) => {
+        const benefit = ctx.benefit(id);
+        // Past the tiles that show, only the name is kept, for screen readers: a picture nobody sees is never fetched.
+        if (index >= shown) {
+          return (
+            <li key={id} className="sr-only">
+              {ctx.t(benefit.label)}
+            </li>
+          );
+        }
+        const icon = ctx.media(benefit.icon);
+        return (
+          <li key={id} {...ctx.bind(`benefit:${id}`)}>
+            <span className="tm-benefit-tile">
+              <Image src={icon.src} width={icon.width} height={icon.height} alt="" sizes="48px" />
+            </span>
+            <span className={dense ? "sr-only" : undefined}>{ctx.t(benefit.label)}</span>
+          </li>
+        );
+      })}
+      {ids.length > shown ? (
+        <li aria-hidden="true" className="tm-benefit-more tm-num">
+          +{ids.length - shown}
+        </li>
+      ) : null}
+    </ul>
+  );
+}
+
 /** One row of the card: which package field it shows, and how. */
 type Row = { key: string; field: (item: CatalogPackage) => string; cell: (item: CatalogPackage) => ReactNode };
 
@@ -56,7 +95,7 @@ type PackageCompareProps = {
   cta: Cta;
   /** Editor binding of the page's package button. */
   ctaBind?: Binding;
-  /** "compare" lines fields up in roomy cards; "compact" suits long lists of add-ons. */
+  /** "compare" is the roomy card; "compact" suits long lists of add-ons. */
   variant: "compare" | "compact";
   /** Level of the package names, one below the heading above the cards. */
   headingLevel?: 3 | 4;
@@ -65,9 +104,13 @@ type PackageCompareProps = {
 };
 
 /**
- * Package cards whose fields sit in the same order and, on wide screens, on
- * the same row lines (CSS subgrid), so speed and price compare at a glance.
- * A row appears only when at least one package in the list has that field.
+ * Package cards as slips (docs/renovation/R8-PROMO-CARDS.md): what the package
+ * gives leads, in figures, then its name, its terms and what comes with it,
+ * each with its picture; the price is on the stub below the perforation, with
+ * the way to ask for it. A card needs no picture of its own. Fields sit in the
+ * same order and, on wide screens, on the same row lines (CSS subgrid), so
+ * speed and price compare at a glance; a row appears only when at least one
+ * package in the list has that field.
  */
 export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel = 3, className = "" }: PackageCompareProps) {
   const { ui } = ctx.site;
@@ -79,24 +122,41 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
     });
   const compact = variant === "compact";
   const fixed = (name: string) => () => name;
+  const recommended = new Set(ctx.content.featured);
+  // The meter under a speed is its share of the fastest in this list.
+  const fastest = Math.max(0, ...items.map((item) => downloadMbps(item) ?? 0));
 
   const rows: Row[] = [];
-  if (some((item) => item.image)) {
+  if (some((item) => item.speed ?? item.allowance) || items.some((item) => recommended.has(item.id))) {
     rows.push({
-      key: "image",
-      field: fixed("image"),
+      key: "figure",
+      field: (item) => (item.speed ? "speed" : item.allowance ? "allowance" : ""),
       cell: (item) => {
-        if (!item.image) return null;
-        const image = ctx.media(item.image);
+        const speed = item.speed ? speedText(item.speed, ctx.locale) : null;
+        const mark = recommended.has(item.id);
+        if (!speed && !item.allowance && !mark) return null;
+        const mbps = downloadMbps(item);
         return (
-          <Image
-            src={image.src}
-            width={image.width}
-            height={image.height}
-            alt={ctx.t(image.alt)}
-            sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 90vw"
-            className="mx-auto aspect-square w-full max-w-[14rem] rounded-tm-control object-contain"
-          />
+          <div className="tm-slip-head">
+            <p className="tm-slip-kicker">
+              {speed ? <span>{ctx.t(ui.speed)}</span> : item.allowance ? <span>{ctx.t(ui.allowance)}</span> : null}
+              {mark ? <span className="tm-slip-mark">{ctx.t(ui.recommended)}</span> : null}
+            </p>
+            {speed ? (
+              <p className="tm-slip-figure">
+                <span className="tm-num">{speed.figure}</span>
+                <span>{speed.unit}</span>
+              </p>
+            ) : item.allowance ? (
+              <p className="tm-slip-lead">{ctx.t(item.allowance)}</p>
+            ) : null}
+            {speed && mbps && fastest > 0 ? (
+              <div className="tm-slip-meter" aria-hidden="true">
+                <span style={{ width: `${Math.round((mbps / fastest) * 100)}%` }} />
+              </div>
+            ) : null}
+            {speed && item.allowance ? <p className="mt-3 text-tm-small">{ctx.t(item.allowance)}</p> : null}
+          </div>
         );
       },
     });
@@ -104,50 +164,24 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
   rows.push({
     key: "name",
     field: fixed("name"),
-    cell: (item) => (
-      <>
-        <Heading className={`${compact ? "text-tm-body" : "text-tm-h4"} font-medium`}>{ctx.t(item.name)}</Heading>
-        {item.audience ? (
-          <p className="mt-1 text-tm-small text-tm-muted" {...ctx.bind(`package:${item.id}`, "audience")}>
-            {ctx.t(ui.audience)} {ctx.t(item.audience)}
-          </p>
-        ) : null}
-      </>
-    ),
+    cell: (item) => {
+      const image = item.image ? ctx.media(item.image) : null;
+      return (
+        <div className="tm-slip-name">
+          <div className="min-w-0">
+            <Heading className={`${compact ? "text-tm-body" : "text-tm-lead"} font-medium leading-snug`}>{ctx.t(item.name)}</Heading>
+            {item.audience ? (
+              <p className="mt-1 text-tm-small text-tm-muted" {...ctx.bind(`package:${item.id}`, "audience")}>
+                {ctx.t(ui.audience)} {ctx.t(item.audience)}
+              </p>
+            ) : null}
+          </div>
+          {/* The package's own picture, when it has one, rides along small: the card never waits for one. */}
+          {image ? <Image src={image.src} width={104} height={104} alt="" sizes="52px" className="tm-slip-thumb" {...ctx.bind(`package:${item.id}`, "image")} /> : null}
+        </div>
+      );
+    },
   });
-  if (some((item) => item.speed)) {
-    rows.push({
-      key: "speed",
-      field: fixed("speed"),
-      cell: (item) => {
-        if (!item.speed) return null;
-        const speed = speedText(item.speed, ctx.locale);
-        return (
-          <>
-            <Label>{ctx.t(ui.speed)}</Label>
-            <p className="mt-1 flex flex-wrap items-baseline gap-x-2">
-              <span className={`tm-num font-medium leading-tight ${compact ? "text-tm-h4" : "text-tm-h3"}`}>{speed.figure}</span>
-              <span className="text-tm-small font-medium">{speed.unit}</span>
-            </p>
-          </>
-        );
-      },
-    });
-  }
-  if (some((item) => item.allowance)) {
-    rows.push({
-      key: "allowance",
-      field: fixed("allowance"),
-      cell: (item) =>
-        item.allowance ? (
-          <>
-            <Label>{ctx.t(ui.allowance)}</Label>
-            <p className="mt-1 font-medium">{ctx.t(item.allowance)}</p>
-          </>
-        ) : null,
-    });
-  }
-  rows.push({ key: "price", field: fixed("price"), cell: (item) => <PriceBlock ctx={ctx} price={item.price} size={compact ? "medium" : "large"} /> });
   if (some((item) => item.contract ?? item.validity)) {
     rows.push({
       key: "term",
@@ -156,10 +190,10 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
         const term = item.contract ?? item.validity;
         if (!term) return null;
         return (
-          <>
-            <Label>{ctx.t(item.contract ? ui.contract : ui.validity)}</Label>
-            <p className="mt-1">{ctx.t(term)}</p>
-          </>
+          <p className="tm-slip-line tm-slip-pair">
+            <span>{ctx.t(item.contract ? ui.contract : ui.validity)}</span>
+            <span>{ctx.t(term)}</span>
+          </p>
         );
       },
     });
@@ -170,21 +204,10 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       field: fixed("benefits"),
       cell: (item) =>
         item.benefits.length > 0 ? (
-          <>
+          <div className="tm-slip-line">
             <Label>{ctx.t(ui.benefits)}</Label>
-            <ul className="mt-2 grid gap-2">
-              {item.benefits.map((id) => {
-                const benefit = ctx.benefit(id);
-                const icon = ctx.media(benefit.icon);
-                return (
-                  <li key={id} className="flex items-center gap-3 text-tm-small" {...ctx.bind(`benefit:${id}`)}>
-                    <Image src={icon.src} width={icon.width} height={icon.height} alt="" className="h-9 w-9 shrink-0 object-contain" />
-                    <span>{ctx.t(benefit.label)}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
+            <BenefitList ctx={ctx} ids={item.benefits} className="mt-2.5" />
+          </div>
         ) : null,
     });
   }
@@ -194,14 +217,14 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       field: fixed("details"),
       cell: (item) =>
         item.details.length > 0 ? (
-          <>
+          <div className="tm-slip-line">
             <Label>{ctx.t(ui.details)}</Label>
-            <ul className="mt-1 grid list-disc gap-1 pl-5 text-tm-small marker:text-tm-muted">
+            <ul className="mt-1.5 grid list-disc gap-1 pl-5 text-tm-small marker:text-tm-muted">
               {item.details.map((detail, index) => (
                 <li key={index}>{ctx.t(detail)}</li>
               ))}
             </ul>
-          </>
+          </div>
         ) : null,
     });
   }
@@ -211,14 +234,14 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       field: fixed("conditions"),
       cell: (item) =>
         item.conditions.length > 0 ? (
-          <>
+          <div className="tm-slip-line">
             <Label>{ctx.t(ui.conditions)}</Label>
-            <ul className="mt-1 grid list-disc gap-1 pl-5 text-tm-small text-tm-muted">
+            <ul className="mt-1.5 grid list-disc gap-1 pl-5 text-tm-small text-tm-muted">
               {item.conditions.map((condition, index) => (
                 <li key={index}>{ctx.t(condition)}</li>
               ))}
             </ul>
-          </>
+          </div>
         ) : null,
     });
   }
@@ -228,20 +251,23 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       field: fixed("dialCode"),
       cell: (item) =>
         item.dialCode ? (
-          <>
-            <Label>{ctx.t(ui.dialCode)}</Label>
-            <a href={`tel:${encodeURIComponent(item.dialCode)}`} className="tm-link tm-num mt-1 inline-block text-tm-lead font-semibold">
+          <div className="tm-slip-line tm-slip-pair">
+            <span>{ctx.t(ui.dialCode)}</span>
+            <a href={`tel:${encodeURIComponent(item.dialCode)}`} className="tm-link tm-num text-tm-body font-semibold">
               {item.dialCode}
             </a>
-          </>
+          </div>
         ) : null,
     });
   }
   rows.push({
-    key: "cta",
+    key: "stub",
     field: fixed(""),
     cell: (item) => (
-      <div className="grid gap-3">
+      <div className="tm-slip-stub">
+        <div {...ctx.bind(`package:${item.id}`, "price")}>
+          <PriceBlock ctx={ctx} price={item.price} size={compact ? "medium" : "large"} />
+        </div>
         <CtaLink ctx={ctx} cta={cta} context={ctx.t(item.name)} className="w-full" bind={ctaBind} />
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <ComparePick packageId={item.id} name={ctx.t(item.name)} />
@@ -257,18 +283,11 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
   return (
     <ul role="list" className={`tm-compare ${compact ? "tm-compare-compact" : ""} ${className}`}>
       {items.map((item) => (
-        <ExplorableCard
-          key={item.id}
-          packageId={item.id}
-          data-package={item.id}
-          className="tm-compare-card rounded-tm-panel border border-tm-line bg-tm-canvas"
-          style={{ "--tm-rows": rows.length } as CSSProperties}
-          {...ctx.bind(`package:${item.id}`)}
-        >
+        <ExplorableCard key={item.id} packageId={item.id} data-package={item.id} className="tm-compare-card tm-slip" style={{ "--tm-rows": rows.length } as CSSProperties} {...ctx.bind(`package:${item.id}`)}>
           {rows.map((row) => {
             const field = row.field(item);
             return (
-              <div key={row.key} data-row={row.key} className={compact ? "px-4 py-3" : "px-5 py-4"} {...(field ? ctx.bind(`package:${item.id}`, field) : {})}>
+              <div key={row.key} data-row={row.key} {...(field ? ctx.bind(`package:${item.id}`, field) : {})}>
                 {row.cell(item)}
               </div>
             );

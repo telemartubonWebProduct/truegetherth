@@ -124,22 +124,18 @@ describe("autosave", () => {
   it("saves a document again once the document that blocked it is fixed", async () => {
     const save = serverSaves();
     const store = makeStore(save);
-    const [tab] = content.pages.home.promos.tabs;
-    const card = tab.items[0];
-    const featured = card.packageId;
-    // Hiding a package is refused while a card of the home page still shows it.
-    store.edit(`package:${featured}`, ["review", "status"], "hidden");
+    const bare = content.catalog.find((item) => item.review.status !== "hidden" && item.image === undefined)!;
+    // Recommending a package on the home page is refused while it has no picture for its card.
+    store.replace("catalog", { order: content.catalog.map((item) => item.id), featured: [...content.featured, bare.id] });
     await vi.advanceTimersByTimeAsync(800);
-    expect(store.metaOf(`package:${featured}`).status).toBe("invalid");
+    expect(store.metaOf("catalog").status).toBe("invalid");
     expect(save).not.toHaveBeenCalled();
 
-    const shown = new Set(tab.items.map((entry) => entry.packageId));
-    const other = content.catalog.find((item) => item.review.status !== "hidden" && item.category === "broadband-new" && !shown.has(item.id))!;
-    store.edit("page:home", ["promos", "tabs", tab.id, "items", card.id, "packageId"], other.id);
+    store.edit(`package:${bare.id}`, ["image"], content.site.seo.image);
     // Fake timers run a zero-delay timer set during a tick one millisecond later.
     await vi.advanceTimersByTimeAsync(810);
-    expect(save.mock.calls.map((call) => call[0].documentId)).toEqual(["page:home", `package:${featured}`]);
-    expect(store.metaOf(`package:${featured}`).status).toBe("saved");
+    expect(save.mock.calls.map((call) => call[0].documentId)).toEqual([`package:${bare.id}`, "catalog"]);
+    expect(store.metaOf("catalog").status).toBe("saved");
   });
 
   it("saves a new package, its place in the order and its removal once each (R4)", async () => {
@@ -147,7 +143,7 @@ describe("autosave", () => {
     const store = makeStore(save);
     const fresh = { ...content.catalog[0], id: "fresh", review: { status: "hidden" as const, notes: ["ใหม่"] } };
     store.create("package:fresh", fresh);
-    store.replace("catalog", { order: ["fresh", ...content.catalog.map((item) => item.id)] });
+    store.replace("catalog", { order: ["fresh", ...content.catalog.map((item) => item.id)], featured: content.featured });
     await vi.advanceTimersByTimeAsync(2000);
     expect(save.mock.calls.map((call) => call[0].documentId).sort()).toEqual(["catalog", "package:fresh"]);
     expect(store.getSnapshot().content.catalog[0].id).toBe("fresh");
