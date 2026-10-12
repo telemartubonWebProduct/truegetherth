@@ -100,3 +100,16 @@ Accessibility, best practices and SEO were 100 in every run, and the element tim
 
 - The number moves from run to run: a single run of 97 or of 100 is the same page.
 - The 0.4 s wait of the painting is one line (`landing.css`, `html[data-motion] .hero-scene`). It is what keeps the score from depending on which picture arrives when; taking it out means asking for the sky ahead of the page again (67 KiB counted) and living with a score that moves by eight points between runs.
+
+## 9. Scrolling on a phone (12 Oct 2026)
+
+The owner tried the live page on a phone: it stuttered in places, most of all along the row of recommended packages.
+
+Traced on a processor slowed four times, with the page scrolled a little each frame: every frame spent 19 to 25 ms working out styles, in every stage, where a frame has 16. `ScrollDriver` wrote its scroll values as custom properties on `<html>`; a custom property is inherited, so each write made the browser restyle the whole page.
+
+- **Each value is written on the elements that read it**, and only when it has changed, and `landing.css` registers every one with `@property` as not inherited. Styles now take about 1 ms a frame in every stage. A browser without `@property` still shows the same thing, with the old cost under those elements only.
+- **The counting prices write twelve times a second**, not every frame: each new number lays its card out again, and several cards count at once while the row moves.
+- **The drawn plates** (the slip's strokes, the contour behind the services) draw thirty times a second, and the slip's draws nothing while a step's picture covers it.
+
+Frames dropped while scrolling through the rail in that trace: 512 of 950 before, 22 to 55 after. (The trace runs without a graphics chip, so what it says about handing pictures to the screen is not a phone's; the style and layout times are.)
+

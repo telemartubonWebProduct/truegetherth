@@ -5,7 +5,11 @@ import { useEffect, useRef } from "react";
 // Generated plates: drawn on a canvas, no image files. "field" is a bed of
 // short strokes that drift like signal moving through fibre; "contour" is a
 // stack of slow waves, every fifth one red. They animate only while on screen,
-// and hold a single still frame for visitors who ask for reduced motion.
+// and hold a single still frame for visitors who ask for reduced motion. A new
+// drawing is a new picture for the browser to take up, which on a phone costs
+// more than the drawing itself: they drift slowly, so thirty a second is
+// plenty, and a plate that something covers (data-rest on its box, set by
+// ScrollDriver for the slip's) draws nothing.
 
 type Kind = "field" | "contour";
 
@@ -72,10 +76,15 @@ export function Plate({ kind, tone = "light", className = "" }: { kind: Kind; to
     let visible = false;
     let width = 0;
     let height = 0;
+    let drawn = -Infinity;
 
     const paint = (now: number) => {
       frame = 0;
-      draw(context, width, height, still ? 4 : now / 1000, ink);
+      const resting = canvas.parentElement?.hasAttribute("data-rest") ?? false;
+      if (!resting && now - drawn >= 30) {
+        drawn = now;
+        draw(context, width, height, still ? 4 : now / 1000, ink);
+      }
       if (visible && !still) frame = requestAnimationFrame(paint);
     };
     const kick = () => {
@@ -88,6 +97,8 @@ export function Plate({ kind, tone = "light", className = "" }: { kind: Kind; to
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      // A canvas that changes size is wiped: draw at once.
+      drawn = -Infinity;
       kick();
     };
 

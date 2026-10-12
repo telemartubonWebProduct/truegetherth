@@ -48,7 +48,12 @@ async function scrub(page: Page, stage: Stage, progress: number) {
   );
 }
 
-const variable = (page: Page, name: string) => page.evaluate((property) => document.documentElement.style.getPropertyValue(property), name);
+/** A scroll value, read where ScrollDriver writes it: on an element that reads it (the row of the open tab for --rail-x). Empty when nothing has it. */
+const variable = (page: Page, name: string) =>
+  page.evaluate((property) => {
+    const holders = [...document.querySelectorAll<HTMLElement>('[style*="' + property + ':"]')].filter((element) => !element.closest("[hidden]"));
+    return holders[0]?.style.getPropertyValue(property) ?? "";
+  }, name);
 
 test("each stage pins one screen and the page never scrolls sideways", async ({ page }) => {
   await open(page);
