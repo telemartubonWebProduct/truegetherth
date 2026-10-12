@@ -43,12 +43,19 @@ export default function CountUp({ to, from = 0, delay = 0, duration = 2, classNa
     let frame = 0;
     let timer = 0;
 
+    // A new number is a new layout of its card. Written every frame, several cards counting at once cost a
+    // slow phone more than a frame has while the row moves under the finger; twelve times a second reads as
+    // counting just the same.
     const count = () => {
       const began = performance.now();
+      let wrote = 0;
       const step = (now: number) => {
         const t = Math.min(1, (now - began) / (duration * 1000));
-        // Fast at first, slowing into the number.
-        show(t < 1 ? from + (to - from) * (1 - (1 - t) ** 4) : to);
+        if (t === 1 || now - wrote >= 80) {
+          wrote = now;
+          // Fast at first, slowing into the number.
+          show(t < 1 ? from + (to - from) * (1 - (1 - t) ** 4) : to);
+        }
         if (t < 1) frame = requestAnimationFrame(step);
       };
       frame = requestAnimationFrame(step);

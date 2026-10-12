@@ -6,9 +6,16 @@ import { useEffect, useState } from "react";
 import "lenis/dist/lenis.css";
 
 // The page's one scroll handler. Every pinned stage is choreographed in CSS
-// from custom properties on <html>; this component only measures how far each
-// stage has scrolled and writes those numbers. Text in the DOM changes only
-// when a stage moves to another phase, never per frame.
+// from custom properties; this component only measures how far each stage has
+// scrolled and writes those numbers. Text in the DOM changes only when a stage
+// moves to another phase, never per frame.
+//
+// Each number is written on the very elements that read it (READERS below),
+// and only when it has changed; landing.css registers them as properties that
+// are not inherited. They used to go on <html>: a custom property is inherited,
+// so every frame of scrolling made the browser work out the styles of the whole
+// page again (20 ms a frame on a slow phone, more than a frame has), and the
+// row of packages stuttered under the finger.
 //
 // Mouse wheels scroll in steps, which would make scroll-driven motion jerk, so
 // Lenis eases the scroll position itself (touch screens keep native scrolling).
@@ -21,6 +28,28 @@ import "lenis/dist/lenis.css";
 // have to stay where they can be clicked.
 
 type SlipPhase = { status: string; values: string[] };
+
+/** Which elements of its stage read each scroll value (landing.css). The rail's row is the open tab's, found as it changes. */
+const READERS: Record<string, string> = {
+  "--hero-art-radius": ".hero-art-inner",
+  "--hero-art-scale": ".hero-art",
+  "--hero-meta-alpha": ".hero-side, .hero-scroll",
+  "--hero-progress": ".hero-layer",
+  "--hero-type-y": ".hero-type",
+  "--hero-type-scale": ".hero-type",
+  "--hero-type-alpha": ".hero-type",
+  "--manifesto-wipe": ".manifesto-fill",
+  "--manifesto-scale": ".manifesto-line",
+  "--rail-meter": ".meter span",
+  "--packet-alpha": ".slip",
+  "--packet-enter": ".slip",
+  "--packet-scale": ".slip",
+  "--packet-cut": ".slip-perforation, .slip-stub",
+  "--packet-meter": ".meter-ink span",
+  "--packet-copy-x": ".ticket-copy",
+  "--season-y": ".season-plate",
+  "--season-scale": ".season-plate",
+};
 
 const clamp = (value: number, low = 0, high = 1) => Math.min(high, Math.max(low, value));
 /** 0..1 across the part of a stage's progress between `from` and `to`. */
@@ -52,23 +81,36 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    const written = new Set<string>();
-    const set = (name: string, value: string) => {
-      written.add(name);
-      root.style.setProperty(name, value);
-    };
     const stage = (name: string) => document.querySelector<HTMLElement>(`[data-stage="${name}"]`);
     const hero = stage("hero");
     const manifesto = stage("manifesto");
     const rail = stage("rail");
     const ticket = stage("ticket");
     const season = stage("season");
+    // A property's name says whose it is: --rail-x is the rail's, --packet-cut the slip's stage's.
+    const owners: Record<string, HTMLElement | null> = { hero, manifesto, rail, packet: ticket, season };
+    const written = new Map<HTMLElement, Map<string, string>>();
+    const put = (element: HTMLElement | null, name: string, value: string) => {
+      if (!element) return;
+      const values = written.get(element) ?? new Map<string, string>();
+      if (values.get(name) === value) return;
+      values.set(name, value);
+      written.set(element, values);
+      element.style.setProperty(name, value);
+    };
+    const readers = new Map<string, HTMLElement[]>();
+    for (const [name, selector] of Object.entries(READERS)) {
+      const owner = owners[name.slice(2, name.indexOf("-", 2))];
+      readers.set(name, Array.from(owner?.querySelectorAll<HTMLElement>(selector) ?? []));
+    }
+    const set = (name: string, value: string) => readers.get(name)?.forEach((element) => put(element, name, value));
     // The row of the open tab; RailTabs sends a resize when another tab opens.
     const railTrack = () => rail?.querySelector<HTMLElement>("[data-rail-panel]:not([hidden]) [data-rail-track]") ?? null;
     const cues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-cue]") ?? []);
     const slipStatus = ticket?.querySelector<HTMLElement>("[data-slip-status]");
     const slipValues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-value]") ?? []);
     const slipPictures = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-picture]") ?? []);
+    const slipPlate = ticket?.querySelector<HTMLElement>(".slip-plate");
     const phases: SlipPhase[] = JSON.parse(ticket?.dataset.phases ?? "[]");
     const chapters = Array.from(season?.querySelectorAll<HTMLElement>("[data-chapter]") ?? []);
     const motion = root.hasAttribute("data-motion");
@@ -95,6 +137,8 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       cues.forEach((cue, index) => cue.toggleAttribute("data-now", index === next - 1));
       // The slip's picture is the one of the step just done; before the first step, the bare plate.
       slipPictures.forEach((picture, index) => picture.toggleAttribute("data-shown", index === next - 1));
+      // Under a picture the plate's strokes are not seen: it stops drawing them (Plate.tsx).
+      if (slipPictures.length > 0) slipPlate?.toggleAttribute("data-rest", next >= 1);
       const current = phases[Math.min(next, phases.length - 1)];
       if (slipStatus) slipStatus.textContent = current.status;
       slipValues.forEach((value, index) => {
@@ -154,7 +198,7 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
 
       // 3. Rail: scrolling down walks along the row, by exactly its overflow.
       const along = easeInOut(span(r, 0.08, 0.94));
-      set("--rail-x", `${(-along * railOverflow).toFixed(1)}px`);
+      put(railTrack(), "--rail-x", `${(-along * railOverflow).toFixed(1)}px`);
       set("--rail-meter", along.toFixed(4));
 
       // 4. Slip: arrives, fills in step by step, then tears along its perforation.
@@ -221,7 +265,7 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       window.clearTimeout(later);
       cancelAnimationFrame(frame);
       // Leave the page as the flat layout expects it: no stage values, the slip complete.
-      written.forEach((name) => root.style.removeProperty(name));
+      written.forEach((values, element) => values.forEach((_, name) => element.style.removeProperty(name)));
       root.removeAttribute("data-hero-away");
       showPhase(phases.length - 1);
       cues.forEach((cue) => {

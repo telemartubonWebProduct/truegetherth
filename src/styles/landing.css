@@ -351,6 +351,127 @@ html[data-nav="ink"] .nav-menu-dot {
   }
 }
 
+/* The scroll values. ScrollDriver writes each on the very elements that read
+   it (the row of packages, the slip, the painting's layers), and none is
+   inherited, so a frame of scrolling restyles those few elements and nothing
+   under them. Written on <html>, as they first were, every frame restyled the
+   whole page: 20 ms on a slow phone, more than a frame has. Each starts at
+   what the flat page shows, which is what an element has when nothing is
+   written on it. An element that reads one must be in ScrollDriver's list. */
+@property --hero-art-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --hero-meta-alpha {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --hero-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --hero-type-alpha {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --hero-type-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --manifesto-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --rail-meter {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --packet-alpha {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --packet-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --packet-cut {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --packet-meter {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --season-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --hero-art-radius {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --hero-type-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --rail-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --packet-enter {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --packet-copy-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --manifesto-wipe {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
+@property --season-y {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
 /* Stages: a tall section holding one screen that stays while it scrolls. ------ */
 
 .stage {
