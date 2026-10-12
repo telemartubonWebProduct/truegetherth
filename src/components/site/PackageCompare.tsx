@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
-import { downloadMbps, packageDetailPath } from "@/lib/content/package-facts";
+import { downloadMbps, packageDetailPath, shownBenefits } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 import type { CatalogPackage, Cta, Price } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
@@ -198,15 +198,15 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       },
     });
   }
-  if (some((item) => item.benefits)) {
+  if (some((item) => shownBenefits(item))) {
     rows.push({
       key: "benefits",
       field: fixed("benefits"),
       cell: (item) =>
-        item.benefits.length > 0 ? (
+        shownBenefits(item).length > 0 ? (
           <div className="tm-slip-line">
             <Label>{ctx.t(ui.benefits)}</Label>
-            <BenefitList ctx={ctx} ids={item.benefits} className="mt-2.5" />
+            <BenefitList ctx={ctx} ids={shownBenefits(item)} className="mt-2.5" />
           </div>
         ) : null,
     });

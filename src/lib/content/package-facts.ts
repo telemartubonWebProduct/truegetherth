@@ -40,18 +40,28 @@ export function priceLimits(items: readonly CatalogPackage[]): number[] {
   return limits;
 }
 
+/**
+ * The benefits of a package that visitors see: its list without the ones the
+ * back office has hidden on it. Everything public reads this, never
+ * item.benefits; the back office reads the whole list.
+ */
+export function shownBenefits(item: Pick<CatalogPackage, "benefits" | "hiddenBenefits">): string[] {
+  const hidden = item.hiddenBenefits;
+  return hidden && hidden.length > 0 ? item.benefits.filter((id) => !hidden.includes(id)) : item.benefits;
+}
+
 /** Benefits to filter by: those some packages have and others do not, in the order they first appear. */
 export function benefitOptions(items: readonly CatalogPackage[]): string[] {
   const seen: string[] = [];
-  for (const item of items) for (const id of item.benefits) if (!seen.includes(id)) seen.push(id);
-  return seen.filter((id) => !items.every((item) => item.benefits.includes(id)));
+  for (const item of items) for (const id of shownBenefits(item)) if (!seen.includes(id)) seen.push(id);
+  return seen.filter((id) => !items.every((item) => shownBenefits(item).includes(id)));
 }
 
 /** What the client needs to filter and sort one package. */
 export type PackageFacts = { id: string; speed: number | null; price: number; benefits: string[] };
 
 export function packageFacts(item: CatalogPackage): PackageFacts {
-  return { id: item.id, speed: downloadMbps(item), price: item.price.amount, benefits: item.benefits };
+  return { id: item.id, speed: downloadMbps(item), price: item.price.amount, benefits: shownBenefits(item) };
 }
 
 export type Filters = { speed: number | null; maxPrice: number | null; benefit: string | null };

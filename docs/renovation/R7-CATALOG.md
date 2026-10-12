@@ -79,3 +79,9 @@ Not checked: a real phone; the dev Supabase project (no sign-in here); pgTAP (no
 - **An exact hour** for a promo to start or end (§4) would need the pages rebuilt on a schedule; that is a Vercel setting, the owner's to decide.
 - **A package's address cannot be renamed** once made. To change it: copy the package under the new name and remove the old one (the old address then answers "not found").
 - The catalog's categories are fixed (decision 1). A sixth would be a new page of the site: its route, its page document, its menu entry.
+
+## Hiding a benefit on one package (12 Oct 2026)
+
+The owner asked for a way to switch a benefit off without taking it out of the package. Each line of a package's benefits in the form has a button, "ซ่อน": the benefit stays in the list, struck through, and visitors no longer see it on the card, the package's page, the comparison or the filters; "แสดง" brings it back. It is kept in the package as `hiddenBenefits`, and `shownBenefits` (`src/lib/content/package-facts.ts`) is the one place that takes them out: public code reads that, the back office reads the whole list.
+
+The field is optional, so every draft and release of schema version 10 still reads and the version was not raised: raising it would have set aside the drafts the owner had not yet published.

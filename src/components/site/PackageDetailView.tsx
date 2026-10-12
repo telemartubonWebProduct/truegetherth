@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import { packageHomeIn } from "@/lib/content/lookup";
-import { packageDetailPath } from "@/lib/content/package-facts";
+import { packageDetailPath, shownBenefits } from "@/lib/content/package-facts";
 import type { CatalogPackage } from "@/lib/content/schema";
 import { localizePath } from "@/lib/i18n/locales";
 
@@ -136,14 +136,14 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
         </div>
       </section>
 
-      {item.benefits.length > 0 || item.details.length > 0 || item.conditions.length > 0 ? (
+      {shownBenefits(item).length > 0 || item.details.length > 0 || item.conditions.length > 0 ? (
         <section className="border-t border-tm-line py-10 lg:py-14" data-tone="surface">
           <div className="tm-container grid gap-10 lg:grid-cols-2 lg:gap-14">
-            {item.benefits.length > 0 ? (
+            {shownBenefits(item).length > 0 ? (
               <div {...own("benefits")}>
                 <h2 className="text-tm-h3 font-semibold">{ctx.t(ui.benefits)}</h2>
                 <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {item.benefits.map((id) => {
+                  {shownBenefits(item).map((id) => {
                     const benefit = ctx.benefit(id);
                     const icon = ctx.media(benefit.icon);
                     return (

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 
-import { packageDetailPath } from "@/lib/content/package-facts";
+import { packageDetailPath, shownBenefits } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 import type { CatalogPackage, HomePage } from "@/lib/content/schema";
 
@@ -432,7 +432,7 @@ function PackageCard({ ctx, tab, item, index }: { ctx: RenderContext; tab: Tab; 
             </span>
           ) : null}
         </p>
-        {item.benefits.length > 0 ? <BenefitList ctx={ctx} ids={item.benefits} dense className="card-perks" /> : null}
+        {shownBenefits(item).length > 0 ? <BenefitList ctx={ctx} ids={shownBenefits(item)} dense className="card-perks" /> : null}
         <p className="card-price" {...own("price")}>
           <CountUp to={item.price.amount} separator="," className="num" duration={1.4} />
           <span className="card-unit">{ctx.t(item.price.per === "month" ? ui.perMonth : ui.baht)}</span>

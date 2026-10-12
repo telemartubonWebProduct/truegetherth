@@ -1,4 +1,4 @@
-import { benefitOptions, packageDetailPath, packageFacts, priceLimits, speedOptions } from "@/lib/content/package-facts";
+import { benefitOptions, packageDetailPath, packageFacts, priceLimits, shownBenefits, speedOptions } from "@/lib/content/package-facts";
 import { formatNumber, resolveLink } from "@/lib/content/render";
 import type { CatalogPackage, Cta } from "@/lib/content/schema";
 import { localizePath } from "@/lib/i18n/locales";
@@ -29,7 +29,7 @@ function compareEntry(ctx: RenderContext, item: CatalogPackage, cta: Cta): Compa
     speed: speed ? `${speed.figure} ${speed.unit}` : undefined,
     term: term ? { label: ctx.t(item.contract ? ui.contract : ui.validity), value: ctx.t(term) } : undefined,
     allowance: item.allowance ? ctx.t(item.allowance) : undefined,
-    benefits: item.benefits.map((id) => ctx.t(ctx.benefit(id).label)),
+    benefits: shownBenefits(item).map((id) => ctx.t(ctx.benefit(id).label)),
     conditions: item.conditions.map((line) => ctx.t(line)),
     dialCode: item.dialCode,
     cta: { id: cta.id, label: ctx.t(cta.label), href: link.href, external: link.external },

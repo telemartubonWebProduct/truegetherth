@@ -59,6 +59,7 @@ const labels: Record<string, string> = {
   per: "คิดราคา",
   vat: "VAT",
   benefits: "สิทธิประโยชน์",
+  hiddenBenefits: "สิทธิประโยชน์ที่ซ่อนไว้",
   details: "รายละเอียด",
   conditions: "เงื่อนไข",
   dialCode: "รหัสกดสมัคร",
