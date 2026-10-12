@@ -157,6 +157,8 @@ export const catalogPackage = z.strictObject({
   contract: localizedText.optional(),
   price,
   benefits: z.array(benefitRef),
+  /** Benefits of the list above that are kept but not shown to visitors (shownBenefits in package-facts.ts). */
+  hiddenBenefits: z.array(benefitRef).optional(),
   details: z.array(localizedText),
   conditions: z.array(localizedText),
   /** USSD code to subscribe from the phone, such as *900*7129#. */

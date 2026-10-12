@@ -30,6 +30,9 @@ import { contentProblems } from "./validate";
 export const CONTENT_SCHEMA_VERSION = 10;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
+// A package's hiddenBenefits (12 Oct 2026) is optional: every draft and release
+// of version 10 still reads, so the version stays, and the drafts the owner had
+// not yet published were not thrown away for it.
 
 export type DraftRecord = {
   documentId: DocumentId;

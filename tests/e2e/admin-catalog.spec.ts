@@ -288,6 +288,36 @@ test("a package set to show until yesterday leaves its page, and one set to star
   await clearDrafts();
 });
 
+test("a benefit is hidden on one package and shown again, without leaving its list", async ({ page }) => {
+  const item = content.catalog.find((entry) => entry.category === "broadband-new" && isShown(entry, today) && entry.benefits.length >= 2)!;
+  const [hidden] = item.benefits;
+  const name = content.benefits[hidden].label.th;
+  await signIn(page, admin);
+
+  await row(page, item.id).getByRole("button", { name: /^แก้ไข:/ }).click();
+  await form(page).getByRole("button", { name: `ซ่อน ${name}` }).click();
+  await saved(page);
+  // Still in the package, marked as hidden; the form's card is the one visitors would get.
+  expect(await stored<CatalogPackage>(`package:${item.id}`)).toMatchObject({ benefits: item.benefits, hiddenBenefits: [hidden] });
+  await expect(form(page).locator("[data-benefit-hidden]")).toHaveCount(1);
+  await expect(form(page).getByLabel("ตัวอย่างการ์ดที่ลูกค้าเห็น").locator(`li[title="${name}"]`)).toHaveCount(0);
+
+  // The package's page, as the editor previews the draft: the others are there, this one is not.
+  await page.goto("/admin/editor?page=broadband-new");
+  const slip = preview(page).locator(`[data-package="${item.id}"]`).first();
+  await expect(slip).toBeVisible();
+  await expect(slip.locator(".tm-benefits > li:not([aria-hidden])")).toHaveCount(item.benefits.length - 1);
+
+  // One click brings it back.
+  await page.goto("/admin/catalog");
+  await row(page, item.id).getByRole("button", { name: /^แก้ไข:/ }).click();
+  await form(page).getByRole("button", { name: `แสดง ${name}` }).click();
+  await saved(page);
+  expect((await stored<CatalogPackage>(`package:${item.id}`))?.hiddenBenefits ?? []).toEqual([]);
+  await expect(form(page).locator("[data-benefit-hidden]")).toHaveCount(0);
+  await clearDrafts();
+});
+
 test("benefits are added, named and removed where the packages are", async ({ page }) => {
   await signIn(page, admin);
   await page.getByRole("tab", { name: /^สิทธิประโยชน์/ }).click();

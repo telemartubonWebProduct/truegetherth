@@ -22,6 +22,7 @@ import { pageLabels } from "@/components/editor/labels";
 import { diffPaths } from "@/lib/content/paths";
 import type { DocumentId } from "@/lib/content/documents";
 import { parseDocument, type FieldIssue } from "@/lib/content/draft-model";
+import { shownBenefits } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 import type { CatalogPackage, LocalizedText, SiteContent } from "@/lib/content/schema";
 
@@ -87,6 +88,8 @@ function OptionalText({ label, value, onChange, issues }: { label: string; value
 function CardPreview({ content, item }: { content: SiteContent; item: CatalogPackage }) {
   const image = item.image ? content.media[item.image] : undefined;
   const { ui } = content.site;
+  // As visitors see it: without the benefits hidden on this package.
+  const shown = shownBenefits(item);
   const speed = item.speed ? `${formatNumber(item.speed.download.value, "th")}/${formatNumber(item.speed.upload.value, "th")} ${item.speed.download.unit}` : null;
   return (
     <div className="max-w-[20rem] overflow-hidden rounded-tm-panel border border-tm-line bg-tm-canvas" role="group" aria-label="ตัวอย่างการ์ดที่ลูกค้าเห็น">
@@ -102,9 +105,9 @@ function CardPreview({ content, item }: { content: SiteContent; item: CatalogPac
       <div className="grid gap-1 p-4">
         <p className="font-medium">{item.name.th || "ยังไม่มีชื่อ"}</p>
         <p className="text-tm-caption text-tm-muted">{item.contract ? `${ui.contract.th} ${item.contract.th}` : item.validity ? `${ui.validity.th} ${item.validity.th}` : ""}</p>
-        {item.benefits.length > 0 ? (
+        {shown.length > 0 ? (
           <ul className="mt-1 flex gap-1.5" aria-label="สิทธิประโยชน์">
-            {item.benefits.slice(0, 4).map((id) => {
+            {shown.slice(0, 4).map((id) => {
               const icon = content.media[content.benefits[id]?.icon ?? ""];
               return (
                 <li key={id} className="grid size-8 place-items-center overflow-hidden rounded-[0.625rem] border border-tm-line bg-white p-1" title={content.benefits[id]?.label.th}>
@@ -112,7 +115,7 @@ function CardPreview({ content, item }: { content: SiteContent; item: CatalogPac
                 </li>
               );
             })}
-            {item.benefits.length > 4 ? <li className="tm-num grid h-8 min-w-8 place-items-center rounded-[0.625rem] bg-tm-surface px-1.5 text-tm-caption font-semibold text-tm-muted">+{item.benefits.length - 4}</li> : null}
+            {shown.length > 4 ? <li className="tm-num grid h-8 min-w-8 place-items-center rounded-[0.625rem] bg-tm-surface px-1.5 text-tm-caption font-semibold text-tm-muted">+{shown.length - 4}</li> : null}
           </ul>
         ) : null}
         <p className="mt-1">
@@ -270,7 +273,15 @@ export function PackageForm({ content, store, id, today, featured, onFeatured, o
               {item.dialCode !== undefined ? <TextField value={item.dialCode} onChange={(value) => set(["dialCode"], value)} issues={at("dialCode")} label="รหัสกดสมัคร" placeholder="*900*7129#" /> : null}
             </div>
             <Labelled label="สิทธิประโยชน์">
-              <BenefitListField value={item.benefits} onChange={(value) => set(["benefits"], value)} ctx={ctx} label="สิทธิประโยชน์" />
+              <BenefitListField
+                value={item.benefits}
+                onChange={(value) => set(["benefits"], value)}
+                hidden={item.hiddenBenefits ?? []}
+                onHiddenChange={(value) => set(["hiddenBenefits"], value)}
+                ctx={ctx}
+                label="สิทธิประโยชน์"
+              />
+              <p className="text-tm-caption text-tm-muted">รายการที่ซ่อนยังอยู่ในแพ็กเกจ แต่ไม่แสดงบนเว็บ กด “แสดง” เพื่อเปิดกลับ</p>
             </Labelled>
           </Part>
 

@@ -487,18 +487,38 @@ export function MediaListField({ value, onChange, ctx, label }: { value: string[
   );
 }
 
-export function BenefitListField({ value, onChange, ctx, label }: { value: string[]; onChange: (value: string[]) => void; ctx: FieldContext; label: string }) {
+/**
+ * A package's benefits. Where `hidden` is given (Packages and promos), each
+ * line can be hidden: it stays in the list, visitors do not see it, and it
+ * comes back with one click.
+ */
+export function BenefitListField({
+  value,
+  onChange,
+  ctx,
+  label,
+  hidden,
+  onHiddenChange,
+}: {
+  value: string[];
+  onChange: (value: string[]) => void;
+  ctx: FieldContext;
+  label: string;
+  hidden?: string[];
+  onHiddenChange?: (value: string[]) => void;
+}) {
   const options = Object.entries(ctx.content.benefits);
+  const off = hidden ?? [];
   return (
     <div className="grid gap-2">
       {value.length === 0 ? <p className="text-tm-caption text-tm-muted">ไม่มีสิทธิประโยชน์</p> : null}
       {value.map((id, index) => (
-        <div key={`${index}-${id}`} className="flex items-center gap-2">
+        <div key={`${index}-${id}`} className="flex items-center gap-2" data-benefit-hidden={off.includes(id) ? "" : undefined}>
           <select
             aria-label={`${label} ${index + 1}`}
             value={id}
             onChange={(event) => onChange(value.map((entry, position) => (position === index ? event.target.value : entry)))}
-            className={inputClass}
+            className={`${inputClass} ${off.includes(id) ? "text-tm-muted line-through" : ""}`}
           >
             {options.map(([key, entry]) => (
               <option key={key} value={key}>
@@ -506,6 +526,17 @@ export function BenefitListField({ value, onChange, ctx, label }: { value: strin
               </option>
             ))}
           </select>
+          {onHiddenChange ? (
+            <button
+              type="button"
+              className={`${smallButton} shrink-0`}
+              aria-pressed={off.includes(id)}
+              aria-label={`${off.includes(id) ? "แสดง" : "ซ่อน"} ${ctx.content.benefits[id]?.label.th ?? id}`}
+              onClick={() => onHiddenChange(off.includes(id) ? off.filter((entry) => entry !== id) : [...off, id])}
+            >
+              {off.includes(id) ? "ซ่อนอยู่ · แสดง" : "ซ่อน"}
+            </button>
+          ) : null}
           <button type="button" className={`${smallButton} shrink-0`} onClick={() => ctx.select(`benefit:${id}`)}>
             แก้ข้อความ
           </button>
