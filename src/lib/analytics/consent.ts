@@ -1,5 +1,5 @@
 // The visitor's cookie choices (PDPA), kept in a first-party cookie for 180
-// days. Analytics (GA4) and advertising (Google Ads) load only when the
+// days. Analytics (GA4) and advertising (Google Ads, Meta Pixel) load only when the
 // visitor agreed to them; a choice made under an older policy
 // version counts as no choice, so changing site.consent.policyVersion asks
 // everyone again. The cookie is only ever read in the browser.
@@ -20,7 +20,7 @@ export const noneGranted: ConsentChoice = { analytics: false, ads: false };
 
 const bit = (value: boolean) => (value ? "1" : "0");
 
-/** "2026-10-02.10.1759390000": policy version, analytics/ads, and when (Unix seconds). */
+/** "2026-10-23.10.1761190000": policy version, analytics/ads, and when (Unix seconds). */
 export function serializeConsent(consent: StoredConsent): string {
   return `${consent.version}.${bit(consent.analytics)}${bit(consent.ads)}.${consent.at}`;
 }
@@ -59,12 +59,12 @@ export function withdrawsConsent(previous: ConsentChoice | null, next: ConsentCh
   return (previous.analytics && !next.analytics) || (previous.ads && !next.ads);
 }
 
-/** Removes Google's measurement cookies from this site and its parent domains. */
-export function clearGoogleCookies(): void {
+/** Removes Google's and Meta's measurement cookies from this site and its parent domains. */
+export function clearTrackingCookies(): void {
   const names = document.cookie
     .split(";")
     .map((part) => part.trim().split("=")[0])
-    .filter((name) => /^(_ga|_gid|_gat|_gcl_|_gac_)/.test(name));
+    .filter((name) => /^(_ga|_gid|_gat|_gcl_|_gac_|_fbp$|_fbc$)/.test(name));
   const labels = location.hostname.split(".");
   const domains = [undefined, ...labels.slice(0, -1).map((_, index) => labels.slice(index).join("."))];
   for (const name of names) {

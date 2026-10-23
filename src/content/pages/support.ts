@@ -237,8 +237,12 @@ export const termsPage: LegalPage = {
           "If these cookies collect data that could identify you, or are used for marketing or advertising, we will tell you and ask for your consent as the law requires. You can refuse or delete cookies in your browser settings.",
         ),
         t(
-          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) และคุกกี้โฆษณา (Google Ads) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
-          "The website uses analytics cookies (Google Analytics) and advertising cookies (Google Ads) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
+          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) และคุกกี้โฆษณา (Google Ads และ Meta Pixel ของ Facebook/Instagram) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
+          "The website uses analytics cookies (Google Analytics) and advertising cookies (Google Ads and the Meta Pixel of Facebook/Instagram) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
+        ),
+        t(
+          "เมื่อท่านยินยอมคุกกี้โฆษณาและส่งแบบฟอร์มให้ติดต่อกลับ เราจะแจ้ง Meta ว่ามีคำขอใหม่ผ่าน Conversions API พร้อมเบอร์โทรที่แปลงเป็นรหัส (SHA-256) ซึ่งอ่านกลับเป็นเบอร์ไม่ได้ IP และประเภทเบราว์เซอร์ เพื่อวัดผลโฆษณาเท่านั้น โดยไม่ส่งชื่อหรือข้อความที่ท่านกรอก",
+          "When you have agreed to advertising cookies and send the call-back form, we tell Meta about the new request through its Conversions API, with your phone number as a one-way code (SHA-256) that cannot be turned back into the number, your IP address and browser type, only to measure our ads; your name and message are not sent.",
         ),
       ],
       list: [

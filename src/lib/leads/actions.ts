@@ -2,9 +2,13 @@
 
 import { randomUUID } from "node:crypto";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { after } from "next/server";
 
+import { consentFromCookies } from "@/lib/analytics/consent";
+import { metaCapiConfigured, sendMetaLead } from "@/lib/analytics/meta-capi";
 import { getPublishedContent } from "@/lib/content/published";
+import { siteUrl } from "@/lib/seo/metadata";
 import { createServiceClient } from "@/lib/supabase/service";
 
 import { fieldErrors, formValues, HONEYPOT_FIELD, leadInput, requestSource, type LeadField, type LeadFieldError } from "./form";
@@ -17,6 +21,8 @@ import { requestablePackages } from "./packages";
 // every field again, then stores the request through submit_lead(), which
 // drops repeats, folds a new request into an open one from the same phone and
 // rate limits. The visitor sees success only after the database said so.
+// A new stored request is also Meta's Lead, sent from here after the answer
+// (src/lib/analytics/meta-capi.ts) when the visitor agreed to advertising.
 
 export type LeadFormState =
   | null
@@ -38,10 +44,12 @@ export async function submitLead(_previous: LeadFormState, form: FormData): Prom
   const content = await getPublishedContent();
   const packageId = input.packageId && requestablePackages(content, todayInThailand()).some((item) => item.id === input.packageId) ? input.packageId : undefined;
   const { path, utm } = requestSource(input.source);
+  const idempotencyKey = input.idempotencyKey ?? randomUUID();
+  const requestHeaders = await headers();
 
   const { data, error } = await service.client
     .rpc("submit_lead", {
-      p_idempotency_key: input.idempotencyKey ?? randomUUID(),
+      p_idempotency_key: idempotencyKey,
       p_name: input.name,
       p_phone: input.phone,
       p_province: input.province,
@@ -54,7 +62,7 @@ export async function submitLead(_previous: LeadFormState, form: FormData): Prom
       p_source_path: path,
       p_utm: utm,
       p_consent_version: content.site.consent.policyVersion,
-      p_client_hash: clientHash(clientAddress(await headers()), service.secretKey),
+      p_client_hash: clientHash(clientAddress(requestHeaders), service.secretKey),
     })
     .single();
   if (error || !data) {
@@ -62,5 +70,25 @@ export async function submitLead(_previous: LeadFormState, form: FormData): Prom
     return { status: "failed" };
   }
   if (data.outcome === "rate_limited") return { status: "rate_limited" };
-  return { status: "sent", duplicate: data.outcome === "duplicate" };
+  const duplicate = data.outcome === "duplicate";
+
+  // Only a new request, only with consent to advertising, only on the site's own domain.
+  const consent = consentFromCookies(requestHeaders.get("cookie") ?? "", content.site.consent.policyVersion);
+  const site = siteUrl();
+  if (!duplicate && consent?.ads && metaCapiConfigured() && requestHeaders.get("host") === site.host) {
+    const cookieStore = await cookies();
+    const lead = {
+      eventId: idempotencyKey,
+      eventSourceUrl: new URL(path ?? "/", site).toString(),
+      phone: input.phone,
+      clientIp: clientAddress(requestHeaders),
+      userAgent: requestHeaders.get("user-agent"),
+      fbp: cookieStore.get("_fbp")?.value ?? null,
+      fbc: cookieStore.get("_fbc")?.value ?? null,
+      service: input.service,
+      packageId,
+    };
+    after(() => sendMetaLead(lead));
+  }
+  return { status: "sent", duplicate };
 }

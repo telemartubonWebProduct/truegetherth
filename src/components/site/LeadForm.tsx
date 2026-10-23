@@ -2,6 +2,7 @@
 
 import { startTransition, useActionState, useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 
+import { trackMetaEvent } from "@/lib/analytics/meta";
 import { trackEvent, trackLeadConversion } from "@/lib/analytics/tags";
 import { submitLead, type LeadFormState } from "@/lib/leads/actions";
 // fields.ts, not form.ts: the schema's validation library stays out of what the page downloads.
@@ -72,7 +73,7 @@ function LeadFormRound({ text, binds, locale, provinces, packages, policyHref, m
   const successRef = useRef<HTMLHeadingElement>(null);
   const keyRef = useRef("");
   const started = useRef(false);
-  const submitted = useRef<{ service?: string; packageId?: string }>({});
+  const submitted = useRef<{ service?: string; packageId?: string; eventId?: string }>({});
   const reported = useRef<LeadFormState>(null);
 
   useEffect(() => {
@@ -84,6 +85,8 @@ function LeadFormRound({ text, binds, locale, provinces, packages, policyHref, m
         trackEvent("generate_lead", { form_id: formId, lead_service: submitted.current.service, package_id: submitted.current.packageId });
         // The same moment is the Google Ads conversion: a stored request to be contacted.
         trackLeadConversion();
+        // And Meta's Lead, with the request's key as the event id the server's copy also carries.
+        trackMetaEvent("Lead", { content_category: submitted.current.service, content_name: submitted.current.packageId }, submitted.current.eventId);
       }
     }
     if (state?.status === "invalid") focusFirstInvalid(formRef.current, state.fields);
@@ -104,7 +107,7 @@ function LeadFormRound({ text, binds, locale, provinces, packages, policyHref, m
       return;
     }
     setClientErrors({});
-    submitted.current = { service: values.service as LeadService, packageId: values.packageId || undefined };
+    submitted.current = { service: values.service as LeadService, packageId: values.packageId || undefined, eventId: keyRef.current };
     startTransition(() => dispatch(data));
   };
 
