@@ -5,6 +5,9 @@ declare global {
 		gtag?: (...args: unknown[]) => void;
 		/** Which Google tags this page has configured. */
 		__tmTags?: { ads: boolean; analytics: boolean; ga4MeasurementId?: string; leadConversion?: string };
+		// Meta Pixel (fbevents.js), defined once the visitor agrees to advertising (src/lib/analytics/meta.ts).
+		fbq?: import("@/lib/analytics/meta").MetaFbq;
+		_fbq?: import("@/lib/analytics/meta").MetaFbq;
 	}
 }
 

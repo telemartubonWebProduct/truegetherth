@@ -72,8 +72,8 @@ export async function SiteLayout({ locale, children }: { locale: Locale; childre
         {/* First, so keyboard and screen-reader users meet the choice before the page. */}
         <ConsentBanner text={consentText} policyHref={policyHref} policyVersion={policyVersion} />
         {children}
-        {/* Google Ads and Google Analytics 4 on the production domain, each only after consent; a request to be contacted is the Ads conversion. */}
-        <SiteTags googleAdsId={googleAdsId} ga4MeasurementId={ga4MeasurementId} adsLeadConversion={googleAdsLeadConversion} productionHost={siteUrl().hostname} policyVersion={policyVersion} />
+        {/* Google Ads, Google Analytics 4 and the Meta Pixel on the production domain, each only after consent; a request to be contacted is the Ads conversion and Meta's Lead/Contact. */}
+        <SiteTags googleAdsId={googleAdsId} ga4MeasurementId={ga4MeasurementId} adsLeadConversion={googleAdsLeadConversion} metaPixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID} productionHost={siteUrl().hostname} policyVersion={policyVersion} />
       </body>
     </html>
   );

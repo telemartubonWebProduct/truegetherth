@@ -7,7 +7,7 @@ import {
   CONSENT_CHANGE_EVENT,
   CONSENT_COOKIE,
   CONSENT_OPEN_EVENT,
-  clearGoogleCookies,
+  clearTrackingCookies,
   noneGranted,
   parseConsent,
   withdrawsConsent,
@@ -98,7 +98,7 @@ export function ConsentBanner({ text, policyHref, policyVersion }: ConsentBanner
     setReopened(false);
     setCustomizing(false);
     if (withdrawsConsent(previous, next)) {
-      clearGoogleCookies();
+      clearTrackingCookies();
       location.reload();
       return;
     }

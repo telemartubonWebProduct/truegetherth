@@ -161,9 +161,10 @@ export const site: SiteSettings = {
     },
   },
   // Cookie banner (PDPA): analytics and advertising load only after the
-  // visitor agrees. policyVersion is also recorded with each call-back request.
+  // visitor agrees. policyVersion is also recorded with each call-back request;
+  // 2026-10-23 added the Meta Pixel, so everyone is asked again.
   consent: {
-    policyVersion: "2026-10-02",
+    policyVersion: "2026-10-23",
     heading: t("เว็บไซต์นี้ใช้คุกกี้", "This website uses cookies"),
     body: t(
       "เราใช้คุกกี้ที่จำเป็นเพื่อให้เว็บทำงาน และขอความยินยอมก่อนใช้คุกกี้วิเคราะห์การใช้งานและโฆษณา เปลี่ยนใจได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
@@ -180,7 +181,10 @@ export const site: SiteSettings = {
     analyticsTitle: t("วิเคราะห์การใช้งาน", "Analytics"),
     analyticsBody: t("นับผู้เข้าชมและหน้าที่ดูด้วย Google Analytics เพื่อปรับปรุงเว็บ", "Count visits and pages viewed with Google Analytics, to improve the site."),
     adsTitle: t("โฆษณา", "Advertising"),
-    adsBody: t("วัดผลโฆษณาของเราบน Google ด้วย Google Ads", "Measure our ads on Google with Google Ads."),
+    adsBody: t(
+      "วัดผลโฆษณาของเราบน Google และ Facebook/Instagram ด้วย Google Ads และ Meta Pixel",
+      "Measure our ads on Google and Facebook/Instagram with Google Ads and the Meta Pixel.",
+    ),
     settingsLink: t("ตั้งค่าคุกกี้", "Cookie settings"),
   },
   ui: {
