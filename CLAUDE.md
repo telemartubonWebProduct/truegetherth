@@ -51,7 +51,7 @@ A new picture goes in a new folder (`hero-v5`; `steps-v2` for the steps' picture
 
 ## Working here
 
-Node 24.18.0 (`.nvmrc`); `package-lock.json` is authoritative. Next 16.4.0 with React 19.3: this version has breaking changes against older Next.js, so read the relevant guide in `node_modules/next/dist/docs/` before using an API you have not used in this version, and heed deprecation notices.
+Node 24.18.0 (`.nvmrc`); `package-lock.json` is authoritative. Next 16.4.2 with React 19.3: this version has breaking changes against older Next.js, so read the relevant guide in `node_modules/next/dist/docs/` before using an API you have not used in this version, and heed deprecation notices.
 
 - `npm run dev -- --port 3200` (port 3000 belongs to another app of the owner's on this machine).
 - Checks: `npm run lint`, `npm run typecheck`, `npm test` (Vitest), `npm run build`.
