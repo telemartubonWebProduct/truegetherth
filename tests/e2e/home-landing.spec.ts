@@ -120,7 +120,7 @@ const composition = async (page: Page) => {
     const router = box(shown.querySelector(".hero-box[data-mark]")!);
     const mark = box(shown.querySelector(".hero-mark")!);
     const title = box(document.querySelector(".hero-title")!);
-    const pills = [...document.querySelectorAll(".nav-logo, .nav-menu, .nav-tags, .nav-right")].filter((element) => element.checkVisibility()).map(box);
+    const pills = [...document.querySelectorAll(".nav-logo, .nav-partner, .nav-menu, .nav-tags, .nav-right")].filter((element) => element.checkVisibility()).map(box);
     return {
       arrangement: shown.classList.contains("hero-pack-tall") ? ("tall" as const) : ("wide" as const),
       layers: [...shown.querySelectorAll(".hero-layer")].map((layer) => layer.getAttribute("data-layer")),

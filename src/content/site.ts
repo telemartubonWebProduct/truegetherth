@@ -15,6 +15,10 @@ export const site: SiteSettings = {
     name: t("truegetherth", "truegetherth"),
     legalName: t("บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด", "Telemart Communication Co., Ltd."),
     logo: "truegetherth-logo",
+    // The badge beside the logo and in the footer (owner, 2026-11-03): True Online's own mark, the owner's file and never
+    // a drawn one, and the line under it in the owner's words. It stays apart from the site's logo, which is our own mark.
+    partnerLogo: "true-online-logo",
+    partnerLabel: t("Authorized Partner by Telemart", "Authorized Partner by Telemart"),
   },
   contact: {
     lineSales: "https://lin.ee/vWV2aFT",
@@ -60,10 +64,11 @@ export const site: SiteSettings = {
     style: "primary",
   },
   footer: {
-    // Who runs the site, as the owner states it (2026-10-11) and as the company's other site words it: an appointed dealer and partner, not True itself.
+    // Who runs the site, as the owner states it (2026-10-11; "a partner of True Online", 2026-11-03) and as the company's
+    // other site words it: an appointed partner and dealer, not True itself.
     about: t(
-      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์และตัวแทนจำหน่ายที่ได้รับการแต่งตั้งอย่างเป็นทางการ (Authorized Dealer) ของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เว็บไซต์นี้ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย",
-      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed partner and Authorized Dealer of True. We take applications for True home internet and arrange installation, wherever you are in Thailand. This is not the main website of True Corporation Public Company Limited, and we are not the network operator.",
+      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่าย (Authorized Dealer) ของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เว็บไซต์นี้ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย",
+      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. We take applications for True home internet and arrange installation, wherever you are in Thailand. This is not the main website of True Corporation Public Company Limited, and we are not the network operator.",
     ),
     groups: [
       {

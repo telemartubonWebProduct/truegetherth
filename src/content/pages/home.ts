@@ -19,10 +19,11 @@ export const home: HomePage = {
   id: "home",
   path: "/",
   seo: {
-    title: t("เน็ตบ้านทรู เน็ตมือถือ และโซลาร์เซลล์", "True home internet, mobile and solar"),
+    // Worded as people search ("สมัครเน็ตบ้านทรู"), and saying who takes the application (R13).
+    title: t("สมัครเน็ตบ้านทรูออนไลน์ เน็ตมือถือ และโซลาร์เซลล์", "Apply for True Online home internet, mobile and solar"),
     description: t(
-      "เทียบแพ็กเกจเน็ตบ้านทรูสำหรับลูกค้าใหม่และลูกค้าปัจจุบัน แพ็กเสริมมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ช่วยเลือกและตรวจพื้นที่ติดตั้งให้",
-      "Compare True home internet for new and current customers, mobile add-ons and W&W Energy solar. Our team helps you choose and checks installation at your address.",
+      "สมัครเน็ตบ้านทรูออนไลน์กับ Telemart พาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เทียบแพ็กเกจลูกค้าใหม่และลูกค้าปัจจุบัน แพ็กเสริมมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ตรวจพื้นที่และนัดติดตั้งให้ รับเรื่องจากทุกจังหวัด",
+      "Apply for True Online home internet with Telemart, an appointed Authorized Partner of True Online. Compare packages for new and current customers, mobile add-ons and W&W Energy solar. We check your area and book the installation, from any province.",
     ),
   },
   hero: {
@@ -228,6 +229,15 @@ export const home: HomePage = {
         ),
       },
       {
+        // Who is behind the site, as the footer and the terms say it: asked by visitors, and by search engines and assistants.
+        id: "who-runs-the-site",
+        question: t("truegetherth เป็นเว็บไซต์ของทรูหรือไม่", "Is truegetherth True's own website?"),
+        answer: t(
+          "ไม่ใช่ truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่ายของทรู เรารับสมัครและประสานงานติดตั้งให้ แต่ไม่ใช่ผู้ให้บริการเครือข่าย",
+          "No. truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. We take your application and arrange the installation; we are not the network operator.",
+        ),
+      },
+      {
         id: "existing-customers",
         question: t("เป็นลูกค้าทรูออนไลน์อยู่แล้ว เพิ่มสปีดได้ไหม", "I already have True Online. Can I get more speed?"),
         answer: t(
@@ -241,6 +251,14 @@ export const home: HomePage = {
         answer: t(
           "โซลาร์เซลล์เป็นบริการของ W&W Energy ซึ่งสำรวจ ออกแบบ และติดตั้งระบบ ราคาและเงื่อนไขแยกจากแพ็กเกจเน็ตบ้านและมือถือของทรู",
           "Solar is provided by W&W Energy, who survey, design and install the system. Its prices and terms are separate from True home internet and mobile packages.",
+        ),
+      },
+      {
+        id: "opening-hours",
+        question: t("ติดต่อเจ้าหน้าที่ได้วันและเวลาใด", "When can I reach your team?"),
+        answer: t(
+          "จันทร์–เสาร์ 09:00–18:00 น. ทาง LINE หรือโทรศัพท์ สำนักงานใหญ่อยู่ที่จังหวัดอุบลราชธานี และรับเรื่องจากทุกจังหวัด",
+          "Monday to Saturday, 9:00 to 18:00, on LINE or by phone. Our head office is in Ubon Ratchathani, and we take requests from every province.",
         ),
       },
     ],

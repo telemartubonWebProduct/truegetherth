@@ -9,7 +9,7 @@ export const solarPage: SolarPage = {
   id: "solar",
   path: "/wEnergy",
   seo: {
-    title: t("ติดตั้งโซลาร์เซลล์ W&W Energy", "W&W Energy rooftop solar installation"),
+    title: t("ติดตั้งโซลาร์เซลล์บนหลังคา โดย W&W Energy", "Rooftop solar installation by W&W Energy"),
     description: t(
       "บริการสำรวจ ออกแบบ ติดตั้ง และบำรุงรักษาระบบโซลาร์เซลล์บนหลังคาบ้านและโรงงาน โดย W&W Energy พร้อมแพ็กเกจ 3, 5 และ 10 kWp",
       "Survey, design, installation and maintenance of rooftop solar for homes and factories by W&W Energy, with 3, 5 and 10 kWp packages.",

@@ -6,10 +6,10 @@ export const contactPage: ContactPage = {
   id: "contact",
   path: "/service",
   seo: {
-    title: t("ติดต่อเรา", "Contact us"),
+    title: t("ติดต่อเจ้าหน้าที่ truegetherth", "Contact the truegetherth team"),
     description: t(
-      "ติดต่อ truegetherth ทาง LINE โทรศัพท์ อีเมล หรือเฟซบุ๊ก เพื่อสอบถามแพ็กเกจเน็ตบ้าน เน็ตมือถือ และโซลาร์เซลล์",
-      "Contact truegetherth on LINE, by phone, email or Facebook about home internet, mobile packages and solar.",
+      "ติดต่อ truegetherth ทาง LINE โทรศัพท์ อีเมล หรือเฟซบุ๊ก เพื่อสอบถามแพ็กเกจเน็ตบ้าน เน็ตมือถือ และโซลาร์เซลล์ หรือขอให้เจ้าหน้าที่โทรกลับ จันทร์–เสาร์ 09:00–18:00 น.",
+      "Contact truegetherth on LINE, by phone, email or Facebook about home internet, mobile packages and solar, or ask us to call you back. Monday to Saturday, 9:00 to 18:00.",
     ),
   },
   hero: {
@@ -68,10 +68,10 @@ export const agentPage: AgentPage = {
   id: "apply-with-agent",
   path: "/wifiService",
   seo: {
-    title: t("สมัครเน็ตบ้านผ่านเจ้าหน้าที่", "Apply for home internet through our team"),
+    title: t("สมัครเน็ตบ้านทรูผ่านเจ้าหน้าที่", "Apply for True home internet through our team"),
     description: t(
-      "สมัครเน็ตบ้านทรูไฟเบอร์ผ่านเจ้าหน้าที่ ช่วยเลือกแพ็กเกจ ตรวจพื้นที่ และนัดวันติดตั้งให้",
-      "Apply for True fibre home internet through our team: we help you choose, check your area and book the installation.",
+      "สมัครเน็ตบ้านทรูไฟเบอร์ผ่านเจ้าหน้าที่ของพาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ ช่วยเลือกแพ็กเกจ ตรวจพื้นที่ และนัดวันติดตั้งให้",
+      "Apply for True fibre home internet through the team of an appointed Authorized Partner of True Online: we help you choose, check your area and book the installation.",
     ),
   },
   hero: {
@@ -140,8 +140,8 @@ export const termsPage: LegalPage = {
   },
   heading: t("ข้อตกลงและเงื่อนไขการให้บริการ และนโยบายความเป็นส่วนตัว", "Terms of service and privacy policy"),
   intro: t(
-    "เงื่อนไขการใช้เว็บไซต์นี้ และวิธีที่เราดูแลข้อมูลส่วนบุคคลของคุณ",
-    "The terms for using this website, and how we look after your personal data.",
+    "เว็บไซต์ truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) หน้านี้คือเงื่อนไขการใช้เว็บไซต์ และวิธีที่เราดูแลข้อมูลส่วนบุคคลของคุณ",
+    "The truegetherth website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online. These are the terms for using it, and how we look after your personal data.",
   ),
   sections: [
     {
@@ -184,8 +184,8 @@ export const termsPage: LegalPage = {
       heading: t("4. ลิขสิทธิ์และทรัพย์สินทางปัญญา", "4. Copyright and intellectual property"),
       paragraphs: [
         t(
-          "เว็บไซต์นี้ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) ซึ่งเป็นพาร์ทเนอร์และตัวแทนจำหน่ายที่ได้รับการแต่งตั้งอย่างเป็นทางการ (Authorized Dealer) ของ True จัดทำขึ้นเพื่อนำเสนอแพ็กเกจและบริการติดตั้ง ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย เนื้อหา ข้อความ รูปภาพ โลโก้ หรือสื่ออื่น ๆ บนเว็บไซต์อาจเป็นทรัพย์สินทางปัญญาที่ได้รับอนุญาตให้ใช้อย่างถูกต้อง ทั้งจากบริษัทเราเอง หรือจาก True และ/หรือพันธมิตรอื่นตามสัญญา ห้ามทำซ้ำ ดัดแปลง หรือเผยแพร่เนื้อหาดังกล่าวไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษรจากเจ้าของสิทธิ์หรือผู้ที่ได้รับสิทธิ์อย่างถูกต้อง",
-          "This website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed partner and Authorized Dealer of True. It presents packages and the installation service; it is not the main website of True Corporation Public Company Limited, and we are not the network operator. Content, text, images, logos and other media on it may be intellectual property licensed to us, whether our own or from True and/or other partners under contract. Do not copy, adapt or publish any of it, in whole or in part, without written permission from the rights holder or an authorised licensee.",
+          "เว็บไซต์นี้ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) ซึ่งเป็นพาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่าย (Authorized Dealer) ของ True จัดทำขึ้นเพื่อนำเสนอแพ็กเกจและบริการติดตั้ง ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย เนื้อหา ข้อความ รูปภาพ โลโก้ หรือสื่ออื่น ๆ บนเว็บไซต์อาจเป็นทรัพย์สินทางปัญญาที่ได้รับอนุญาตให้ใช้อย่างถูกต้อง ทั้งจากบริษัทเราเอง หรือจาก True และ/หรือพันธมิตรอื่นตามสัญญา ห้ามทำซ้ำ ดัดแปลง หรือเผยแพร่เนื้อหาดังกล่าวไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษรจากเจ้าของสิทธิ์หรือผู้ที่ได้รับสิทธิ์อย่างถูกต้อง",
+          "This website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. It presents packages and the installation service; it is not the main website of True Corporation Public Company Limited, and we are not the network operator. Content, text, images, logos and other media on it may be intellectual property licensed to us, whether our own or from True and/or other partners under contract. Do not copy, adapt or publish any of it, in whole or in part, without written permission from the rights holder or an authorised licensee.",
         ),
       ],
       list: [],

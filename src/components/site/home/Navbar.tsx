@@ -20,8 +20,11 @@ export type NavLinkView = {
 
 export type NavGroupView = { id: string; label: string; binding?: string; link?: NavLinkView; children: NavLinkView[] };
 
+/** The partner's badge beside the logo: its own mark and the line under it. */
+export type PartnerView = { logo: { src: string; width: number; height: number; alt: string }; label?: string; binding?: string };
+
 export type NavbarView = {
-  brand: { href: string; name: string; logo: { src: string; width: number; height: number }; binding?: string };
+  brand: { href: string; name: string; logo: { src: string; width: number; height: number }; binding?: string; partner?: PartnerView };
   labels: { menu: string; navigation: string; newTab: string };
   /** Short links beside the menu on wide screens. */
   shortcuts: NavLinkView[];
@@ -31,6 +34,8 @@ export type NavbarView = {
   cta: NavLinkView;
   /** The same page in each language. */
   languages: { locale: string; name: string; href: string; current: boolean; label: string };
+  /** The bar is over the home page's painting (landing.css keeps it clear of the router's mark). */
+  home?: boolean;
 };
 
 function NavAnchor({ link, className, newTab, onClick, children }: { link: NavLinkView; className?: string; newTab: string; onClick?: () => void; children: ReactNode }) {
@@ -132,13 +137,20 @@ function NavPills({ view }: { view: NavbarView }) {
   const { labels } = view;
 
   return (
-    <header className="nav">
+    <header className="nav" data-home={view.home || undefined}>
       <div className="nav-left">
         <Link className="nav-logo" href={view.brand.href} aria-label={view.brand.name} data-edit={view.brand.binding}>
           {/* Said how wide it shows, or the optimizer is asked for a picture as wide as the largest screen. Not asked
               for ahead of the page: the bar fades in, and the first paint is the words' alone. */}
           <Image src={view.brand.logo.src} alt="" width={view.brand.logo.width} height={view.brand.logo.height} sizes="160px" />
         </Link>
+        {/* A pill of its own, so the partner's mark never reads as part of ours; wide screens only (the footer has it on every screen). */}
+        {view.brand.partner ? (
+          <p className="nav-partner" data-edit={view.brand.partner.binding}>
+            <Image src={view.brand.partner.logo.src} alt={view.brand.partner.logo.alt} width={view.brand.partner.logo.width} height={view.brand.partner.logo.height} sizes="96px" />
+            {view.brand.partner.label ? <span>{view.brand.partner.label}</span> : null}
+          </p>
+        ) : null}
         <div className="nav-menu-wrap" ref={wrap}>
           <button type="button" className="nav-menu" aria-expanded={open} aria-controls={panelId} onClick={() => (open ? close() : (setLeaving(false), setOpen(true)))}>
             <span className="nav-menu-dot" data-open={open || undefined}>
