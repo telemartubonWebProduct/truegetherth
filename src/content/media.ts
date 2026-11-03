@@ -39,15 +39,16 @@ export const media = {
   "true-online-logo": asset("/assets/wEnergy/trueonline.png", 744, 117, "brand", "ทรูออนไลน์", "True Online"),
   "line-logo": asset("/assets/IcoSocialMedia/LINE_APP_iOS.png", 1001, 1000, "brand", "LINE", "LINE"),
   "facebook-logo": asset("/assets/IcoSocialMedia/facebook.png", 512, 512, "brand", "Facebook", "Facebook"),
-  "line-qr": asset(
-    // Made from site.contact.lineService and read back (a QR generator, 2026-10-11); make it again if that link changes.
-    "/assets/etc/line-qr-truefiberhome.webp",
-    540,
-    540,
-    "brand",
-    "คิวอาร์โค้ดเพิ่มเพื่อน LINE @truefiberhome",
-    "QR code to add LINE @truefiberhome",
-  ),
+  "line-qr": {
+    // Made from site.contact.lineService (https://lin.ee/Tfnxc7q) with the qrcode package and read back with jsQR, 2026-11-03;
+    // make it again, under a new name, if that link changes.
+    src: "/assets/etc/line-qr-594wrbvr.webp",
+    width: 540,
+    height: 540,
+    kind: "brand",
+    alt: { th: "คิวอาร์โค้ดเพิ่มเพื่อน LINE @594wrbvr", en: "QR code to add LINE @594wrbvr" },
+    source: "สร้างจากลิงก์ LINE ของเพจ True Telemart (https://lin.ee/Tfnxc7q) และอ่านกลับแล้ว 3 พ.ย. 2026",
+  },
 
   // Home internet benefits (icons from the old package cards)
   "icon-wifi-router": asset("/assets/tol-ico/tol-icon-1.png", 106, 106, "product", "เราเตอร์ Wi-Fi", "Wi-Fi router"),

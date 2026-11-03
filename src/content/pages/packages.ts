@@ -22,10 +22,10 @@ export const broadbandNewPage: PackagePage = {
   id: "broadband-new",
   path: "/broadband",
   seo: {
-    title: t("เน็ตบ้านทรูไฟเบอร์ สำหรับลูกค้าใหม่", "True fibre home internet for new customers"),
+    title: t("โปรเน็ตบ้านทรูไฟเบอร์ สำหรับลูกค้าใหม่", "True fibre home internet deals for new customers"),
     description: t(
-      "เทียบแพ็กเกจเน็ตบ้านทรูไฟเบอร์สำหรับลูกค้าใหม่ ความเร็ว 500 Mbps ถึง 1.5 Gbps พร้อมอุปกรณ์และสิทธิประโยชน์ คุยกับเจ้าหน้าที่เพื่อตรวจพื้นที่และสมัคร",
-      "Compare True fibre home internet for new customers, from 500 Mbps to 1.5 Gbps with equipment and benefits. Talk to our team to check your area and apply.",
+      "เทียบโปรเน็ตบ้านทรูไฟเบอร์สำหรับลูกค้าใหม่ ความเร็ว 500 Mbps ถึง 1.5 Gbps พร้อมอุปกรณ์และสิทธิประโยชน์ สมัครกับพาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เจ้าหน้าที่ตรวจพื้นที่และนัดติดตั้งให้",
+      "Compare True fibre home internet deals for new customers, from 500 Mbps to 1.5 Gbps with equipment and benefits. Apply with an appointed Authorized Partner of True Online: we check your area and book the installation.",
     ),
   },
   hero: {
@@ -59,10 +59,10 @@ export const broadbandExistingPage: PackagePage = {
   id: "broadband-existing",
   path: "/broadband-old",
   seo: {
-    title: t("แพ็กเกจเสริมสำหรับลูกค้าทรูออนไลน์ปัจจุบัน", "Add-ons for current True Online customers"),
+    title: t("เพิ่มสปีดเน็ตบ้านทรูออนไลน์ สำหรับลูกค้าปัจจุบัน", "Speed boosts and add-ons for current True Online customers"),
     description: t(
-      "แพ็กเกจเพิ่มสปีด กล้องวงจรปิด และ TrueID TV สำหรับลูกค้าเน็ตบ้านทรูออนไลน์ปัจจุบัน",
-      "Speed boosts, security cameras and TrueID TV for current True Online home internet customers.",
+      "แพ็กเกจเพิ่มสปีด กล้องวงจรปิด และ TrueID TV สำหรับลูกค้าเน็ตบ้านทรูออนไลน์ปัจจุบัน สอบถามและสมัครผ่านเจ้าหน้าที่ทาง LINE หรือโทรศัพท์",
+      "Speed boosts, security cameras and TrueID TV for current True Online home internet customers. Ask and apply through our team on LINE or by phone.",
     ),
   },
   hero: {
@@ -99,10 +99,10 @@ export const mobileMonthlyPage: PackagePage = {
   id: "mobile-monthly",
   path: "/monthy",
   seo: {
-    title: t("แพ็กเสริมมือถือรายเดือน", "Postpaid mobile add-ons"),
+    title: t("แพ็กเสริมทรูรายเดือน", "True postpaid mobile add-ons"),
     description: t(
-      "แพ็กเสริมมือถือรายเดือน ทั้งเน็ตเพิ่มสปีด เน็ตไม่จำกัด โซเชียล โทร ซีรีส์ ความคุ้มครอง เกมและไลฟ์สไตล์",
-      "Postpaid mobile add-ons: speed boosts, unlimited data, social apps, calls, series, cover, games and lifestyle.",
+      "แพ็กเสริมมือถือทรูรายเดือน ทั้งเน็ตเพิ่มสปีด เน็ตไม่จำกัด โซเชียล โทร ซีรีส์ ความคุ้มครอง เกมและไลฟ์สไตล์",
+      "True postpaid mobile add-ons: speed boosts, unlimited data, social apps, calls, series, cover, games and lifestyle.",
     ),
   },
   hero: {
@@ -191,10 +191,10 @@ export const mobilePrepaidPage: PackagePage = {
   id: "mobile-prepaid",
   path: "/topup",
   seo: {
-    title: t("แพ็กเสริมมือถือแบบเติมเงิน", "Prepaid mobile add-ons"),
+    title: t("แพ็กเสริมทรูเติมเงิน", "True prepaid mobile add-ons"),
     description: t(
-      "แพ็กเสริมมือถือแบบเติมเงิน ทั้งเน็ตไม่อั้น เน็ตพร้อมโทร โทรทุกค่าย เกม และประกัน",
-      "Prepaid mobile add-ons: unlimited data, data with calls, calls to all networks, games and insurance.",
+      "แพ็กเสริมมือถือทรูแบบเติมเงิน ทั้งเน็ตไม่อั้น เน็ตพร้อมโทร โทรทุกค่าย เกม และประกัน",
+      "True prepaid mobile add-ons: unlimited data, data with calls, calls to all networks, games and insurance.",
     ),
   },
   hero: {

@@ -131,6 +131,25 @@ test("Google Search Console finds the file that proves who owns the site", async
   expect((await response.text()).trim()).toBe("google-site-verification: googleb1396b0e8315a5c3.html");
 });
 
+test("Bing and the other IndexNow engines find the key that proves who owns the site", async ({ request }) => {
+  // scripts/seo/indexnow.mjs submits the sitemap's addresses with this key; the file's name and its content are the key.
+  const response = await request.get("/78044193b3b9a5759dfd01ac4535ff1e.txt");
+  expect(response.status()).toBe(200);
+  expect((await response.text()).trim()).toBe("78044193b3b9a5759dfd01ac4535ff1e");
+});
+
+test("AI assistants get the site in one file, with every package page in it", async ({ request }) => {
+  const response = await request.get("/llms.txt");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("text/plain");
+  const text = await response.text();
+  expect(text).toContain(content.site.footer.about.th);
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  const packages = [...sitemap.matchAll(/<loc>(https:\/\/[^<]+\/packages\/[^<]+)<\/loc>/g)].map(([, url]) => url).filter((url) => !url.includes("/en/"));
+  expect(packages.length).toBeGreaterThan(10);
+  for (const url of packages) expect(text).toContain(`](${url})`);
+});
+
 test("package buttons open a LINE chat with the sales team", async ({ page }) => {
   await page.goto("/broadband");
   const buttons = page.getByRole("link", { name: /^สนใจแพ็กเกจนี้/ });
