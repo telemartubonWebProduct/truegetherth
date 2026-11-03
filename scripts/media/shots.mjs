@@ -18,15 +18,12 @@ const base = pagesMode ? option("--base", "http://localhost:3200") : (args[0] ??
 const out = path.resolve(pagesMode ? option("--out", "shots") : (args[1] ?? "shots"));
 const route = args[2] ?? "/";
 
-/** [stage, progress through its pinned scroll] */
+/** [stage, progress through its pinned scroll]. The row of packages is not a stage (R12): see the anchors. */
 const moments = [
   ["hero", 0],
   ["hero", 0.5],
   ["manifesto", 0.1],
   ["manifesto", 0.55],
-  ["rail", 0.02],
-  ["rail", 0.5],
-  ["rail", 1],
   ["ticket", 0.04],
   ["ticket", 0.45],
   ["ticket", 0.8],
@@ -35,7 +32,7 @@ const moments = [
   ["season", 0.5],
   ["season", 0.95],
 ];
-const anchors = ["prices", "faq"];
+const anchors = ["packages", "prices", "faq"];
 const screens = [
   { name: "desktop", viewport: { width: 1440, height: 900 } },
   { name: "mobile", viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },

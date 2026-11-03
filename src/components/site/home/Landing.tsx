@@ -29,12 +29,14 @@ const hold = (length: number): Variables => ({ "--len": length });
 const two = (index: number) => String(index + 1).padStart(2, "0");
 
 /**
- * The home page (docs/renovation/R5-LANDING.md): five pinned stages
+ * The home page (docs/renovation/R5-LANDING.md): four pinned stages
  * choreographed by scroll (ScrollDriver writes their progress as CSS custom
- * properties), then a price table and the common questions. Without
- * JavaScript, with reduced motion and in the Mirror editor's preview the same
- * sections lie flat in the page and read top to bottom. Every word, picture
- * and link comes from the content (pages.home, the catalog, site settings).
+ * properties) with the recommended packages between the second and the third,
+ * a section whose row of cards is scrolled sideways on its own (R12), then a
+ * price table and the common questions. Without JavaScript, with reduced
+ * motion and in the Mirror editor's preview the same sections lie flat in the
+ * page and read top to bottom. Every word, picture and link comes from the
+ * content (pages.home, the catalog, site settings).
  */
 export function Landing({ ctx }: { ctx: RenderContext }) {
   const home = ctx.content.pages.home;
@@ -125,56 +127,66 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
         </div>
       </section>
 
-      {/* 3. Recommended packages: scrolling down walks along the open tab's row */}
+      {/* 3. Recommended packages: not pinned; the open tab's row is scrolled sideways on its own, never by scrolling down */}
       {rails.length > 0 ? (
-        <section className="stage stage-rail" id="packages" data-stage="rail" style={hold(340)} aria-labelledby="rail-heading" {...bind("promos")}>
-          <div className="pin">
-            <RailTabs
-              label={ctx.t(promos.heading)}
-              stacked={ctx.edit}
-              head={
-                <>
-                  <p className="label" data-rev="" {...bind("promos", "label")}>
-                    {ctx.t(promos.label)}
-                  </p>
-                  <Words as="h2" id="rail-heading" className="display" text={ctx.t(promos.heading)} locale={ctx.locale} bind={bind("promos", "heading")} />
-                </>
-              }
-              hint={
-                <p className="hint" data-rev="" style={delay(2)} {...bind("promos", "description")}>
-                  {ctx.t(promos.description)}
+        <section className="rail" id="packages" aria-labelledby="rail-heading" {...bind("promos")}>
+          <RailTabs
+            label={ctx.t(promos.heading)}
+            arrows={{ previous: ctx.t(promos.previous), next: ctx.t(promos.next) }}
+            stacked={ctx.edit}
+            head={
+              <>
+                <p className="label" data-rev="" {...bind("promos", "label")}>
+                  {ctx.t(promos.label)}
                 </p>
-              }
-              tabs={rails.map(({ tab }) => ({ id: tab.id, title: ctx.t(tab.title), bind: bind("promos", "tabs", tab.id, "title") }))}
-              more={rails.map(({ tab }) => (
-                <div key={tab.id} className="rail-more-row">
-                  {tab.remark ? (
-                    <p className="note" {...bind("promos", "tabs", tab.id, "remark")}>
-                      {ctx.t(tab.remark)}
-                    </p>
-                  ) : (
-                    <span />
-                  )}
-                  <CtaLink ctx={ctx} cta={tab.viewAll} className="tm-button-small" bind={bind("promos", "tabs", tab.id, "viewAll")} />
-                </div>
-              ))}
-              note={
-                unconfirmed(rails.flatMap((rail) => rail.items)) ? (
-                  <p className="note" data-rev="" {...ctx.bind("site", "ui", "unverifiedNote")}>
-                    {ctx.t(ui.unverifiedNote)}
+                <Words as="h2" id="rail-heading" className="display" text={ctx.t(promos.heading)} locale={ctx.locale} bind={bind("promos", "heading")} />
+              </>
+            }
+            hint={
+              <p className="hint" data-rev="" style={delay(2)} {...bind("promos", "description")}>
+                {ctx.t(promos.description)}
+              </p>
+            }
+            tabs={rails.map(({ tab }) => ({ id: tab.id, title: ctx.t(tab.title), bind: bind("promos", "tabs", tab.id, "title") }))}
+            more={rails.map(({ tab }) => (
+              <div key={tab.id} className="rail-more-row">
+                {tab.remark ? (
+                  <p className="note" {...bind("promos", "tabs", tab.id, "remark")}>
+                    {ctx.t(tab.remark)}
                   </p>
-                ) : null
-              }
-            >
-              {rails.map(({ tab, items }) => (
-                <ul key={tab.id} className="rail-track" role="list" data-rail-track="" aria-label={ctx.t(tab.title)} {...bind("promos", "tabs", tab.id)}>
-                  {items.map((item, index) => (
-                    <PackageCard key={item.id} ctx={ctx} tab={tab} item={item} index={index} />
-                  ))}
-                </ul>
-              ))}
-            </RailTabs>
-          </div>
+                ) : (
+                  <span />
+                )}
+                <CtaLink ctx={ctx} cta={tab.viewAll} className="tm-button-small" bind={bind("promos", "tabs", tab.id, "viewAll")} />
+              </div>
+            ))}
+            note={
+              unconfirmed(rails.flatMap((rail) => rail.items)) ? (
+                <p className="note" data-rev="" {...ctx.bind("site", "ui", "unverifiedNote")}>
+                  {ctx.t(ui.unverifiedNote)}
+                </p>
+              ) : null
+            }
+          >
+            {/* The row rises card by card when it comes into view (landing.css). A sideways trackpad gesture over it is
+                the row's, not the page's: Lenis, which smooths the page's wheel scrolling, leaves those alone. */}
+            {rails.map(({ tab, items }) => (
+              <ul
+                key={tab.id}
+                className="rail-track"
+                role="list"
+                data-rail-track=""
+                data-rev=""
+                data-lenis-prevent-horizontal=""
+                aria-label={ctx.t(tab.title)}
+                {...bind("promos", "tabs", tab.id)}
+              >
+                {items.map((item, index) => (
+                  <PackageCard key={item.id} ctx={ctx} tab={tab} item={item} index={index} />
+                ))}
+              </ul>
+            ))}
+          </RailTabs>
         </section>
       ) : null}
 
@@ -400,13 +412,13 @@ function PackageCard({ ctx, tab, item, index }: { ctx: RenderContext; tab: Tab; 
   const own = (field: string) => ctx.bind(`package:${item.id}`, field);
   const vat = item.price.vat === "excluded" ? ui.vatExcluded : item.price.vat === "included" ? ui.vatIncluded : null;
   return (
-    <li className="card" data-rev="" style={delay(index)} data-package={item.id} {...ctx.bind(`package:${item.id}`)}>
+    <li className="card" style={delay(index)} data-package={item.id} {...ctx.bind(`package:${item.id}`)}>
       <div className="card-plate">
         <Image
           src={image.src}
           alt={ctx.t(image.alt)}
           fill
-          sizes="(min-width: 1270px) 330px, (min-width: 885px) 26vw, 230px"
+          sizes="(min-width: 1440px) calc((100vw - 96px) / 4.25), (min-width: 960px) calc((100vw - 80px) / 3.25), (min-width: 600px) calc((100vw - 64px) / 2.25), calc((100vw - 32px) / 1.25)"
           {...own("image")}
         />
         {speed ? (

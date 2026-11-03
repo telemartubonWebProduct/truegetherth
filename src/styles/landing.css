@@ -2,11 +2,14 @@
    page (docs/renovation/R5-LANDING.md).
    Theme: minimal black and white, floating pills and light type. Red is
    rationed to marks: prices, meters, the live step, printed values. Motion:
-   five pinned stages driven by custom properties that ScrollDriver writes on
-   <html>; this file never knows about JavaScript beyond those values. The
-   choreography applies only under html[data-motion] (scripts running, no
-   reduced-motion request, a screen tall enough); otherwise, and in the Mirror
-   editor's preview, every section lies flat.
+   four pinned stages driven by custom properties that ScrollDriver writes on
+   the elements that read them; this file never knows about JavaScript beyond
+   those values. Between the second and the third, the recommended packages
+   are a section that scrolls by with the page, whose row of cards is scrolled
+   sideways on its own (R12). The choreography applies only under
+   html[data-motion] (scripts running, no reduced-motion request, a screen tall
+   enough); otherwise, and in the Mirror editor's preview, every section lies
+   flat.
    Colours come from the theme (src/styles/tokens.css, site settings > theme):
    the short names below follow the tone of the section they are used in. */
 
@@ -352,12 +355,14 @@ html[data-nav="ink"] .nav-menu-dot {
 }
 
 /* The scroll values. ScrollDriver writes each on the very elements that read
-   it (the row of packages, the slip, the painting's layers), and none is
-   inherited, so a frame of scrolling restyles those few elements and nothing
-   under them. Written on <html>, as they first were, every frame restyled the
-   whole page: 20 ms on a slow phone, more than a frame has. Each starts at
-   what the flat page shows, which is what an element has when nothing is
-   written on it. An element that reads one must be in ScrollDriver's list. */
+   it (the slip, the painting's layers), and none is inherited, so a frame of
+   scrolling restyles those few elements and nothing under them. Written on
+   <html>, as they first were, every frame restyled the whole page: 20 ms on a
+   slow phone, more than a frame has. Each starts at what the flat page shows,
+   which is what an element has when nothing is written on it. An element that
+   reads one must be in ScrollDriver's list. The two of the row of packages
+   (--rail-at, --rail-view) follow the row's own sideways scroll, not the
+   page's: RailTabs writes them on the meter under the row. */
 @property --hero-art-scale {
   syntax: "<number>";
   inherits: false;
@@ -394,7 +399,13 @@ html[data-nav="ink"] .nav-menu-dot {
   initial-value: 1;
 }
 
-@property --rail-meter {
+@property --rail-at {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --rail-view {
   syntax: "<number>";
   inherits: false;
   initial-value: 1;
@@ -437,12 +448,6 @@ html[data-nav="ink"] .nav-menu-dot {
 }
 
 @property --hero-type-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --rail-x {
   syntax: "<length>";
   inherits: false;
   initial-value: 0px;
@@ -493,11 +498,12 @@ html[data-motion] .pin {
    until it comes near the screen: the first paint has little more than the
    opening to lay out, and is on the screen before the page's scripts have
    arrived. A stage's height is set (--len), so nothing moves when it is laid
-   out. The two sections after the stages have no set height: they hold a
-   screen's until they are laid out and keep their own once it is known, which
-   moves what lies under them. So only where the browser keeps the visitor's
-   place when something above the screen grows (Safari does not: there a jump
-   to the questions would land short). Not the contact band and the footer:
+   out. The row of packages and the two sections after the stages have no set
+   height: they hold a screen's until they are laid out and keep their own
+   once it is known, which moves what lies under them. So only where the
+   browser keeps the visitor's place when something above the screen grows
+   (Safari does not: there a jump to the questions would land short). Not the
+   contact band and the footer:
    until such a section is laid out its box is a guess, and an accessibility
    checker that looks for the colour behind words lying beyond the guess finds
    the page's white instead of the footer's ink. And not on the flat page
@@ -507,9 +513,16 @@ html[data-motion] .stage:not(.stage-hero) {
 }
 
 @supports (overflow-anchor: auto) {
+  html[data-motion] .rail,
   html[data-motion] .band {
     content-visibility: auto;
     contain-intrinsic-block-size: auto 100svh;
+  }
+
+  /* Inside its padding, the row of packages is 790 to 910 pixels tall on the
+     screens measured (R12): a closer guess moves less when it is laid out. */
+  html[data-motion] .rail {
+    contain-intrinsic-block-size: auto 840px;
   }
 }
 
@@ -1085,13 +1098,18 @@ html[data-motion] .hero-side {
 
 /* 3. Rail ------------------------------------------------------------------------ */
 
-/* The one column must not grow with the row of cards, or there is nothing to walk along. */
-.stage-rail .pin {
+/* The recommended packages (R12): a section that scrolls by with the page and is
+   never pinned. Scrolling down only ever moves the page. The open tab's row of
+   cards is scrolled sideways on its own: a finger, a trackpad, Shift and the
+   wheel, Tab through its links, or the arrows under it on a wide screen. Its
+   one column must not grow with the row, or the row would widen the page
+   instead of scrolling. */
+.rail {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 20px;
-  padding: 92px 0 24px;
+  padding: clamp(84px, 9vw, 120px) 0 clamp(56px, 7vw, 96px);
   background: var(--pill);
 }
 
@@ -1104,33 +1122,74 @@ html[data-motion] .hero-side {
   padding-inline: var(--pad);
 }
 
+/* The row stops at each card. One card and the start of the next on a phone,
+   two on a tablet, three or four on a desktop: the card that peeks at the edge
+   says that there is more. A swipe past either end goes no further than the
+   row (it does not take the browser back a page).
+   It scrolls sideways only. A box that scrolls on one axis scrolls on the
+   other unless told not to, and with a few pixels to scroll down (a card
+   still rising into place is enough) it took a finger moving up the screen
+   for itself: the page stayed where it was. The room under the cards is for
+   that rise (18px), so nothing is cut off while they come in.
+   It also holds what is positioned in its cards, such as the names kept for
+   screen readers: held by anything further out, they would lie beyond the
+   screen with their cards and widen the page. */
 .rail-track {
+  --cols: 1;
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
   gap: 16px;
-  padding: 0 var(--pad);
+  margin: 0 0 -16px;
+  padding: 4px 0 24px var(--pad);
+  overflow: auto hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--pad);
   list-style: none;
 }
 
-/* Scrolling down walks along the row: it moves by exactly its own overflow. */
-html[data-motion] .rail-track {
-  flex-wrap: nowrap;
-  align-items: stretch;
-  align-self: center;
-  justify-content: flex-start;
-  transform: translateX(var(--rail-x, 0px));
-  will-change: transform;
-}
-
-/* Padding at the end of a scrolled row is not counted in its width; a box with
-   some width is. Gap (16px) + margin + 1px puts the last card one page margin
-   from the edge. */
-html[data-motion] .rail-track::after {
+/* Padding at the end of a row that scrolls is not counted in every browser; a
+   box with some width is. Gap (16px) + margin + 1px puts the last card one page
+   margin from the edge. */
+.rail-track::after {
   content: "";
   flex: 0 0 1px;
   margin-left: calc(var(--pad) - 17px);
+}
+
+.rail-track > .card {
+  flex: 0 0 calc((100% - var(--cols) * 16px) / (var(--cols) + 0.25));
+  scroll-snap-align: start;
+}
+
+@media (min-width: 600px) {
+  .rail-track {
+    --cols: 2;
+  }
+}
+
+@media (min-width: 960px) {
+  .rail-track {
+    --cols: 3;
+  }
+}
+
+@media (min-width: 1440px) {
+  .rail-track {
+    --cols: 4;
+  }
+}
+
+/* Where scripts run, the meter and the arrows say where the row is: the
+   browser's own bar would be a second one. Without them it stays. */
+@media (scripting: enabled) {
+  .rail-track {
+    scrollbar-width: none;
+  }
+
+  .rail-track::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .card {
@@ -1272,8 +1331,88 @@ html[data-motion] .rail-track::after {
   display: block;
   height: 100%;
   background: var(--red);
-  transform: scaleX(var(--rail-meter, 1));
   transform-origin: left;
+}
+
+/* Under the row: the meter, and on a wide screen the arrows at its end. */
+.rail-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rail-bar .meter {
+  flex: 1;
+}
+
+/* Where the row is: the red part is the share of the row in view, at its place
+   along the row. Before RailTabs has measured the row, the bar is whole. */
+.rail-meter span {
+  transform: translateX(calc(var(--rail-at) * (1 - var(--rail-view)) * 100%)) scaleX(var(--rail-view));
+}
+
+/* A phone swipes: the arrows are for a pointer and a keyboard on a wide screen. */
+.rail-arrows {
+  display: none;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .rail-arrows {
+    display: flex;
+  }
+}
+
+.rail-arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* The site's chevron (the buttons' own, larger), leaning the way the row goes. */
+.rail-arrow::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  transform: translateX(-2px) rotate(45deg);
+}
+
+.rail-arrow[data-way="back"]::before {
+  transform: translateX(2px) rotate(-135deg);
+}
+
+.rail-arrow:not([aria-disabled="true"]):hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* At an end of the row: still in the tab order, so focus is not lost there. */
+.rail-arrow[aria-disabled="true"] {
+  border-color: var(--line);
+  color: var(--ink-34);
+  cursor: default;
+}
+
+/* Without scripts every tab's row shows (below), each with the browser's own
+   bar; the meter and the arrows would follow none of them. */
+@media (scripting: none) {
+  .rail-bar {
+    display: none;
+  }
 }
 
 /* 4. The slip ------------------------------------------------------------------- */
@@ -1649,10 +1788,6 @@ html:not([data-motion]) .stage-season .pin {
   justify-content: flex-end;
 }
 
-html:not([data-motion]) .stage-rail .pin {
-  padding-block: 88px 64px;
-}
-
 /* Bands after the stages --------------------------------------------------------- */
 
 .band {
@@ -1878,6 +2013,27 @@ html[data-motion] .cue[data-rev] {
     border-color 0.6s var(--ease);
 }
 
+/* The row of packages rises card by card when the row comes into view, all of
+   it at once: a card that is scrolled in sideways later is already there, not
+   still rising. The row itself stays where it is. */
+html[data-motion] .rail-track[data-rev] {
+  opacity: 1;
+  translate: none;
+}
+
+html[data-motion] .rail-track .card {
+  opacity: 0;
+  translate: 0 18px;
+  transition:
+    opacity 0.8s ease var(--d, 0ms),
+    translate 1s var(--ease) var(--d, 0ms);
+}
+
+html[data-motion] .rail-track.is-in .card {
+  opacity: 1;
+  translate: none;
+}
+
 /* Parts the content system added to the stages ---------------------------------- */
 
 /* The whole menu, in the panel under the Menu pill. */
@@ -1981,14 +2137,23 @@ html[data-motion] .cue[data-rev] {
   color: var(--paper);
 }
 
-/* Tabs of the rail: one row of cards per category. */
+/* Tabs of the rail: one row of cards per category. On a phone they and the hint
+   sit under the heading, right above the row. */
 .rail-controls {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 8px;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .rail-controls {
+    align-items: flex-end;
+    width: auto;
+  }
 }
 
 .rail-tabs {
@@ -2033,8 +2198,8 @@ html[data-motion] .cue[data-rev] {
   color: var(--paper);
 }
 
-/* Like the pinned screen around it, the panel's one column must not grow with
-   the row of cards, or there is nothing to walk along. */
+/* Like the section around it, the panel's one column must not grow with the row
+   of cards, or the row would widen the page instead of scrolling. */
 .rail-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -2063,7 +2228,8 @@ html[data-motion] .cue[data-rev] {
   gap: 8px 24px;
 }
 
-/* Every row at once, each under its title: the Mirror editor, and pages without scripts. */
+/* Every row at once, each under its title: the Mirror editor (pages without
+   scripts below). There every card lies in view, where it can be clicked. */
 .rail-stack {
   display: grid;
   gap: 44px;
@@ -2071,6 +2237,21 @@ html[data-motion] .cue[data-rev] {
 
 .rail-stack .rail-panel-title {
   display: block;
+}
+
+.rail-stack .rail-track {
+  flex-wrap: wrap;
+  padding-right: var(--pad);
+  overflow: visible;
+  scroll-snap-type: none;
+}
+
+.rail-stack .rail-track::after {
+  display: none;
+}
+
+.rail-stack .rail-track > .card {
+  flex-basis: clamp(230px, 26vw, 400px);
 }
 
 .rail-stack .rail-more {
@@ -2116,95 +2297,6 @@ html[data-motion] .cue[data-rev] {
 .card-link:hover,
 .chapter-link:hover {
   text-decoration-color: var(--red);
-}
-
-/* The pinned rail holds the heading, the tabs, a row of cards and the foot on one
-   screen, whatever its height: the row takes the room between the other two,
-   and in each card the picture is what gives way. */
-html[data-motion] .rail-panel {
-  grid-template-rows: minmax(0, 1fr);
-  align-content: stretch;
-  min-height: 0;
-}
-
-html[data-motion] .rail-track {
-  height: min(100%, 560px);
-}
-
-html[data-motion] .card {
-  min-height: 0;
-}
-
-html[data-motion] .card-plate {
-  flex: 1 1 0;
-  min-height: 0;
-  aspect-ratio: auto;
-}
-
-html[data-motion] .card-body {
-  flex: none;
-}
-
-@media (max-height: 800px) {
-  html[data-motion] .stage-rail .pin {
-    gap: 14px;
-    padding: 80px 0 16px;
-  }
-
-  html[data-motion] .stage-rail .display {
-    margin-top: 4px;
-    font-size: clamp(1.75rem, 1rem + 2.6vw, 2.75rem);
-  }
-}
-
-@media (max-width: 767px) {
-  html[data-motion] .stage-rail .pin {
-    gap: 12px;
-    padding: 76px 0 14px;
-  }
-
-  html[data-motion] .stage-rail .hint,
-  html[data-motion] .stage-rail .rail-more-row .note {
-    display: none;
-  }
-
-  html[data-motion] .stage-rail .display {
-    font-size: 1.75rem;
-  }
-
-  html[data-motion] .card-title {
-    min-height: 0;
-  }
-
-  html[data-motion] .rail-controls {
-    align-items: flex-start;
-    width: 100%;
-  }
-}
-
-/* A short phone: the picture has little room left, so the row of benefit
-   pictures goes (the package's own page lists them) and the figure over the
-   picture is set smaller. */
-@media (max-width: 767px) and (max-height: 700px) {
-  html[data-motion] .card-perks {
-    display: none;
-  }
-
-  html[data-motion] .card-plate {
-    min-height: 52px;
-  }
-
-  html[data-motion] .card-plate::after {
-    background: linear-gradient(180deg, rgba(11, 11, 12, 0.3), rgba(11, 11, 12, 0.72));
-  }
-
-  html[data-motion] .card-figure {
-    bottom: 8px;
-  }
-
-  html[data-motion] .card-figure .num {
-    font-size: 24px;
-  }
 }
 
 /* Services: as many chapters as the content has. */

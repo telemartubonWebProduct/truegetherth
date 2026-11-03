@@ -246,6 +246,8 @@ const contextLabels: Record<string, string> = {
   "ui.packageDetails": "ลิงก์ ดูรายละเอียด บนการ์ดโปร",
   "ui.recommended": "ป้าย แนะนำ บนการ์ดของแพ็กเกจที่แนะนำในหน้าแรก",
   "hero.heading": "หัวเรื่อง (ทีละบรรทัด)",
+  "promos.previous": "ปุ่มลูกศร ย้อนกลับ ใต้แถวการ์ด (โปรแกรมอ่านหน้าจอ)",
+  "promos.next": "ปุ่มลูกศร ถัดไป ใต้แถวการ์ด (โปรแกรมอ่านหน้าจอ)",
   "slip.title": "ชื่อบนใบ",
   "slip.service": "บรรทัด บริการ",
   "slip.area": "บรรทัด พื้นที่",

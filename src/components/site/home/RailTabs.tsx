@@ -18,37 +18,81 @@ type RailTabsProps = {
   more: ReactNode[];
   /** The line under everything, such as the note on unconfirmed prices. */
   note: ReactNode;
+  /** Names of the arrows that move the row back and on, for screen readers. */
+  arrows: { previous: string; next: string };
   /** Every row at once, each under its title (the Mirror editor). */
   stacked: boolean;
 };
 
+/** The row of cards in a tab's panel. */
+const rowIn = (panel: HTMLElement | null | undefined) => panel?.querySelector<HTMLElement>("[data-rail-track]") ?? null;
+
 /**
  * The recommended packages of the home page: a tab per category (WAI-ARIA
  * tabs: arrow keys, Home and End move between them) and, in the open tab, a
- * row of cards that the page's scroll walks along. The server renders the
- * first tab open. ScrollDriver measures whichever row is showing, so it is
- * told when the tab changes.
+ * row of cards that is scrolled sideways on its own (docs/renovation/R12-RAIL-SWIPE.md):
+ * a finger, a trackpad, Shift and the wheel, Tab through its links, or the
+ * arrows under it. The page's scroll never moves it. The meter and the arrows
+ * follow the row's own scroll. The server renders the first tab open; another
+ * tab opens at its first card.
  */
-export function RailTabs({ label, head, hint, tabs, children, more, note, stacked }: RailTabsProps) {
+export function RailTabs({ label, head, hint, tabs, children, more, note, arrows, stacked }: RailTabsProps) {
   const base = useId();
   const panels = Children.toArray(children);
   const [active, setActive] = useState(0);
+  const [ends, setEnds] = useState({ start: true, end: false });
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const first = useRef(true);
+  const rows = useRef<(HTMLDivElement | null)[]>([]);
+  const meter = useRef<HTMLSpanElement>(null);
+  const opened = useRef(false);
 
+  // The row lies in a section that is laid out only when it comes near the screen (landing.css), and measuring
+  // the row from afar would lay it out there and then: while the page starts, that is before anything has been
+  // shown. So nothing is measured until the browser says the section is near. Then each frame of the row's own
+  // scroll is measured first and written after, on the meter that reads it.
   useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    window.dispatchEvent(new Event("resize"));
-  }, [active]);
+    const row = rowIn(rows.current[active]);
+    const bar = meter.current;
+    if (stacked || !row || !bar) return;
+    if (opened.current) row.scrollTo({ left: 0, behavior: "auto" });
+    opened.current = true;
 
-  const meter = (
-    <div className="meter" aria-hidden="true">
-      <span />
-    </div>
-  );
+    let near = false;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      if (!near) return;
+      const width = row.clientWidth;
+      const room = row.scrollWidth - width;
+      const left = row.scrollLeft;
+      if (width === 0) return;
+      bar.style.setProperty("--rail-view", (width / (width + Math.max(0, room))).toFixed(4));
+      bar.style.setProperty("--rail-at", (room > 0 ? Math.min(1, Math.max(0, left / room)) : 0).toFixed(4));
+      const start = left <= 1;
+      const end = left >= room - 1;
+      setEnds((was) => (was.start === start && was.end === end ? was : { start, end }));
+    };
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const seen = new IntersectionObserver(
+      ([entry]) => {
+        near ||= entry.isIntersecting;
+        request();
+      },
+      { rootMargin: "50% 0px" },
+    );
+    seen.observe(row.closest("section") ?? row);
+    const resized = new ResizeObserver(request);
+    resized.observe(row);
+    row.addEventListener("scroll", request, { passive: true });
+    return () => {
+      seen.disconnect();
+      resized.disconnect();
+      row.removeEventListener("scroll", request);
+      cancelAnimationFrame(frame);
+    };
+  }, [active, stacked]);
 
   if (stacked) {
     return (
@@ -82,6 +126,21 @@ export function RailTabs({ label, head, hint, tabs, children, more, note, stacke
     buttons.current[next]?.focus();
   };
 
+  /** A page of whole cards on or back: the card that peeks at the edge comes to the start. */
+  const go = (direction: 1 | -1) => {
+    const row = rowIn(rows.current[active]);
+    const cards = row?.querySelectorAll<HTMLElement>(":scope > li");
+    if (!row || !cards || cards.length < 2) return;
+    const step = cards[1].offsetLeft - cards[0].offsetLeft;
+    const gap = step - cards[0].offsetWidth;
+    const room = row.clientWidth - 2 * (parseFloat(getComputedStyle(row).paddingLeft) || 0);
+    const whole = Math.max(1, Math.floor((room + gap) / step));
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    row.scrollBy({ left: direction * whole * step, behavior: calm ? "auto" : "smooth" });
+  };
+
+  const panelId = (index: number) => `${base}-panel-${tabs[index].id}`;
+
   return (
     <>
       <header className="rail-head">
@@ -99,7 +158,7 @@ export function RailTabs({ label, head, hint, tabs, children, more, note, stacke
                   role="tab"
                   id={`${base}-tab-${tab.id}`}
                   aria-selected={index === active}
-                  aria-controls={`${base}-panel-${tab.id}`}
+                  aria-controls={panelId(index)}
                   tabIndex={index === active ? 0 : -1}
                   className="rail-tab"
                   onClick={() => setActive(index)}
@@ -116,8 +175,11 @@ export function RailTabs({ label, head, hint, tabs, children, more, note, stacke
       {panels.map((panel, index) => (
         <div
           key={tabs[index].id}
+          ref={(element) => {
+            rows.current[index] = element;
+          }}
           role={tabs.length > 1 ? "tabpanel" : undefined}
-          id={`${base}-panel-${tabs[index].id}`}
+          id={panelId(index)}
           aria-labelledby={tabs.length > 1 ? `${base}-tab-${tabs[index].id}` : undefined}
           hidden={index !== active}
           className="rail-panel"
@@ -129,7 +191,32 @@ export function RailTabs({ label, head, hint, tabs, children, more, note, stacke
         </div>
       ))}
       <div className="rail-foot">
-        {meter}
+        {/* Where the row is, and on a wide screen the arrows that move it; both follow the open tab's row. */}
+        <div className="rail-bar">
+          <div className="meter rail-meter" aria-hidden="true">
+            <span ref={meter} />
+          </div>
+          <div className="rail-arrows">
+            <button
+              type="button"
+              className="rail-arrow"
+              data-way="back"
+              aria-label={arrows.previous}
+              aria-controls={panelId(active)}
+              aria-disabled={ends.start}
+              onClick={() => (ends.start ? undefined : go(-1))}
+            />
+            <button
+              type="button"
+              className="rail-arrow"
+              data-way="on"
+              aria-label={arrows.next}
+              aria-controls={panelId(active)}
+              aria-disabled={ends.end}
+              onClick={() => (ends.end ? undefined : go(1))}
+            />
+          </div>
+        </div>
         <div className="rail-more">{more[active]}</div>
         {note}
       </div>

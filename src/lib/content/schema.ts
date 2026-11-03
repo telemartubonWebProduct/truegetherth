@@ -437,12 +437,19 @@ export const homePage = z.strictObject({
   }),
   /** One sentence that fills with ink as visitors scroll. */
   manifesto: z.strictObject({ label: localizedText, sentence: localizedText }),
-  /** Recommended packages: one tab per category, and in each a row of picture cards the scroll walks along. */
+  /** Recommended packages: one tab per category, and in each a row of picture cards that is scrolled sideways. */
   promos: z.strictObject({
     label: localizedText,
     heading: localizedText,
     /** Beside the heading, such as how to move along the row. */
     description: localizedText,
+    /**
+     * Names of the arrows under the row (R12), for screen readers. A release
+     * published before the row had arrows gets these words, so every release
+     * and draft of version 10 still reads and the version stays.
+     */
+    previous: localizedText.default({ th: "แพ็กเกจก่อนหน้า", en: "Previous packages" }),
+    next: localizedText.default({ th: "แพ็กเกจถัดไป", en: "Next packages" }),
     tabs: z.array(promoTab).min(1).max(4),
   }),
   /** How it works: four steps that light up in turn, beside a slip that fills itself in. */
