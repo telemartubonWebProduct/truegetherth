@@ -5,11 +5,12 @@ import { t } from "./catalog/helpers";
 
 const page = (path: string, hash?: string): LinkTarget => (hash ? { kind: "page", path, hash } : { kind: "page", path });
 
-// Contact details are the ones the company's other site shows (truefiberhome.com,
-// read 2026-10-11, on the owner's word that this site follows it). That site
-// uses two LINE links: its package buttons open lineSales, and its other
-// buttons, with the LINE ID it shows, open lineService; the QR picture is made
-// from lineService.
+// Contact details are the ones of the Facebook page the business advertises on
+// (True Telemart; owner, 2026-11-03), so a visitor meets the same LINE account
+// on the page, in its chats and here: both LINE links open @594wrbvr, and the
+// QR picture is made from that link (read back 2026-11-03; make it again if
+// the link changes). The phones are the page cover's. They were the company's
+// other site's (truefiberhome.com) from 2026-10-11 until then.
 export const site: SiteSettings = {
   brand: {
     name: t("truegetherth", "truegetherth"),
@@ -21,16 +22,16 @@ export const site: SiteSettings = {
     partnerLabel: t("Authorized Partner by Telemart", "Authorized Partner by Telemart"),
   },
   contact: {
-    lineSales: "https://lin.ee/vWV2aFT",
-    lineService: "https://lin.ee/V4hnwC4",
-    lineId: "@truefiberhome",
+    lineSales: "https://lin.ee/Tfnxc7q",
+    lineService: "https://lin.ee/Tfnxc7q",
+    lineId: "@594wrbvr",
     lineQr: "line-qr",
     phones: [
       { number: "0639274977", label: t("เจ้าหน้าที่", "Our team") },
       { number: "0639234798", label: t("เจ้าหน้าที่", "Our team") },
     ],
     email: "telemartcommu@gmail.com",
-    facebook: "https://www.facebook.com/profile.php?id=61558200500505",
+    facebook: "https://www.facebook.com/profile.php?id=61571963492436",
     // The head office, its map and the hours are as the company's other site states them (truefiberhome.com, read 2026-10-11).
     office: t("สำนักงานใหญ่ จังหวัดอุบลราชธานี", "Head office in Ubon Ratchathani"),
     mapUrl: "https://maps.app.goo.gl/rHnXppgYGqKn9aD97",
