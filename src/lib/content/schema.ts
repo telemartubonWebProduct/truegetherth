@@ -312,7 +312,15 @@ const navItem = z.strictObject({
 });
 
 export const siteSettings = z.strictObject({
-  brand: z.strictObject({ name: localizedText, legalName: localizedText, logo: mediaRef }),
+  brand: z.strictObject({
+    name: localizedText,
+    legalName: localizedText,
+    logo: mediaRef,
+    /** The partner's own mark, beside the logo and in the footer; no badge without it. */
+    partnerLogo: mediaRef.optional(),
+    /** The line under that mark. */
+    partnerLabel: localizedText.optional(),
+  }),
   contact: z.strictObject({
     lineSales: httpsUrl,
     lineService: httpsUrl,

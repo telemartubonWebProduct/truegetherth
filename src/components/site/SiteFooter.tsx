@@ -12,6 +12,7 @@ export function SiteFooter({ ctx, path }: { ctx: RenderContext; path: string }) 
   const { site } = ctx;
   const { ui, contact } = site;
   const qr = ctx.media(contact.lineQr);
+  const partner = site.brand.partnerLogo ? ctx.media(site.brand.partnerLogo) : null;
   const year = new Date().getFullYear();
 
   return (
@@ -24,6 +25,17 @@ export function SiteFooter({ ctx, path }: { ctx: RenderContext; path: string }) 
           <p className="mt-3 max-w-[22rem] text-tm-small text-tm-on-ink-muted" {...ctx.bind("site", "footer", "about")}>
             {ctx.t(site.footer.about)}
           </p>
+          {/* The partner's badge, under the statement it stands for; on white, which the partner's colours need. */}
+          {partner ? (
+            <p className="mt-5 inline-flex flex-col items-start gap-2 rounded-tm-control bg-tm-canvas px-4 py-3 text-tm-ink">
+              <Image src={partner.src} width={partner.width} height={partner.height} alt={ctx.t(partner.alt)} sizes="160px" className="h-5 w-auto" {...ctx.bind("site", "brand", "partnerLogo")} />
+              {site.brand.partnerLabel ? (
+                <span className="text-tm-caption font-medium" {...ctx.bind("site", "brand", "partnerLabel")}>
+                  {ctx.t(site.brand.partnerLabel)}
+                </span>
+              ) : null}
+            </p>
+          ) : null}
         </div>
 
         {site.footer.groups.map((group) => (

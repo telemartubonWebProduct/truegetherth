@@ -5,28 +5,33 @@ import { t } from "./catalog/helpers";
 
 const page = (path: string, hash?: string): LinkTarget => (hash ? { kind: "page", path, hash } : { kind: "page", path });
 
-// Contact details are the ones the company's other site shows (truefiberhome.com,
-// read 2026-10-11, on the owner's word that this site follows it). That site
-// uses two LINE links: its package buttons open lineSales, and its other
-// buttons, with the LINE ID it shows, open lineService; the QR picture is made
-// from lineService.
+// Contact details are the ones of the Facebook page the business advertises on
+// (True Telemart; owner, 2026-11-03), so a visitor meets the same LINE account
+// on the page, in its chats and here: both LINE links open @594wrbvr, and the
+// QR picture is made from that link (read back 2026-11-03; make it again if
+// the link changes). The phones are the page cover's. They were the company's
+// other site's (truefiberhome.com) from 2026-10-11 until then.
 export const site: SiteSettings = {
   brand: {
     name: t("truegetherth", "truegetherth"),
     legalName: t("บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด", "Telemart Communication Co., Ltd."),
     logo: "truegetherth-logo",
+    // The badge beside the logo and in the footer (owner, 2026-11-03): True Online's own mark, the owner's file and never
+    // a drawn one, and the line under it in the owner's words. It stays apart from the site's logo, which is our own mark.
+    partnerLogo: "true-online-logo",
+    partnerLabel: t("Authorized Partner by Telemart", "Authorized Partner by Telemart"),
   },
   contact: {
-    lineSales: "https://lin.ee/vWV2aFT",
-    lineService: "https://lin.ee/V4hnwC4",
-    lineId: "@truefiberhome",
+    lineSales: "https://lin.ee/Tfnxc7q",
+    lineService: "https://lin.ee/Tfnxc7q",
+    lineId: "@594wrbvr",
     lineQr: "line-qr",
     phones: [
       { number: "0639274977", label: t("เจ้าหน้าที่", "Our team") },
       { number: "0639234798", label: t("เจ้าหน้าที่", "Our team") },
     ],
     email: "telemartcommu@gmail.com",
-    facebook: "https://www.facebook.com/profile.php?id=61558200500505",
+    facebook: "https://www.facebook.com/profile.php?id=61571963492436",
     // The head office, its map and the hours are as the company's other site states them (truefiberhome.com, read 2026-10-11).
     office: t("สำนักงานใหญ่ จังหวัดอุบลราชธานี", "Head office in Ubon Ratchathani"),
     mapUrl: "https://maps.app.goo.gl/rHnXppgYGqKn9aD97",
@@ -60,10 +65,11 @@ export const site: SiteSettings = {
     style: "primary",
   },
   footer: {
-    // Who runs the site, as the owner states it (2026-10-11) and as the company's other site words it: an appointed dealer and partner, not True itself.
+    // Who runs the site, as the owner states it (2026-10-11; "a partner of True Online", 2026-11-03) and as the company's
+    // other site words it: an appointed partner and dealer, not True itself.
     about: t(
-      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์และตัวแทนจำหน่ายที่ได้รับการแต่งตั้งอย่างเป็นทางการ (Authorized Dealer) ของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เว็บไซต์นี้ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย",
-      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed partner and Authorized Dealer of True. We take applications for True home internet and arrange installation, wherever you are in Thailand. This is not the main website of True Corporation Public Company Limited, and we are not the network operator.",
+      "truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่าย (Authorized Dealer) ของทรู รับสมัครและประสานงานติดตั้งเน็ตบ้านทรูจากทุกจังหวัด เว็บไซต์นี้ไม่ใช่เว็บไซต์หลักของบริษัท ทรู คอร์ปอเรชั่น จำกัด (มหาชน) และเราไม่ใช่ผู้ให้บริการเครือข่าย",
+      "truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. We take applications for True home internet and arrange installation, wherever you are in Thailand. This is not the main website of True Corporation Public Company Limited, and we are not the network operator.",
     ),
     groups: [
       {

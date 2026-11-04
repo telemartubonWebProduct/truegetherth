@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "test-results/**",
     "supabase/.temp/**",
     "src/lib/supabase/database.types.ts",
+    // Worktrees of other branches that Claude sessions make inside the checkout.
+    ".claude/**",
   ]),
 ]);
 

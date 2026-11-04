@@ -131,6 +131,37 @@
   height: 18px;
 }
 
+/* The partner's badge: its own mark over the line that says whose partner we
+   are. A pill of its own beside the logo on wide screens; a phone's bar has no
+   room for it, and the footer carries it on every screen. Its picture is lazy
+   and a hidden one is never fetched, so a phone does not download it. */
+.nav-partner {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  color: var(--tm-solid-ink);
+}
+
+.nav-partner img {
+  width: auto;
+  height: 13px;
+}
+
+.nav-partner span {
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
 .nav-menu-wrap {
   position: relative;
 }
@@ -340,7 +371,8 @@ html[data-nav="ink"] .nav-menu-dot {
     height: 32px;
   }
 
-  .nav-tags {
+  .nav-tags,
+  .nav-partner {
     display: inline-flex;
   }
 
@@ -351,6 +383,23 @@ html[data-nav="ink"] .nav-menu-dot {
     padding-right: 14px;
     overflow: visible;
     clip-path: none;
+  }
+}
+
+/* An upright tablet's bar has room for the partner's badge or the short
+   links, not both: the links are the menu's own, so they give way. Over the
+   home page's painting they give way up to 1536px too: on a wide, short
+   screen the router with True Online's mark stands near the top, around the
+   middle, where the badge would push them (1280x720 measured 2026-11-03). */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .nav-left:has(.nav-partner) .nav-tags {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1535.98px) {
+  .nav[data-home] .nav-left:has(.nav-partner) .nav-tags {
+    display: none;
   }
 }
 

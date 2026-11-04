@@ -84,6 +84,8 @@ const labels: Record<string, string> = {
   brand: "แบรนด์",
   legalName: "ชื่อนิติบุคคล",
   logo: "โลโก้",
+  partnerLogo: "โลโก้พาร์ทเนอร์ (ข้างโลโก้และท้ายเว็บ)",
+  partnerLabel: "ข้อความใต้โลโก้พาร์ทเนอร์",
   contact: "ช่องทางติดต่อ",
   lineSales: "ลิงก์ LINE ฝ่ายขาย",
   lineService: "ลิงก์ LINE ฝ่ายบริการ",
