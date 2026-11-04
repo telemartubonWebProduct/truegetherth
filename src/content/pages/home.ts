@@ -59,7 +59,10 @@ export const home: HomePage = {
   promos: {
     label: t("แพ็กเกจที่เราแนะนำ", "Packages we recommend"),
     heading: t("โปรแนะนำ", "Recommended packages"),
-    description: t("เลือกหมวด แล้วเลื่อนลงเพื่อดูแพ็กเกจถัดไป", "Pick a category, then keep scrolling to walk along the row"),
+    // The row is scrolled sideways, not by scrolling down (owner, 2026-11-03: first-time visitors were confused).
+    description: t("เลือกหมวด แล้วเลื่อนซ้าย–ขวาเพื่อดูแพ็กเกจอื่น", "Pick a category, then scroll sideways for more packages"),
+    previous: t("แพ็กเกจก่อนหน้า", "Previous packages"),
+    next: t("แพ็กเกจถัดไป", "Next packages"),
     // Each tab shows the packages recommended in the catalog (src/content/catalog/featured.ts, then the
     // back office) that belong to its categories; the cards show price, terms and picture as the catalog has them.
     tabs: [

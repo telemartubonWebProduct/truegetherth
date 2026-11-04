@@ -8,14 +8,15 @@ import "lenis/dist/lenis.css";
 // The page's one scroll handler. Every pinned stage is choreographed in CSS
 // from custom properties; this component only measures how far each stage has
 // scrolled and writes those numbers. Text in the DOM changes only when a stage
-// moves to another phase, never per frame.
+// moves to another phase, never per frame. The row of recommended packages is
+// not a stage: it is scrolled sideways on its own, and RailTabs follows it (R12).
 //
 // Each number is written on the very elements that read it (READERS below),
 // and only when it has changed; landing.css registers them as properties that
 // are not inherited. They used to go on <html>: a custom property is inherited,
 // so every frame of scrolling made the browser work out the styles of the whole
 // page again (20 ms a frame on a slow phone, more than a frame has), and the
-// row of packages stuttered under the finger.
+// page stuttered under the finger.
 //
 // Mouse wheels scroll in steps, which would make scroll-driven motion jerk, so
 // Lenis eases the scroll position itself (touch screens keep native scrolling).
@@ -29,7 +30,7 @@ import "lenis/dist/lenis.css";
 
 type SlipPhase = { status: string; values: string[] };
 
-/** Which elements of its stage read each scroll value (landing.css). The rail's row is the open tab's, found as it changes. */
+/** Which elements of its stage read each scroll value (landing.css). */
 const READERS: Record<string, string> = {
   "--hero-art-radius": ".hero-art-inner",
   "--hero-art-scale": ".hero-art",
@@ -40,7 +41,6 @@ const READERS: Record<string, string> = {
   "--hero-type-alpha": ".hero-type",
   "--manifesto-wipe": ".manifesto-fill",
   "--manifesto-scale": ".manifesto-line",
-  "--rail-meter": ".meter span",
   "--packet-alpha": ".slip",
   "--packet-enter": ".slip",
   "--packet-scale": ".slip",
@@ -84,11 +84,10 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     const stage = (name: string) => document.querySelector<HTMLElement>(`[data-stage="${name}"]`);
     const hero = stage("hero");
     const manifesto = stage("manifesto");
-    const rail = stage("rail");
     const ticket = stage("ticket");
     const season = stage("season");
-    // A property's name says whose it is: --rail-x is the rail's, --packet-cut the slip's stage's.
-    const owners: Record<string, HTMLElement | null> = { hero, manifesto, rail, packet: ticket, season };
+    // A property's name says whose it is: --manifesto-wipe is the manifesto's, --packet-cut the slip's stage's.
+    const owners: Record<string, HTMLElement | null> = { hero, manifesto, packet: ticket, season };
     const written = new Map<HTMLElement, Map<string, string>>();
     const put = (element: HTMLElement | null, name: string, value: string) => {
       if (!element) return;
@@ -104,8 +103,6 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       readers.set(name, Array.from(owner?.querySelectorAll<HTMLElement>(selector) ?? []));
     }
     const set = (name: string, value: string) => readers.get(name)?.forEach((element) => put(element, name, value));
-    // The row of the open tab; RailTabs sends a resize when another tab opens.
-    const railTrack = () => rail?.querySelector<HTMLElement>("[data-rail-panel]:not([hidden]) [data-rail-track]") ?? null;
     const cues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-cue]") ?? []);
     const slipStatus = ticket?.querySelector<HTMLElement>("[data-slip-status]");
     const slipValues = Array.from(ticket?.querySelectorAll<HTMLElement>("[data-slip-value]") ?? []);
@@ -116,8 +113,6 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     const motion = root.hasAttribute("data-motion");
 
     let frame = 0;
-    let railOverflow = 0;
-    let railMeasured = false;
     let phase = -1;
     let chapter = -1;
     let heroAway = false;
@@ -153,30 +148,17 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       chapters.forEach((item, index) => item.toggleAttribute("data-active", index === next));
     };
 
-    // The row's stage is laid out only when it comes near the screen (landing.css), and measuring the row from
-    // afar would lay the stage out there and then: while the page starts, that is before anything has been shown.
-    // So it is measured once its stage is within two screens; the observer below says when the row gets its size.
-    const measure = () => {
-      railMeasured = false;
-      if (!rail || rail.getBoundingClientRect().top > window.innerHeight * 2) return;
-      const track = railTrack();
-      railOverflow = track ? Math.max(0, track.scrollWidth - track.clientWidth) : 0;
-      railMeasured = true;
-    };
-
     const update = () => {
       frame = 0;
       if (!motion) return;
 
       // Everything is measured first and written after: a measurement that follows a write makes the browser
-      // work the whole page's styles out again there and then, five times a frame.
+      // work the whole page's styles out again there and then, four times a frame.
       const away = hero ? hero.getBoundingClientRect().bottom <= 0 : false;
       const h = progress(hero);
       const m = progress(manifesto);
-      const r = progress(rail);
       const t = progress(ticket);
       const s = progress(season);
-      if (!railMeasured && r > 0) measure();
 
       // 1. Hero: the lockup lifts, shrinks and fades on three separate curves; the picture draws back into a frame.
       //    Once it has left the screen, its own animations rest (landing.css pauses them on this flag).
@@ -196,10 +178,7 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       set("--manifesto-wipe", `${(span(m, 0.06, 0.88) * 100).toFixed(2)}%`);
       set("--manifesto-scale", (1 + 0.05 * m).toFixed(4));
 
-      // 3. Rail: scrolling down walks along the row, by exactly its overflow.
-      const along = easeInOut(span(r, 0.08, 0.94));
-      put(railTrack(), "--rail-x", `${(-along * railOverflow).toFixed(1)}px`);
-      set("--rail-meter", along.toFixed(4));
+      // 3. The row of packages is not a stage (R12): the page's scroll never moves it.
 
       // 4. Slip: arrives, fills in step by step, then tears along its perforation.
       set("--packet-alpha", span(t, 0, 0.12).toFixed(3));
@@ -219,10 +198,6 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     const request = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    const onResize = () => {
-      measure();
-      request();
-    };
 
     // Everything that rises into place does so once, when it first comes into view.
     const reveal = new IntersectionObserver(
@@ -237,25 +212,21 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     );
     document.querySelectorAll("[data-rev], [data-words]").forEach((element) => reveal.observe(element));
 
-    // What can wait for the first paint: Lenis, and the row's overflow (the row lies in a stage that is not laid
-    // out until it is near, so measuring it now would lay that stage out before anything has been shown). A
-    // frame is on the screen a little after it is made: a short while after the first one, not the next task.
+    // What can wait for the first paint: Lenis. A frame is on the screen a little after it is made: a short
+    // while after the first one, not the next task.
     let lenis: Lenis | null = null;
     let over = false;
     let later = 0;
     const painted = requestAnimationFrame(() => {
       later = window.setTimeout(() => {
-        onResize();
         if (!motion) return;
         void import("lenis").then(({ default: Smooth }) => {
           if (!over) lenis = new Smooth({ autoRaf: true, anchors: true, lerp: 0.11 });
         });
       }, 250);
     });
-    const resized = new ResizeObserver(onResize);
-    rail?.querySelectorAll("[data-rail-track]").forEach((track) => resized.observe(track));
     window.addEventListener("scroll", request, { passive: true });
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", request);
     update();
     root.setAttribute("data-ready", "");
 
@@ -275,9 +246,8 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
       chapters.forEach((item) => item.removeAttribute("data-active"));
       lenis?.destroy();
       reveal.disconnect();
-      resized.disconnect();
       window.removeEventListener("scroll", request);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", request);
     };
   }, [mode]);
 

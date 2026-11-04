@@ -50,4 +50,13 @@ describe("publishing drafts (M4)", () => {
     broken.catalog[0].benefits.push("no-such-benefit");
     expect(usableRelease({ number: 1, schemaVersion: CONTENT_SCHEMA_VERSION, content: broken })).toBeNull();
   });
+
+  it("still shows a release published before the row of packages had arrows, with the arrows' default names (R12)", () => {
+    const earlier = structuredClone(content) as unknown as { pages: { home: { promos: Record<string, unknown> } } };
+    delete earlier.pages.home.promos.previous;
+    delete earlier.pages.home.promos.next;
+    const shown = usableRelease({ number: 1, schemaVersion: CONTENT_SCHEMA_VERSION, content: earlier });
+    expect(shown?.pages.home.promos.previous).toEqual({ th: "แพ็กเกจก่อนหน้า", en: "Previous packages" });
+    expect(shown?.pages.home.promos.next).toEqual({ th: "แพ็กเกจถัดไป", en: "Next packages" });
+  });
 });
