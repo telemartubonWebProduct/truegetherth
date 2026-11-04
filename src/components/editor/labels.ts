@@ -154,7 +154,7 @@ const labels: Record<string, string> = {
   integrations: "การเชื่อมต่อ (Google Ads, แชต)",
   googleAdsId: "Google Ads ID ของแท็ก",
   ga4MeasurementId: "Google Analytics 4 (Measurement ID)",
-  googleAdsLeadConversion: "Google Ads conversion เมื่อลูกค้าส่งฟอร์มหรือกดติดต่อ (send_to)",
+  googleAdsLeadConversion: "Google Ads conversion เมื่อบันทึกฟอร์มขอให้โทรกลับสำเร็จ (send_to)",
   source: "ที่มาของข้อมูล",
   category: "หมวดสินค้า",
   group: "กลุ่ม",
