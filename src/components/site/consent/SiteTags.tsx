@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { CONSENT_CHANGE_EVENT, readConsent, type ConsentChoice, type StoredConsent } from "@/lib/analytics/consent";
 import { contactEventFor } from "@/lib/analytics/contact-channel";
 import { applyMetaPixel, trackMetaEvent } from "@/lib/analytics/meta";
-import { applyGoogleTags, trackEvent, trackLeadConversion } from "@/lib/analytics/tags";
+import { applyGoogleTags, trackEvent } from "@/lib/analytics/tags";
 
 type SiteTagsProps = {
   googleAdsId: string;
@@ -21,8 +21,8 @@ type SiteTagsProps = {
  * Loads the third-party tags the visitor agreed to, now and whenever they
  * agree to more, and reports clicks on LINE, phone, email and Facebook links
  * to GA4 as separate events (with the link's stable CTA id, no personal data).
- * A click on LINE or a phone number is also the Google Ads conversion and
- * Meta's Contact: the visitor is asking to be contacted.
+ * A click on LINE or a phone number is also tracked as
+ * Meta's Contact.
  */
 export function SiteTags({ googleAdsId, ga4MeasurementId, adsLeadConversion, metaPixelId, productionHost, policyVersion }: SiteTagsProps) {
   useEffect(() => {
@@ -44,7 +44,6 @@ export function SiteTags({ googleAdsId, ga4MeasurementId, adsLeadConversion, met
       if (!anchor || !name) return;
       trackEvent(name, { cta_id: anchor.dataset.cta ?? "none", page_path: location.pathname });
       if (name === "contact_line" || name === "contact_phone") {
-        trackLeadConversion();
         trackMetaEvent("Contact", { content_name: anchor.dataset.cta ?? "none", contact_method: name.replace("contact_", "") });
       }
     };

@@ -266,9 +266,9 @@ export const site: SiteSettings = {
   },
   theme: defaultTheme,
   integrations: {
-    googleAdsId: "AW-18007307609",
+    googleAdsId: "AW-18554992380",
     // The owner's GA4 property (web stream tag sent 2 Oct 2026).
     ga4MeasurementId: "G-DQGCC5J4YM",
-    googleAdsLeadConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
+    googleAdsLeadConversion: "AW-18554992380/fP08CPmR4bEdEPzt2o9F",
   },
 };

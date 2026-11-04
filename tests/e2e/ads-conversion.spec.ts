@@ -6,17 +6,14 @@ import { siteUrl } from "@/lib/seo/metadata";
 import { consentState, everything, necessaryOnly } from "./support/consent";
 import { blockThirdParty, serveAt, settle } from "./support/network";
 
-// A Google Ads conversion is a visitor asking to be contacted: a click on LINE
-// or on a phone number (here), or a sent call-back form (leads.spec.ts, which
-// needs the local database). Opening a page is not one. It counts on the
-// production domain only, and only after the visitor agreed to advertising
+// Only a successful call-back form submission (leads.spec.ts) is a Google Ads conversion. The tag runs on the production domain only, and only after the visitor agreed to advertising
 // cookies (consent.spec.ts covers refusing); previews and development
 // machines report none. The server under test is served at the production
 // origin, and requests to Google are blocked, so the calls are read from the
 // tag's queue (window.dataLayer) that gtag.js sends.
 // The editor and its preview are covered in admin-editor.spec.ts.
 
-const { googleAdsId, googleAdsLeadConversion } = content.site.integrations;
+const { googleAdsId } = content.site.integrations;
 const production = siteUrl().origin;
 
 test.use({ storageState: consentState(everything) });
@@ -68,21 +65,21 @@ for (const path of ["/", "/en", "/broadband"]) {
   });
 }
 
-test("a click on LINE or on a phone number is one conversion each, after the tag is configured", async ({ page }) => {
+test("contact clicks are Analytics events without a form conversion", async ({ page }) => {
   await page.goto(`${production}/broadband`);
   await tagConfigured(page);
 
   await clickContact(page, "footer-line");
-  expect(await conversions(page)).toEqual([["event", "conversion", { send_to: googleAdsLeadConversion }]]);
+  expect(await conversions(page)).toEqual([]);
   await clickContact(page, "footer-call");
-  expect(await conversions(page)).toHaveLength(2);
+  expect(await conversions(page)).toEqual([]);
 
   // E-mail and Facebook are contact events in Analytics, but not conversions.
   await clickContact(page, "footer-email");
   await clickContact(page, "footer-facebook");
-  expect(await conversions(page)).toHaveLength(2);
+  expect(await conversions(page)).toEqual([]);
   const events = (await gtagCalls(page)).filter(([command]) => command === "event").map(([, name]) => name);
-  expect(events).toEqual(["contact_line", "conversion", "contact_phone", "conversion", "contact_email", "contact_facebook"]);
+  expect(events).toEqual(["contact_line", "contact_phone", "contact_email", "contact_facebook"]);
 });
 
 test("elsewhere, such as a preview deployment, a click reports none", async ({ page }) => {

@@ -330,7 +330,7 @@ test("the lead conversion is edited in the site settings, only for the site's ow
   await openEditor(page);
   await page.getByRole("button", { name: "ตั้งค่าทั้งเว็บ" }).click();
   await page.getByRole("button", { name: /การเชื่อมต่อ/ }).click();
-  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อลูกค้าส่งฟอร์มหรือกดติดต่อ (send_to)" });
+  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อบันทึกฟอร์มขอให้โทรกลับสำเร็จ (send_to)" });
   await expect(field).toHaveValue(googleAdsLeadConversion);
   // The tag stays fixed.
   await expect(page.getByRole("textbox", { name: /Google Ads ID/ })).toHaveCount(0);
