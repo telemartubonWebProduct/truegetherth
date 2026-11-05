@@ -32,6 +32,10 @@ The stub holds the LINE button, a call-back link with the package already select
 
 At 390 × 844, after choosing necessary cookies, the first card starts at 427 px instead of 1,019 px. The first price, VAT label and review note fit in the viewport. [Before](images/broadband-mobile-before.png) · [After](images/broadband-mobile-after.png).
 
+### Returning from package details (5 November 2026)
+
+The comparison selection belongs to the listing's browser history entry. Following a detail link and pressing Back restores the selected packages, in both languages. Clearing the selection also updates that entry. Packages removed from the current listing are excluded on restore, duplicates are removed, and the three-package limit still applies. No selection is read during server rendering.
+
 ## 3. The home page: the picture plate (B)
 
 `PackageCard` in `Landing.tsx`, styles in `src/styles/landing.css`.
