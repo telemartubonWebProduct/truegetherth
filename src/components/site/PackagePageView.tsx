@@ -12,6 +12,7 @@ import { PageShell } from "./PageShell";
 export function PackagePageView({ ctx, page }: { ctx: RenderContext; page: PackagePage }) {
   const items = page.sections.flatMap((section) => section.groups.flatMap((group) => ctx.packages(group.category, group.group)));
   const unique = items.filter((item, index) => items.findIndex((entry) => entry.id === item.id) === index);
+  const broadband = page.id === "broadband-new";
   return (
     <PageShell ctx={ctx} path={page.path}>
       <PageHero
@@ -19,9 +20,10 @@ export function PackagePageView({ ctx, page }: { ctx: RenderContext; page: Packa
         heading={page.hero.heading}
         description={page.hero.description}
         tone={page.hero.tone}
+        compactOnMobile={broadband}
         binds={heroBinds(ctx, `page:${page.id}` as DocumentId, "hero")}
       />
-      <PackageExplorer {...explorerProps(ctx, unique, page.packageCta)}>
+      <PackageExplorer {...explorerProps(ctx, unique, page.packageCta)} collapseOnMobile={broadband}>
         <PackageSections ctx={ctx} page={page} />
       </PackageExplorer>
     </PageShell>

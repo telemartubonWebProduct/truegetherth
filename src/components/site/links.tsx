@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { resolveLink, type ResolvedLink } from "@/lib/content/render";
 import type { Cta, LinkTarget } from "@/lib/content/schema";
+import { localizePath } from "@/lib/i18n/locales";
 
 import type { RenderContext } from "./context";
 
@@ -112,6 +113,20 @@ export function ContactLink({
       {...bind}
     >
       {children}
+    </SmartLink>
+  );
+}
+
+/** Link to the call-back form with the package already selected. */
+export function PackageCallbackLink({ ctx, packageId }: { ctx: RenderContext; packageId: string }) {
+  return (
+    <SmartLink
+      link={{ href: `${localizePath("/service", ctx.locale)}?package=${encodeURIComponent(packageId)}#callback`, external: false }}
+      ctaId={`package-callback-${packageId}`}
+      newTabLabel={ctx.t(ctx.site.ui.opensInNewTab)}
+      className="tm-button tm-button-secondary"
+    >
+      {ctx.t(ctx.site.ui.requestCallback)}
     </SmartLink>
   );
 }
