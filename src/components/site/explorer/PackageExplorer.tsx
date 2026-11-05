@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type LiHTMLAttributes, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type LiHTMLAttributes, type ReactNode } from "react";
 
 import { matches, ranks, type Filters, type PackageFacts, type SortKey } from "@/lib/content/package-facts";
 
@@ -55,6 +55,31 @@ export type ExplorerLabels = {
 };
 
 const MAX_COMPARE = 3;
+const COMPARE_HISTORY_KEY = "truegetherthCompare";
+const COMPARE_CHANGE = "truegetherth:compare";
+
+// Keep the selection on this browser history entry. Next's own state is
+// preserved, and Back restores the listing's selection without a storage read.
+function comparisonSnapshot(): string {
+  const saved: unknown = window.history.state?.[COMPARE_HISTORY_KEY];
+  return typeof saved === "string" ? saved : "";
+}
+
+function subscribeComparison(notify: () => void) {
+  window.addEventListener("popstate", notify);
+  window.addEventListener(COMPARE_CHANGE, notify);
+  return () => {
+    window.removeEventListener("popstate", notify);
+    window.removeEventListener(COMPARE_CHANGE, notify);
+  };
+}
+
+const emptyComparison = () => "";
+
+function saveComparison(ids: string[]) {
+  window.history.replaceState({ ...window.history.state, [COMPARE_HISTORY_KEY]: ids.join("\n") }, "");
+  window.dispatchEvent(new Event(COMPARE_CHANGE));
+}
 
 type ExplorerState = {
   visible: (id: string) => boolean;
@@ -84,7 +109,11 @@ export function PackageExplorer({ facts, speeds, prices, benefits, compare, labe
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>({ speed: null, maxPrice: null, benefit: null });
   const [sort, setSort] = useState<SortKey>("recommended");
-  const [chosen, setChosen] = useState<string[]>([]);
+  const savedChoice = useSyncExternalStore(subscribeComparison, comparisonSnapshot, emptyComparison);
+  const chosen = useMemo(
+    () => [...new Set(savedChoice.split("\n"))].filter((id) => compare.some((entry) => entry.id === id)).slice(0, MAX_COMPARE),
+    [savedChoice, compare],
+  );
   const dialog = useRef<HTMLDialogElement>(null);
 
   const shown = useMemo(() => new Set(facts.filter((entry) => matches(entry, filters)).map((entry) => entry.id)), [facts, filters]);
@@ -97,7 +126,7 @@ export function PackageExplorer({ facts, speeds, prices, benefits, compare, labe
       order: (id) => rank?.get(id),
       chosen,
       toggle: (id) =>
-        setChosen((current) => (current.includes(id) ? current.filter((entry) => entry !== id) : current.length < MAX_COMPARE ? [...current, id] : current)),
+        saveComparison(chosen.includes(id) ? chosen.filter((entry) => entry !== id) : chosen.length < MAX_COMPARE ? [...chosen, id] : chosen),
       labels,
     }),
     [shown, rank, chosen, labels],
@@ -229,7 +258,7 @@ export function PackageExplorer({ facts, speeds, prices, benefits, compare, labe
             <button type="button" className="tm-button tm-button-primary" disabled={chosen.length < 2} onClick={() => dialog.current?.showModal()}>
               {labels.compareOpen}
             </button>
-            <button type="button" className="tm-button tm-button-secondary" onClick={() => setChosen([])}>
+            <button type="button" className="tm-button tm-button-secondary" onClick={() => saveComparison([])}>
               {labels.compareClear}
             </button>
           </div>

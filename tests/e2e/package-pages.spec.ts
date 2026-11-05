@@ -152,6 +152,26 @@ test("two or three packages compare side by side, and no more than three", async
   await expect(page.getByRole("region", { name: ui.compareOpen.th })).toHaveCount(0);
 });
 
+test("comparison choices survive a detail visit and Back in both languages", async ({ page }) => {
+  for (const [prefix, locale] of [["", "th"], ["/en", "en"]] as const) {
+    await page.goto(`${prefix}/broadband`);
+    const pick = (id: string) => page.locator(`[data-package="${id}"]`).getByRole("checkbox");
+    for (const item of broadband.slice(0, 2)) await pick(item.id).check();
+    await page.getByRole("button", { name: ui.compareOpen[locale], exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: ui.compareOpen[locale] });
+    await dialog.getByRole("link", { name: new RegExp(ui.packageDetails[locale]) }).first().click();
+    await expect(page).toHaveURL(`${prefix}${packageDetailPath(broadband[0].id)}`);
+    await page.goBack();
+    for (const item of broadband.slice(0, 2)) await expect(pick(item.id)).toBeChecked();
+    await page.getByRole("button", { name: ui.compareOpen[locale], exact: true }).click();
+    await expect(dialog.getByRole("columnheader")).toHaveText(broadband.slice(0, 2).map((item) => item.name[locale]));
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: ui.compareClear[locale], exact: true }).click();
+    await page.reload();
+    for (const item of broadband.slice(0, 2)) await expect(pick(item.id)).not.toBeChecked();
+  }
+});
+
 test("each package has its own page, in both languages", async ({ page }) => {
   const item = packageById("fiber-1g-799");
   const home = packageHomeIn(content, item)!;
