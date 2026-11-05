@@ -24,6 +24,14 @@ On the home page's cards, where the height is the screen's, the list is `dense`:
 
 Red stays rationed: the price, the meter, the dot.
 
+### New-customer broadband cards (5 November 2026)
+
+On `/broadband` and `/en/broadband`, the speed and package name lead into the price, VAT and the review note for unverified prices. The term follows, then any conditions before the benefit list, so “choose one” is visible before the choices. Cards show the first four entries from `shownBenefits` in catalog order, with their pictures and names. The package detail and comparison still show the full visible list.
+
+The stub holds the LINE button, a call-back link with the package already selected, comparison and details. The phone layout uses a shorter opening and starts with the filter controls collapsed behind “Find a package”. The desktop toolbar stays open. These changes apply only to the new-customer broadband listing. The card leaves out its decorative thumbnail and keeps the benefit pictures.
+
+At 390 × 844, after choosing necessary cookies, the first card starts at 427 px instead of 1,019 px. The first price, VAT label and review note fit in the viewport. [Before](images/broadband-mobile-before.png) · [After](images/broadband-mobile-after.png).
+
 ## 3. The home page: the picture plate (B)
 
 `PackageCard` in `Landing.tsx`, styles in `src/styles/landing.css`.

@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { content, getPackagePage, packageById } from "@/lib/content";
 import { todayInThailand } from "@/lib/content/dates";
 import { detailPackagesIn, packageHomeIn, publicPackagesIn } from "@/lib/content/lookup";
-import { benefitOptions, downloadMbps, packageDetailPath, priceLimits } from "@/lib/content/package-facts";
+import { benefitOptions, downloadMbps, packageDetailPath, priceLimits, shownBenefits } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 
 import { blockThirdParty, settle } from "./support/network";
@@ -40,6 +40,8 @@ test("speed, price and benefit filters leave only matching packages, and clear a
   const status = page.locator("[data-result-count]");
   await expect(status).toHaveText(count(broadband.length, broadband.length));
 
+  const toggle = page.getByRole("button", { name: ui.findPackage.th, exact: true });
+  if (await toggle.isVisible()) await toggle.click();
   await page.getByRole("button", { name: "1 Gbps", exact: true }).click();
   await expect(page.getByRole("button", { name: "1 Gbps", exact: true })).toHaveAttribute("aria-pressed", "true");
   const fast = broadband.filter((item) => downloadMbps(item) === 1000);
@@ -59,7 +61,7 @@ test("speed, price and benefit filters leave only matching packages, and clear a
   await expect.poll(() => visibleCards(page)).toEqual(broadband.filter((item) => item.benefits.includes(benefit)).map((item) => item.id));
 });
 
-test("a card leads with what the package gives, marks the recommended, and shows each benefit with its picture", async ({ page }) => {
+test("a card leads with what the package gives, marks the recommended, and shows its price and key benefits", async ({ page }) => {
   const recommended = broadband.find((item) => content.featured.includes(item.id) && item.benefits.length > 0)!;
   const plain = broadband.find((item) => !content.featured.includes(item.id))!;
   await page.goto("/broadband");
@@ -68,11 +70,18 @@ test("a card leads with what the package gives, marks the recommended, and shows
   await expect(card.locator('[data-row="figure"]')).toContainText(`${formatNumber(speed.download.value, "th")}/${formatNumber(speed.upload.value, "th")}`);
   await expect(card.locator(".tm-slip-mark")).toHaveText(ui.recommended.th);
   await expect(page.locator(`[data-package="${plain.id}"] .tm-slip-mark`)).toHaveCount(0);
-  // The price is on the stub, below everything the package lists.
-  await expect(card.locator('[data-row="stub"]')).toContainText(formatNumber(recommended.price.amount, "th"));
+  await expect(card.locator('[data-row="price"]')).toContainText(formatNumber(recommended.price.amount, "th"));
+  await expect(card.locator('[data-row="price"]')).toContainText(ui.vatExcluded.th);
+  await expect(card.locator('[data-row="price"]')).toContainText(ui.unverifiedNote.th);
+  const rowOrder = await card.locator(":scope > [data-row]").evaluateAll((rows) => rows.map((row) => row.getAttribute("data-row")));
+  expect(rowOrder).toEqual(["figure", "name", "price", "term", "conditions", "benefits", "stub"]);
+  await expect(card.getByRole("link", { name: /^ถามแพ็กนี้ทาง LINE/ })).toHaveAttribute("href", content.site.contact.lineSales);
+  await expect(card.getByRole("link", { name: ui.requestCallback.th })).toHaveAttribute("href", `/service?package=${recommended.id}#callback`);
+  const withMoreBenefits = broadband.find((item) => shownBenefits(item).length > 4)!;
+  await expect(page.locator(`[data-package="${withMoreBenefits.id}"] [data-row="benefits"] li`)).toHaveCount(4);
 
   const benefits = card.locator('[data-row="benefits"] li');
-  await expect(benefits).toHaveText(recommended.benefits.map((id) => content.benefits[id].label.th));
+  await expect(benefits).toHaveText(shownBenefits(recommended).slice(0, 4).map((id) => content.benefits[id].label.th));
   await benefits.last().scrollIntoViewIfNeeded();
   // Every one has its picture, and the picture arrived.
   await expect
@@ -80,8 +89,26 @@ test("a card leads with what the package gives, marks the recommended, and shows
     .toBe(true);
 });
 
+test("at 390 × 844 broadband shows the first price before scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [prefix, locale] of [["", "th"], ["/en", "en"]] as const) {
+    await page.goto(`${prefix}/broadband`);
+    const toggle = page.getByRole("button", { name: ui.findPackage[locale], exact: true });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByLabel(ui.filterPrice[locale])).toBeHidden();
+    const card = page.locator(`[data-package="${broadband[0].id}"]`);
+    await expect(card.locator('[data-row="price"]')).toBeInViewport({ ratio: 1 });
+    await expect(card.getByRole("link", { name: ui.requestCallback[locale] })).toHaveAttribute(
+      "href",
+      `${prefix}/service?package=${broadband[0].id}#callback`,
+    );
+  }
+});
+
 test("sorting reorders the cards on screen", async ({ page }) => {
   await page.goto("/broadband");
+  const toggle = page.getByRole("button", { name: ui.findPackage.th, exact: true });
+  if (await toggle.isVisible()) await toggle.click();
   await page.getByLabel(ui.sortBy.th).selectOption("price-low");
   const cheapestFirst = [...broadband].sort((a, b) => a.price.amount - b.price.amount).map((item) => item.id);
   await expect.poll(() => visibleCards(page)).toEqual(cheapestFirst);

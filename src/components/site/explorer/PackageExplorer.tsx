@@ -76,10 +76,12 @@ type PackageExplorerProps = {
   compare: CompareEntry[];
   labels: ExplorerLabels;
   children: ReactNode;
+  collapseOnMobile?: boolean;
 };
 
-export function PackageExplorer({ facts, speeds, prices, benefits, compare, labels, children }: PackageExplorerProps) {
+export function PackageExplorer({ facts, speeds, prices, benefits, compare, labels, children, collapseOnMobile = false }: PackageExplorerProps) {
   const base = useId();
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>({ speed: null, maxPrice: null, benefit: null });
   const [sort, setSort] = useState<SortKey>("recommended");
   const [chosen, setChosen] = useState<string[]>([]);
@@ -112,11 +114,26 @@ export function PackageExplorer({ facts, speeds, prices, benefits, compare, labe
   return (
     <ExplorerContext.Provider value={state}>
       <section aria-labelledby={`${base}-find`} className="tm-explorer border-b border-tm-line">
-        <div className="tm-container py-6">
-          <h2 id={`${base}-find`} className="text-tm-h4 font-semibold">
+        <div className={`tm-container ${collapseOnMobile ? "py-3 sm:py-6" : "py-6"}`}>
+          <h2 id={`${base}-find`} className={`text-tm-h4 font-semibold ${collapseOnMobile ? "sr-only sm:not-sr-only" : ""}`}>
             {labels.findPackage}
           </h2>
-          <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-4">
+          {collapseOnMobile ? (
+            <button
+              type="button"
+              className="tm-button tm-button-secondary sm:hidden"
+              aria-expanded={filtersOpen}
+              aria-controls={`${base}-filters`}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              {labels.findPackage}
+              <span aria-hidden="true">{filtersOpen ? "−" : "+"}</span>
+            </button>
+          ) : null}
+          <div
+            id={`${base}-filters`}
+            className={`mt-4 flex-wrap items-end gap-x-6 gap-y-4 ${collapseOnMobile && !filtersOpen ? "hidden sm:flex" : "flex"}`}
+          >
             {speeds.length > 0 ? (
               <div role="group" aria-labelledby={`${base}-speed`}>
                 <p id={`${base}-speed`} className="tm-explorer-label">
@@ -182,7 +199,7 @@ export function PackageExplorer({ facts, speeds, prices, benefits, compare, labe
               </select>
             </label>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className={`mt-4 flex-wrap items-center gap-x-4 gap-y-2 ${collapseOnMobile && !filtersOpen && !filtered && sort === "recommended" ? "hidden sm:flex" : "flex"}`}>
             <p className="text-tm-small text-tm-muted" role="status" data-result-count="">
               {fill(labels.resultCount, { shown: shown.size, total: facts.length })}
             </p>

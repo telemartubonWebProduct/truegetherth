@@ -21,20 +21,21 @@ type PageHeroProps = {
   media?: ReactNode;
   /** Small print under the actions, such as the service provider. */
   note?: ReactNode;
+  compactOnMobile?: boolean;
 };
 
 /** Opening block of an interior page: one heading, one paragraph, optional media. */
-export function PageHero({ ctx, heading, description, tone = "canvas", binds = {}, actions, media, note }: PageHeroProps) {
+export function PageHero({ ctx, heading, description, tone = "canvas", binds = {}, actions, media, note, compactOnMobile = false }: PageHeroProps) {
   return (
     <section data-tone={tone} {...binds.section}>
       <div
-        className={`tm-container grid gap-10 pb-10 pt-12 lg:pb-14 lg:pt-20 ${media ? "lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:gap-14" : ""}`}
+        className={`tm-container grid gap-10 lg:pb-14 lg:pt-20 ${compactOnMobile ? "pb-5 pt-5 sm:pb-10 sm:pt-12" : "pb-10 pt-12"} ${media ? "lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:gap-14" : ""}`}
       >
         <div className="max-w-[44rem]">
-          <h1 className="text-balance text-tm-h1 font-semibold lg:text-tm-display" {...binds.heading}>
+          <h1 className={`text-balance font-semibold lg:text-tm-display ${compactOnMobile ? "text-[1.875rem] leading-tight sm:text-tm-h1" : "text-tm-h1"}`} {...binds.heading}>
             {ctx.t(heading)}
           </h1>
-          <p className="mt-4 text-tm-lead text-tm-muted" {...binds.description}>
+          <p className={`text-tm-muted ${compactOnMobile ? "mt-2 text-tm-body sm:mt-4 sm:text-tm-lead" : "mt-4 text-tm-lead"}`} {...binds.description}>
             {ctx.t(description)}
           </p>
           {actions ? <div className="mt-8 flex flex-wrap gap-3">{actions}</div> : null}

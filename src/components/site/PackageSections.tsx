@@ -51,6 +51,7 @@ function JumpNav({ ctx, page }: { ctx: RenderContext; page: PackagePage }) {
 
 export function PackageSections({ ctx, page }: { ctx: RenderContext; page: PackagePage }) {
   const doc = `page:${page.id}` as DocumentId;
+  const broadband = page.id === "broadband-new";
   return (
     <>
       {page.sections.length > 1 ? <JumpNav ctx={ctx} page={page} /> : null}
@@ -59,7 +60,7 @@ export function PackageSections({ ctx, page }: { ctx: RenderContext; page: Packa
           key={section.id}
           id={section.id}
           aria-labelledby={`${section.id}-heading`}
-          className={`py-12 lg:py-16 ${index > 0 ? "border-t border-tm-line" : ""}`}
+          className={`${broadband ? "py-6 sm:py-12" : "py-12"} lg:py-16 ${index > 0 ? "border-t border-tm-line" : ""}`}
           data-tone={section.tone}
           {...ctx.bind(doc, "sections", section.id)}
         >
@@ -72,7 +73,7 @@ export function PackageSections({ ctx, page }: { ctx: RenderContext; page: Packa
                 {ctx.t(section.description)}
               </p>
             ) : null}
-            <div className="mt-8 grid gap-12">
+            <div className={`grid gap-12 ${broadband ? "mt-4 sm:mt-8" : "mt-8"}`}>
               <NoMatches packageIds={section.groups.flatMap((group) => ctx.packages(group.category, group.group).map((item) => item.id))} />
               {section.groups.map((group) => {
                 // A group with no package at all is one just made in the back office: nothing to show yet.
@@ -98,6 +99,7 @@ export function PackageSections({ ctx, page }: { ctx: RenderContext; page: Packa
                           cta={page.packageCta}
                           ctaBind={ctx.bind(doc, "packageCta")}
                           variant={page.layout}
+                          broadband={broadband}
                           headingLevel={group.heading ? 4 : 3}
                         />
                       ) : (

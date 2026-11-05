@@ -152,7 +152,7 @@ test("AI assistants get the site in one file, with every package page in it", as
 
 test("package buttons open a LINE chat with the sales team", async ({ page }) => {
   await page.goto("/broadband");
-  const buttons = page.getByRole("link", { name: /^สนใจแพ็กเกจนี้/ });
+  const buttons = page.getByRole("link", { name: /^ถามแพ็กนี้ทาง LINE/ });
   expect(await buttons.count()).toBeGreaterThan(3);
   const first = buttons.first();
   await expect(first).toHaveAttribute("href", content.site.contact.lineSales);

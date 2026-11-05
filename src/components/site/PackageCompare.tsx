@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/i18n/locales";
 
 import type { RenderContext } from "./context";
 import { ComparePick, ExplorableCard } from "./explorer/PackageExplorer";
-import { CtaLink, TargetLink } from "./links";
+import { CtaLink, PackageCallbackLink, TargetLink } from "./links";
 
 type Speed = NonNullable<CatalogPackage["speed"]>["download"];
 type Binding = { "data-edit"?: string };
@@ -97,6 +97,7 @@ type PackageCompareProps = {
   ctaBind?: Binding;
   /** "compare" is the roomy card; "compact" suits long lists of add-ons. */
   variant: "compare" | "compact";
+  broadband?: boolean;
   /** Level of the package names, one below the heading above the cards. */
   headingLevel?: 3 | 4;
   /** Extra classes on the grid, such as a fixed column count. */
@@ -106,13 +107,13 @@ type PackageCompareProps = {
 /**
  * Package cards as slips (docs/renovation/R8-PROMO-CARDS.md): what the package
  * gives leads, in figures, then its name, its terms and what comes with it,
- * each with its picture; the price is on the stub below the perforation, with
- * the way to ask for it. A card needs no picture of its own. Fields sit in the
+ * each with its picture. On the new-customer broadband cards, the price
+ * follows the name and the stub holds the contact actions. A card needs no picture of its own. Fields sit in the
  * same order and, on wide screens, on the same row lines (CSS subgrid), so
  * speed and price compare at a glance; a row appears only when at least one
  * package in the list has that field.
  */
-export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel = 3, className = "" }: PackageCompareProps) {
+export function PackageCompare({ ctx, items, cta, ctaBind, variant, broadband = false, headingLevel = 3, className = "" }: PackageCompareProps) {
   const { ui } = ctx.site;
   const Heading = headingLevel === 3 ? "h3" : "h4";
   const some = (pick: (item: CatalogPackage) => unknown) =>
@@ -121,6 +122,9 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       return Array.isArray(value) ? value.length > 0 : value !== undefined;
     });
   const compact = variant === "compact";
+  const lineCta = broadband && cta.target.kind === "contact" && cta.target.channel === "line-sales"
+    ? { ...cta, label: { th: "ถามแพ็กนี้ทาง LINE", en: "Ask about this plan on LINE" } }
+    : cta;
   const fixed = (name: string) => () => name;
   const recommended = new Set(ctx.content.featured);
   // The meter under a speed is its share of the fastest in this list.
@@ -165,7 +169,7 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
     key: "name",
     field: fixed("name"),
     cell: (item) => {
-      const image = item.image ? ctx.media(item.image) : null;
+      const image = !broadband && item.image ? ctx.media(item.image) : null;
       return (
         <div className="tm-slip-name">
           <div className="min-w-0">
@@ -182,6 +186,20 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       );
     },
   });
+  if (broadband) {
+    rows.push({
+      key: "price",
+      field: fixed("price"),
+      cell: (item) => (
+        <div className="tm-slip-line">
+          <PriceBlock ctx={ctx} price={item.price} size="large" />
+          {item.review.status === "unverified" ? (
+            <p className="mt-1 text-tm-caption text-tm-muted">{ctx.t(ui.unverifiedNote)}</p>
+          ) : null}
+        </div>
+      ),
+    });
+  }
   if (some((item) => item.contract ?? item.validity)) {
     rows.push({
       key: "term",
@@ -198,6 +216,23 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
       },
     });
   }
+  const conditions: Row = {
+    key: "conditions",
+    field: fixed("conditions"),
+    cell: (item) =>
+      item.conditions.length > 0 ? (
+        <div className="tm-slip-line">
+          <Label>{ctx.t(ui.conditions)}</Label>
+          <ul className="mt-1.5 grid list-disc gap-1 pl-5 text-tm-small text-tm-muted">
+            {item.conditions.map((condition, index) => (
+              <li key={index}>{ctx.t(condition)}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null,
+  };
+  const hasConditions = some((item) => item.conditions);
+  if (broadband && hasConditions) rows.push(conditions);
   if (some((item) => shownBenefits(item))) {
     rows.push({
       key: "benefits",
@@ -206,7 +241,7 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
         shownBenefits(item).length > 0 ? (
           <div className="tm-slip-line">
             <Label>{ctx.t(ui.benefits)}</Label>
-            <BenefitList ctx={ctx} ids={shownBenefits(item)} className="mt-2.5" />
+            <BenefitList ctx={ctx} ids={broadband ? shownBenefits(item).slice(0, 4) : shownBenefits(item)} className="mt-2.5" />
           </div>
         ) : null,
     });
@@ -228,23 +263,7 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
         ) : null,
     });
   }
-  if (some((item) => item.conditions)) {
-    rows.push({
-      key: "conditions",
-      field: fixed("conditions"),
-      cell: (item) =>
-        item.conditions.length > 0 ? (
-          <div className="tm-slip-line">
-            <Label>{ctx.t(ui.conditions)}</Label>
-            <ul className="mt-1.5 grid list-disc gap-1 pl-5 text-tm-small text-tm-muted">
-              {item.conditions.map((condition, index) => (
-                <li key={index}>{ctx.t(condition)}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null,
-    });
-  }
+  if (!broadband && hasConditions) rows.push(conditions);
   if (some((item) => item.dialCode)) {
     rows.push({
       key: "dial",
@@ -265,10 +284,13 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
     field: fixed(""),
     cell: (item) => (
       <div className="tm-slip-stub">
-        <div {...ctx.bind(`package:${item.id}`, "price")}>
-          <PriceBlock ctx={ctx} price={item.price} size={compact ? "medium" : "large"} />
-        </div>
-        <CtaLink ctx={ctx} cta={cta} context={ctx.t(item.name)} className="w-full" bind={ctaBind} />
+        {!broadband ? (
+          <div {...ctx.bind(`package:${item.id}`, "price")}>
+            <PriceBlock ctx={ctx} price={item.price} size={compact ? "medium" : "large"} />
+          </div>
+        ) : null}
+        <CtaLink ctx={ctx} cta={lineCta} context={ctx.t(item.name)} className="w-full" bind={ctaBind} />
+        {broadband ? <PackageCallbackLink ctx={ctx} packageId={item.id} /> : null}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <ComparePick packageId={item.id} name={ctx.t(item.name)} />
           <TargetLink ctx={ctx} target={{ kind: "page", path: packageDetailPath(item.id) }} className="tm-link ml-auto text-tm-small font-semibold">

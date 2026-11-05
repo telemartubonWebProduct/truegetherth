@@ -3,10 +3,9 @@ import Image from "next/image";
 import { packageHomeIn } from "@/lib/content/lookup";
 import { packageDetailPath, shownBenefits } from "@/lib/content/package-facts";
 import type { CatalogPackage } from "@/lib/content/schema";
-import { localizePath } from "@/lib/i18n/locales";
 
 import type { RenderContext } from "./context";
-import { ContactLink, CtaLink, SmartLink, TargetLink } from "./links";
+import { ContactLink, CtaLink, PackageCallbackLink, TargetLink } from "./links";
 import { PriceBlock, speedText } from "./PackageCompare";
 import { PageShell } from "./PageShell";
 
@@ -109,15 +108,7 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
                 <ContactLink ctx={ctx} channel="phone-sales" ctaId={`package-call-${item.id}`} className="tm-button tm-button-secondary">
                   {ctx.t(ui.callSales)}
                 </ContactLink>
-                {/* The contact page's call-back form, with this package filled in. */}
-                <SmartLink
-                  link={{ href: `${localizePath("/service", ctx.locale)}?package=${encodeURIComponent(item.id)}#callback`, external: false }}
-                  ctaId={`package-callback-${item.id}`}
-                  newTabLabel={ctx.t(ui.opensInNewTab)}
-                  className="tm-button tm-button-secondary"
-                >
-                  {ctx.t(ui.requestCallback)}
-                </SmartLink>
+                <PackageCallbackLink ctx={ctx} packageId={item.id} />
               </div>
             </div>
           </div>
