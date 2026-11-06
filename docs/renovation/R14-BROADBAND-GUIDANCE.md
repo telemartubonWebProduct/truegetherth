@@ -23,3 +23,7 @@ Lint, typecheck, 196 unit tests and production build pass. Run full desktop and 
 Local final checks: desktop 113 passed, 52 skipped; mobile 93 passed, 27 skipped, one unchanged home-page touch-swipe failure (also reproduced before this branch). The complete first-price viewport and FAQ/link checks pass on both projects. Local Lighthouse mobile on the production build: performance 100, LCP 1.083 s, CLS 0; this is a lab measurement, not Google PageSpeed field data.
 
 [Before on mobile](images/broadband-guide-before.png) · [After on mobile](images/broadband-guide-after.png)
+
+## Authorized scroll repair
+
+The owner authorized repairing the homepage scroll behavior after the first CI failure. Touch-only devices now retain native scrolling: deferred Lenis is initialized only when the primary pointer is fine and supports hover. No hero or visual design changes. The swipe regression waits for fonts and card entrance transitions before dispatching the existing native touch sequence, and explicitly checks that mobile has no Lenis root class. Vertical page scrolling, horizontal rail movement and snapping assertions remain intact. Focused desktop passes; focused mobile passes five consecutive runs. Full suites and CI are rerun on this patch.
