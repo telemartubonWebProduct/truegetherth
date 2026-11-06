@@ -19,3 +19,7 @@ Earlier requests for /service and /wifiService were accepted by Google, as was a
 ## Verification
 
 Lint, typecheck, 196 unit tests and production build pass. Run full desktop and mobile E2E separately. The existing bilingual FAQ test also checks both new internal links, and the 390x844 regression ensures the complete first-price area stays in the initial viewport. Screenshots and full run outcomes are included in the PR handoff.
+
+Local final checks: desktop 113 passed, 52 skipped; mobile 93 passed, 27 skipped, one unchanged home-page touch-swipe failure (also reproduced before this branch). The complete first-price viewport and FAQ/link checks pass on both projects. Local Lighthouse mobile on the production build: performance 100, LCP 1.083 s, CLS 0; this is a lab measurement, not Google PageSpeed field data.
+
+[Before on mobile](images/broadband-guide-before.png) · [After on mobile](images/broadband-guide-after.png)
