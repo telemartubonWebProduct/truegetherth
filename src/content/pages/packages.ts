@@ -22,17 +22,17 @@ export const broadbandNewPage: PackagePage = {
   id: "broadband-new",
   path: "/broadband",
   seo: {
-    title: t("โปรเน็ตบ้านทรูไฟเบอร์ สำหรับลูกค้าใหม่", "True fibre home internet deals for new customers"),
+    title: t("ติดเน็ตบ้านทรู โปรเน็ตบ้านทรูไฟเบอร์ลูกค้าใหม่", "Get True home internet: fibre deals for new customers"),
     description: t(
-      "เทียบโปรเน็ตบ้านทรูไฟเบอร์สำหรับลูกค้าใหม่ ความเร็ว 500 Mbps ถึง 1.5 Gbps พร้อมอุปกรณ์และสิทธิประโยชน์ สมัครกับพาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เจ้าหน้าที่ตรวจพื้นที่และนัดติดตั้งให้",
-      "Compare True fibre home internet deals for new customers, from 500 Mbps to 1.5 Gbps with equipment and benefits. Apply with an appointed Authorized Partner of True Online: we check your area and book the installation.",
+      "ติดเน็ตบ้านทรูกับพาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เทียบโปรเน็ตบ้านทรูไฟเบอร์ลูกค้าใหม่ 500 Mbps ถึง 1.5 Gbps ราคาต่อเดือนไม่รวม VAT เจ้าหน้าที่เช็คพื้นที่และนัดติดตั้งให้ รับเรื่องทุกจังหวัด",
+      "Get True home internet through an appointed Authorized Partner of True Online. Compare fibre deals for new customers from 500 Mbps to 1.5 Gbps; monthly prices exclude VAT. We check your area and book the installation, in every province.",
     ),
   },
   hero: {
-    heading: t("เน็ตบ้านทรูไฟเบอร์ สำหรับลูกค้าใหม่", "True fibre home internet for new customers"),
+    heading: t("โปรเน็ตบ้านทรูไฟเบอร์ สำหรับลูกค้าใหม่", "True fibre home internet deals for new customers"),
     description: t(
-      "แพ็กเกจเน็ตบ้านพร้อมสิทธิประโยชน์สำหรับสายเกม สายซีรีส์ และสายกีฬา ทุกแพ็กเกจเรียงข้อมูลแบบเดียวกันให้เทียบง่าย",
-      "Home internet with perks for gamers, series fans and sports lovers. Every package lists the same details, so they are easy to compare.",
+      "ติดเน็ตบ้านทรูกับพาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เจ้าหน้าที่เช็คพื้นที่และนัดติดตั้งให้ ทุกแพ็กเกจเรียงข้อมูลแบบเดียวกันให้เทียบง่าย",
+      "Get True home internet through a True Online partner: we check your area and book the installation.",
     ),
     tone: "canvas",
   },
@@ -41,7 +41,7 @@ export const broadbandNewPage: PackagePage = {
   sections: [
     {
       id: "packages",
-      heading: t("โปรโมชันสำหรับลูกค้าใหม่", "Offers for new customers"),
+      heading: t("แพ็กเกจเน็ตบ้านทรูสำหรับลูกค้าใหม่", "True home internet packages"),
       groups: [{ id: "new-customer", category: "broadband-new", group: "new-customer" }],
       notes: [
         t("ราคาต่อเดือน ไม่รวม VAT ทุกแพ็กเกจทำสัญญา 24 เดือน", "Monthly prices exclude VAT. Every package has a 24-month contract."),
@@ -66,7 +66,7 @@ export const broadbandExistingPage: PackagePage = {
     ),
   },
   hero: {
-    heading: t("แพ็กเกจและสิทธิพิเศษสำหรับลูกค้าปัจจุบัน", "Packages and perks for current customers"),
+    heading: t("เพิ่มสปีดเน็ตบ้านทรู และแพ็กเสริมสำหรับลูกค้าปัจจุบัน", "Speed boosts and add-ons for current True Online customers"),
     description: t("อุปกรณ์และแพ็กเกจเสริมที่ตอบโจทย์ไลฟ์สไตล์คุณ", "Equipment and add-on packages that fit the way you live."),
     tone: "canvas",
   },
