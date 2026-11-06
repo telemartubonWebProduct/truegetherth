@@ -53,6 +53,55 @@ export const broadbandNewPage: PackagePage = {
       tone: "canvas",
     },
   ],
+  // Answers say only what the page and the site already state (VAT, contract, area check, who runs the site).
+  faq: {
+    heading: t("คำถามเรื่องติดเน็ตบ้านทรู", "Questions about getting True home internet"),
+    items: [
+      {
+        id: "can-i-get-it",
+        question: t("บ้านของฉันติดเน็ตบ้านทรูได้ไหม", "Can True home internet be installed at my home?"),
+        answer: t(
+          "ขึ้นกับผลตรวจพื้นที่ แจ้งที่อยู่ทาง LINE โทรหาเรา หรือฝากเบอร์ให้โทรกลับ เจ้าหน้าที่จะตรวจพื้นที่และแจ้งผลก่อนคุณสมัคร รับเรื่องจากทุกจังหวัด",
+          "It depends on a check of your address. Send it to us on LINE, call us or leave your number for a call back, and we tell you the result before you sign up. We take requests from every province.",
+        ),
+      },
+      {
+        id: "how-to-apply",
+        question: t("สมัครเน็ตบ้านทรูกับเราอย่างไร", "How do I apply?"),
+        answer: t(
+          "เลือกแพ็กเกจที่สนใจ แล้วทัก LINE โทรหาเรา หรือขอให้เจ้าหน้าที่โทรกลับ เจ้าหน้าที่ช่วยเทียบแพ็กเกจ ตรวจพื้นที่ และนัดวันติดตั้งให้",
+          "Pick a package, then message us on LINE, call us or ask us to call you back. We help you compare packages, check your area and book the installation.",
+        ),
+      },
+      {
+        id: "vat",
+        question: t("ราคาในหน้านี้รวม VAT หรือยัง", "Do the prices on this page include VAT?"),
+        answer: t("ยังไม่รวม ราคาที่แสดงเป็นราคาต่อเดือนที่ยังไม่รวม VAT", "No. The prices shown are monthly prices before VAT."),
+      },
+      {
+        id: "contract",
+        question: t("ต้องทำสัญญากี่เดือน", "How long is the contract?"),
+        answer: t("ทุกแพ็กเกจลูกค้าใหม่ในหน้านี้ทำสัญญา 24 เดือน", "Every package for new customers on this page has a 24-month contract."),
+      },
+      {
+        id: "up-to-date",
+        question: t("ราคาและเงื่อนไขในหน้านี้เป็นข้อมูลล่าสุดไหม", "Are these prices and terms up to date?"),
+        answer: t(
+          "ราคาและเงื่อนไขมาจากข้อมูลเดิมของร้าน อาจไม่ใช่ข้อมูลล่าสุด เจ้าหน้าที่จะยืนยันเงื่อนไขล่าสุดกับคุณก่อนสมัครทุกครั้ง",
+          "They come from our earlier listings and may not be current. Our team always confirms the latest terms with you before you sign up.",
+        ),
+      },
+      {
+        // Who is behind the site, in the words of the footer, the terms and the home page's questions.
+        id: "who-runs-the-site",
+        question: t("truegetherth เป็นเว็บไซต์ของทรูหรือไม่", "Is truegetherth True's own website?"),
+        answer: t(
+          "ไม่ใช่ truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่ายของทรู เรารับสมัครและประสานงานติดตั้งให้ แต่ไม่ใช่ผู้ให้บริการเครือข่าย",
+          "No. truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. We take your application and arrange the installation; we are not the network operator.",
+        ),
+      },
+    ],
+  },
 };
 
 export const broadbandExistingPage: PackagePage = {

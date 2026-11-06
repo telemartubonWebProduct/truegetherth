@@ -4,6 +4,7 @@ import type { PackagePage } from "@/lib/content/schema";
 import type { RenderContext } from "./context";
 import { explorerProps } from "./explorer/explorer-data";
 import { PackageExplorer } from "./explorer/PackageExplorer";
+import { PackageFaq } from "./PackageFaq";
 import { PackageSections } from "./PackageSections";
 import { heroBinds, PageHero } from "./PageHero";
 import { PageShell } from "./PageShell";
@@ -26,6 +27,7 @@ export function PackagePageView({ ctx, page }: { ctx: RenderContext; page: Packa
       <PackageExplorer {...explorerProps(ctx, unique, page.packageCta)} collapseOnMobile={broadband}>
         <PackageSections ctx={ctx} page={page} />
       </PackageExplorer>
+      <PackageFaq ctx={ctx} page={page} />
     </PageShell>
   );
 }

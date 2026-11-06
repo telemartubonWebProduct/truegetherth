@@ -33,7 +33,8 @@ export const CONTENT_SCHEMA_VERSION = 10;
 // A package's hiddenBenefits (12 Oct 2026) is optional: every draft and release
 // of version 10 still reads, so the version stays, and the drafts the owner had
 // not yet published were not thrown away for it. The same holds for the
-// partner's badge of the brand (partnerLogo, partnerLabel; 3 Nov 2026).
+// partner's badge of the brand (partnerLogo, partnerLabel; 3 Nov 2026) and
+// for a package page's questions and answers (faq; 6 Nov 2026).
 
 export type DraftRecord = {
   documentId: DocumentId;

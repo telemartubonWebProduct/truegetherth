@@ -105,6 +105,24 @@ test("at 390 × 844 broadband shows the first price before scrolling", async ({ 
   }
 });
 
+test("broadband answers its questions on the page and gives them to search engines", async ({ page }) => {
+  const faq = getPackagePage("/broadband").faq!;
+  for (const [prefix, locale] of [["", "th"], ["/en", "en"]] as const) {
+    await page.goto(`${prefix}/broadband`);
+    const section = page.locator("#faq");
+    await expect(section.getByRole("heading", { level: 2 })).toHaveText(faq.heading[locale]);
+    for (const item of faq.items) await expect(section.getByText(item.question[locale], { exact: true })).toBeVisible();
+    // An answer opens with its question.
+    await section.getByText(faq.items[0].question[locale], { exact: true }).click();
+    await expect(section.getByText(faq.items[0].answer[locale], { exact: true })).toBeVisible();
+    const nodes = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((scripts) => scripts.flatMap((script) => (JSON.parse(script.textContent ?? "{}")["@graph"] ?? []) as { "@type": string; mainEntity?: { name: string }[] }[]));
+    expect(nodes.find((node) => node["@type"] === "FAQPage")?.mainEntity?.map((entry) => entry.name)).toEqual(faq.items.map((item) => item.question[locale]));
+    expect(nodes.some((node) => node["@type"] === "BreadcrumbList")).toBe(true);
+  }
+});
+
 test("sorting reorders the cards on screen", async ({ page }) => {
   await page.goto("/broadband");
   const toggle = page.getByRole("button", { name: ui.findPackage.th, exact: true });
