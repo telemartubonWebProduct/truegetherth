@@ -403,6 +403,13 @@ export const packagePage = z.strictObject({
   layout: z.enum(["compare", "compact"]),
   packageCta: cta,
   sections: z.array(packageSection).min(1),
+  /** Questions and answers under the packages; search engines get them as an FAQPage. */
+  faq: z
+    .strictObject({
+      heading: localizedText,
+      items: z.array(z.strictObject({ id: stableId, question: localizedText, answer: localizedText })).min(1),
+    })
+    .optional(),
 });
 export type PackagePage = z.infer<typeof packagePage>;
 
