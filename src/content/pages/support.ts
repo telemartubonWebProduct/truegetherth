@@ -6,17 +6,17 @@ export const contactPage: ContactPage = {
   id: "contact",
   path: "/service",
   seo: {
-    title: t("ติดต่อเจ้าหน้าที่ truegetherth", "Contact the truegetherth team"),
+    title: t("ติดต่อเจ้าหน้าที่ เช็คพื้นที่เน็ตบ้านทรู", "Contact us and check True home internet at your address"),
     description: t(
-      "ติดต่อ truegetherth ทาง LINE โทรศัพท์ อีเมล หรือเฟซบุ๊ก เพื่อสอบถามแพ็กเกจเน็ตบ้าน เน็ตมือถือ และโซลาร์เซลล์ หรือขอให้เจ้าหน้าที่โทรกลับ จันทร์–เสาร์ 09:00–18:00 น.",
-      "Contact truegetherth on LINE, by phone, email or Facebook about home internet, mobile packages and solar, or ask us to call you back. Monday to Saturday, 9:00 to 18:00.",
+      "ติดต่อ truegetherth ทาง LINE โทรศัพท์ อีเมล หรือเฟซบุ๊ก หรือขอให้เจ้าหน้าที่โทรกลับเพื่อเช็คพื้นที่ติดตั้งเน็ตบ้านทรูและแนะนำแพ็กเกจ รับเรื่องทุกจังหวัด จันทร์–เสาร์ 09:00–18:00 น.",
+      "Contact truegetherth on LINE, by phone, email or Facebook, or ask us to call you back to check True home internet at your address and suggest a package. We take requests from every province, Monday to Saturday, 9:00 to 18:00.",
     ),
   },
   hero: {
-    heading: t("ติดต่อเรา", "Contact us"),
+    heading: t("ติดต่อเจ้าหน้าที่ เช็คพื้นที่เน็ตบ้านทรู", "Contact us and check your area"),
     description: t(
-      "มีคำถามหรือต้องการความช่วยเหลือ ติดต่อเจ้าหน้าที่ได้ทุกช่องทางด้านล่าง",
-      "Questions or need help? Reach our team through any of the channels below.",
+      "มีคำถาม หรืออยากรู้ว่าที่อยู่ของคุณติดเน็ตบ้านทรูได้ไหม ติดต่อเจ้าหน้าที่ได้ทุกช่องทางด้านล่าง หรือฝากเบอร์ให้เราโทรกลับ",
+      "Questions, or want to know whether True home internet can be installed at your address? Reach our team through any channel below, or leave your number and we will call you back.",
     ),
     tone: "canvas",
   },
@@ -75,10 +75,10 @@ export const agentPage: AgentPage = {
     ),
   },
   hero: {
-    heading: t("สมัครเน็ตบ้านผ่านเจ้าหน้าที่", "Apply for home internet through our team"),
+    heading: t("สมัครเน็ตบ้านทรูผ่านเจ้าหน้าที่", "Apply for True home internet through our team"),
     description: t(
-      "ติดตั้งเน็ตบ้านไฟเบอร์ได้ง่าย ๆ เจ้าหน้าที่ช่วยเลือกแพ็กเกจ ตรวจพื้นที่ และนัดวันติดตั้งให้",
-      "Getting fibre installed is simple: our team helps you choose a package, checks your area and books the installation.",
+      "สมัครและติดเน็ตบ้านทรูไฟเบอร์ได้ง่าย ๆ เจ้าหน้าที่ช่วยเลือกแพ็กเกจ เช็คพื้นที่ และนัดวันติดตั้งให้ รับเรื่องทุกจังหวัด",
+      "Applying for True fibre home internet is simple: our team helps you choose a package, checks your area and books the installation, in every province.",
     ),
     image: "agent-support",
     primaryCta: {
@@ -96,7 +96,7 @@ export const agentPage: AgentPage = {
     tone: "canvas",
   },
   steps: {
-    heading: t("เจ้าหน้าที่ช่วยอะไรบ้าง", "How our team helps"),
+    heading: t("ขั้นตอนสมัครเน็ตบ้านทรูกับเจ้าหน้าที่", "How to apply with our team"),
     items: [
       {
         id: "tell-us",
