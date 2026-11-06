@@ -1,5 +1,6 @@
 import type { DocumentId } from "@/lib/content/documents";
 import type { PackagePage } from "@/lib/content/schema";
+import { localizePath } from "@/lib/i18n/locales";
 
 import type { RenderContext } from "./context";
 import { PlusIcon } from "./icons";
@@ -28,6 +29,15 @@ export function PackageFaq({ ctx, page }: { ctx: RenderContext; page: PackagePag
             </details>
           ))}
         </div>
+        {page.id === "broadband-new" ? (
+          <div className="flex flex-wrap gap-3 lg:col-start-2">
+            {[ctx.content.pages.contact, ctx.content.pages.agent].map((destination) => (
+              <a key={destination.id} href={localizePath(destination.path, ctx.locale)} className="tm-button tm-button-secondary">
+                {ctx.t(destination.hero.heading)}
+              </a>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );
