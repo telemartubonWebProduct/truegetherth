@@ -20,6 +20,8 @@ The site's one domain is `https://www.truegetherth.com` (`siteUrl()` in `src/lib
 
 Organic search research and application guidance are recorded in `docs/renovation/R17-ORGANIC-SEARCH-RESEARCH.md`: retain the existing URLs and editable content fields, distinguish dated aggregate index reports from direct URL inspections, and do not claim page-one rankings from a release or tiny query samples.
 
+The broadband FAQ's 500 Mbps workload examples and Wi-Fi test guidance are sourced in `docs/renovation/R18-BROADBAND-USAGE-GUIDANCE.md`. Netflix/Zoom bandwidth figures are general app requirements, not added subscriptions or a guarantee of per-device speed. Preserve that distinction when editing the answers.
+
 ## Look and motion
 
 Package cards (`docs/renovation/R8-PROMO-CARDS.md`): on package pages a card is a slip (`PackageCompare.tsx`, `.tm-slip` in `globals.css`) led by what the package gives in figures, with its price on a stub under a perforation, and it needs no picture of its own; on the home page a card is a picture plate with the figure over the picture (`PackageCard` in `Landing.tsx`). What comes with a package is always shown with its picture, in a white tile of one size (`BenefitList`); where only the tiles show, the names stay in the page for screen readers.
