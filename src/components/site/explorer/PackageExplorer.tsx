@@ -342,6 +342,7 @@ function CompareTable({ entries, labels }: { entries: CompareEntry[]; labels: Ex
                 <a
                   href={entry.cta.href}
                   data-cta={entry.cta.id}
+                  data-package-id={entry.id}
                   className="tm-button tm-button-primary"
                   {...(entry.cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >

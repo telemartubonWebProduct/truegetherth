@@ -83,9 +83,9 @@ export function whenTagReady(tag: "ads" | "analytics", callback: () => void): ()
 }
 
 /**
- * Reports one Google Ads conversion: a visitor asked to be contacted (sent the
- * call-back form, or clicked LINE or a phone number). Only on the production
- * domain and only when the visitor agreed to advertising cookies; otherwise
+ * Reports one Google Ads conversion after a call-back form is stored successfully
+ * and is not a duplicate. Contact-link clicks stay separate GA4 events. Only on
+ * the production domain, with the visitor's advertising consent; otherwise
  * nothing. Opening a page is not a conversion.
  */
 export function trackLeadConversion(): void {
