@@ -42,7 +42,10 @@ export function SiteTags({ googleAdsId, ga4MeasurementId, adsLeadConversion, met
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
       const name = anchor ? contactEventFor(anchor.href) : null;
       if (!anchor || !name) return;
-      trackEvent(name, { cta_id: anchor.dataset.cta ?? "none", page_path: location.pathname });
+      // Package cards and detail sections already identify their package. The
+      // comparison table puts it on its own CTA, without changing card selectors.
+      const packageId = anchor.dataset.packageId ?? anchor.closest<HTMLElement>("[data-package]")?.dataset.package;
+      trackEvent(name, { cta_id: anchor.dataset.cta ?? "none", page_path: location.pathname, package_id: packageId });
       if (name === "contact_line" || name === "contact_phone") {
         trackMetaEvent("Contact", { content_name: anchor.dataset.cta ?? "none", contact_method: name.replace("contact_", "") });
       }

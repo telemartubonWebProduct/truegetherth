@@ -130,3 +130,42 @@ test("the English site asks in English", async ({ page }) => {
   await expect(page.getByRole("region", { name: consent.heading.en })).toBeVisible();
   await expect(page.getByRole("link", { name: consent.policyLink.en })).toHaveAttribute("href", "/en/termsAndPrivacy#cookies");
 });
+
+for (const locale of ["th", "en"] as const) {
+  test(`package contact events identify the selected plan across cards, comparison and details (${locale})`, async ({ page }) => {
+    await page.context().addCookies(consentState({ analytics: true, ads: false }).cookies);
+    const prefix = locale === "th" ? "" : "/en";
+    await page.goto(`${production}${prefix}/broadband`);
+    await expect.poll(() => configured(page)).toEqual([integrations.ga4MeasurementId]);
+    // Exercise the real click handler while keeping external apps closed.
+    await page.evaluate(() => window.addEventListener("click", (event) => { if (event.target instanceof Element && event.target.closest('a[href^="tel:"], a[href^="https://lin.ee/"]')) event.preventDefault(); }, { capture: true }));
+    const cards = page.locator("main .tm-slip[data-package]");
+    const ids = await Promise.all([cards.nth(0).getAttribute("data-package"), cards.nth(1).getAttribute("data-package")]);
+    for (const index of [0, 1]) {
+      await cards.nth(index).locator(`a[href="${contact.lineSales}"]`).click();
+      await cards.nth(index).getByRole("checkbox").check();
+    }
+    await page.getByRole("button", { name: content.site.ui.compareOpen[locale], exact: true }).click();
+    const comparison = page.getByRole("dialog", { name: content.site.ui.compareOpen[locale] });
+    await comparison.locator(`a[data-package-id="${ids[1]}"]`).click();
+    const events = (await gtagCalls(page)).filter(([command, name]) => command === "event" && name === "contact_line");
+    expect(events.map((call) => (call[2] as Record<string, unknown>).package_id)).toEqual([ids[0], ids[1], ids[1]]);
+    expect(events).toHaveLength(3);
+
+    await page.goto(`${production}${prefix}/packages/${ids[1]}`);
+    await expect.poll(() => configured(page)).toEqual([integrations.ga4MeasurementId]);
+    await page.evaluate(() => window.addEventListener("click", (event) => { if (event.target instanceof Element && event.target.closest('a[href^="tel:"], a[href^="https://lin.ee/"]')) event.preventDefault(); }, { capture: true }));
+    const detail = page.locator(`section[data-package="${ids[1]}"]`);
+    await detail.locator(`a[href="${contact.lineSales}"]`).first().click();
+    await detail.locator('a[href^="tel:"]').first().click();
+    const detailEvents = (await gtagCalls(page)).filter(([command]) => command === "event");
+    expect(detailEvents.map((call) => call[1])).toEqual(["contact_line", "contact_phone"]);
+    for (const call of detailEvents) {
+      expect(call[2]).toMatchObject({ package_id: ids[1], page_path: `${prefix}/packages/${ids[1]}`, send_to: integrations.ga4MeasurementId });
+      expect(Object.keys(call[2] as object).sort()).toEqual(["cta_id", "package_id", "page_path", "send_to"]);
+    }
+    await page.locator('footer [data-cta="footer-line"]').click();
+    const last = (await gtagCalls(page)).filter(([command]) => command === "event").at(-1)!;
+    expect(last[2]).not.toHaveProperty("package_id");
+  });
+}
