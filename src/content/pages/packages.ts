@@ -118,10 +118,10 @@ export const broadbandNewPage: PackagePage = {
       {
         // Who is behind the site, in the words of the footer, the terms and the home page's questions.
         id: "who-runs-the-site",
-        question: t("truegetherth เป็นเว็บไซต์ของทรูหรือไม่", "Is truegetherth True's own website?"),
+        question: t("เว็บไซต์นี้เป็นเว็บไซต์หลักของทรูหรือไม่", "Is this True's own website?"),
         answer: t(
-          "ไม่ใช่ truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่ายของทรู เรารับสมัครและประสานงานติดตั้งให้ แต่ไม่ใช่ผู้ให้บริการเครือข่าย",
-          "No. truegetherth is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. We take your application and arrange the installation; we are not the network operator.",
+          "ไม่ใช่ เว็บไซต์นี้ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) และตัวแทนจำหน่ายของทรู เรารับสมัครและประสานงานติดตั้งให้ แต่ไม่ใช่ผู้ให้บริการเครือข่าย",
+          "No. This website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online and Authorized Dealer of True. We take your application and arrange the installation; we are not the network operator.",
         ),
       },
     ],

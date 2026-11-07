@@ -316,7 +316,7 @@ export const siteSettings = z.strictObject({
     name: localizedText,
     legalName: localizedText,
     logo: mediaRef,
-    /** The partner's own mark, beside the logo and in the footer; no badge without it. */
+    /** The partner's own mark in the footer; no badge without it. */
     partnerLogo: mediaRef.optional(),
     /** The line under that mark. */
     partnerLabel: localizedText.optional(),

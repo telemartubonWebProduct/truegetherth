@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     });
 
     await transporter.sendMail({
-      from: `"truegetherth Contact Form" <${process.env.EMAIL_USER}>`,
+      from: `"Telemart Contact Form" <${process.env.EMAIL_USER}>`,
       to: "nodemailertelemart@gmail.com",
       subject: `ติดต่อจาก คุณ ${firstName} `,
       text: `
