@@ -1,6 +1,7 @@
 import { CallbackSection } from "../CallbackSection";
 import { ContactChannels } from "../ContactChannels";
 import type { RenderContext } from "../context";
+import { TargetLink } from "../links";
 import { heroBinds, PageHero } from "../PageHero";
 import { PageShell } from "../PageShell";
 
@@ -19,6 +20,11 @@ export function ContactPageView({ ctx }: { ctx: RenderContext }) {
       />
       <ContactChannels ctx={ctx} page={page} />
       <CallbackSection ctx={ctx} page={page} />
+      <div className="tm-container border-t border-tm-line py-8">
+        <TargetLink ctx={ctx} target={{ kind: "page", path: ctx.content.pages.agent.path }} className="tm-link">
+          {ctx.t(ctx.content.pages.agent.steps.heading)}
+        </TargetLink>
+      </div>
     </PageShell>
   );
 }

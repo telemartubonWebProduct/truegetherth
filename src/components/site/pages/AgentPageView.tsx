@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { localizePath } from "@/lib/i18n/locales";
+
 import type { RenderContext } from "../context";
 import { CtaLink } from "../links";
 import { heroBinds, PageHero } from "../PageHero";
@@ -23,6 +25,9 @@ export function AgentPageView({ ctx }: { ctx: RenderContext }) {
           <>
             <CtaLink ctx={ctx} cta={page.hero.primaryCta} bind={ctx.bind(doc, "hero", "primaryCta")} />
             <CtaLink ctx={ctx} cta={page.hero.secondaryCta} bind={ctx.bind(doc, "hero", "secondaryCta")} />
+            <a href={`${localizePath(ctx.content.pages.contact.path, ctx.locale)}#callback`} className="tm-button tm-button-secondary" data-cta="agent-callback">
+              {ctx.t(ctx.content.pages.contact.callback.heading)}
+            </a>
           </>
         }
         media={
@@ -31,7 +36,7 @@ export function AgentPageView({ ctx }: { ctx: RenderContext }) {
             width={image.width}
             height={image.height}
             alt={ctx.t(image.alt)}
-            preload
+            loading="lazy"
             sizes="(min-width: 1024px) 36rem, 100vw"
             className="aspect-[16/9] w-full rounded-tm-panel object-cover"
             {...ctx.bind(doc, "hero", "image")}

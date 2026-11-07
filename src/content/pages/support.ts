@@ -68,17 +68,17 @@ export const agentPage: AgentPage = {
   id: "apply-with-agent",
   path: "/wifiService",
   seo: {
-    title: t("สมัครเน็ตบ้านทรูผ่านเจ้าหน้าที่", "Apply for True home internet through our team"),
+    title: t("สมัครเน็ตบ้านทรู เตรียมข้อมูล เช็กพื้นที่และนัดติดตั้ง", "Apply for True home internet: address checks and installation steps"),
     description: t(
-      "สมัครเน็ตบ้านทรูไฟเบอร์ผ่านเจ้าหน้าที่ของพาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ ช่วยเลือกแพ็กเกจ ตรวจพื้นที่ และนัดวันติดตั้งให้",
-      "Apply for True fibre home internet through the team of an appointed Authorized Partner of True Online: we help you choose, check your area and book the installation.",
+      "ขั้นตอนสมัครเน็ตบ้านทรูผ่าน Telemart พาร์ทเนอร์ของทรู ออนไลน์: เตรียมที่อยู่บ้านหรือคอนโด เทียบแพ็กเกจ ยืนยันค่าใช้จ่าย สอบถามเอกสาร และนัดติดตั้งหลังตรวจพื้นที่",
+      "Apply through Telemart, an Authorized Partner of True Online: prepare your home or condo address, compare plans, confirm charges and required documents, then arrange installation after the address check.",
     ),
   },
   hero: {
     heading: t("สมัครเน็ตบ้านทรูผ่านเจ้าหน้าที่", "Apply for True home internet through our team"),
     description: t(
-      "สมัครและติดเน็ตบ้านทรูไฟเบอร์ได้ง่าย ๆ เจ้าหน้าที่ช่วยเลือกแพ็กเกจ เช็คพื้นที่ และนัดวันติดตั้งให้ รับเรื่องทุกจังหวัด",
-      "Applying for True fibre home internet is simple: our team helps you choose a package, checks your area and books the installation, in every province.",
+      "เริ่มจากตรวจพื้นที่ตามที่อยู่จริง แล้วให้เจ้าหน้าที่ช่วยเทียบแพ็กเกจและยืนยันเงื่อนไขก่อนสมัคร รับเรื่องทุกจังหวัด การติดตั้งขึ้นกับพื้นที่และคิวที่เจ้าหน้าที่ยืนยัน",
+      "Start with a check of your installation address. Our team compares plans and confirms the terms before you apply. We take requests nationwide; installation depends on availability at the address and a confirmed appointment.",
     ),
     image: "agent-support",
     primaryCta: {
@@ -96,27 +96,30 @@ export const agentPage: AgentPage = {
     tone: "canvas",
   },
   steps: {
-    heading: t("ขั้นตอนสมัครเน็ตบ้านทรูกับเจ้าหน้าที่", "How to apply with our team"),
+    heading: t("เตรียมอะไรบ้างก่อนสมัครและติดตั้งเน็ตบ้านทรู", "What to prepare before applying and installing True home internet"),
     items: [
       {
         id: "tell-us",
-        title: t("บอกความต้องการ", "Tell us what you need"),
+        title: t("แจ้งที่อยู่บ้านหรือคอนโดเพื่อตรวจพื้นที่", "Provide your home or condo address for an availability check"),
         description: t(
-          "ส่งข้อความทาง LINE หรือโทร บอกการใช้งานและพื้นที่ที่ต้องการติดตั้ง",
-          "Message us on LINE or call, and tell us how you use the internet and where you need it.",
+          "เตรียมบ้านเลขที่ ซอยหรือถนน ตำบลหรือแขวง อำเภอหรือเขต จังหวัด และรหัสไปรษณีย์ หากเป็นคอนโด ให้แจ้งชื่อโครงการ อาคารและชั้นด้วย เพื่อให้เจ้าหน้าที่ตรวจจุดติดตั้งได้ตรงที่อยู่ การมีบริการในจังหวัดเดียวกันยังไม่ยืนยันว่าทุกอาคารติดตั้งได้ ติดต่อทาง LINE โทรศัพท์ หรือขอให้โทรกลับเพื่อเริ่มตรวจพื้นที่",
+          "Have the house number, street, subdistrict, district, province and postcode ready. For a condo, include the development, building and floor so the team can check the actual installation location. Service elsewhere in the same province does not confirm availability in your building. Start the check on LINE, by phone or with a callback request.",
         ),
       },
       {
         id: "choose",
-        title: t("เลือกแพ็กเกจ", "Pick a package"),
-        description: t("เจ้าหน้าที่ช่วยเทียบแพ็กเกจที่เหมาะกับบ้านของคุณ", "We compare the packages that suit your home."),
+        title: t("เทียบแพ็กเกจและยืนยันค่าใช้จ่ายก่อนสมัคร", "Compare plans and confirm charges before applying"),
+        description: t(
+          "บอกจำนวนคนที่ใช้งานพร้อมกัน งานที่ทำ และจุดที่ต้องการ Wi-Fi แล้วเทียบความเร็วดาวน์โหลดและอัปโหลด ระยะสัญญา อุปกรณ์ และสิทธิ์ที่ใช้จริง ให้เจ้าหน้าที่ยืนยันราคาหลังรวม VAT ค่าแรกเข้า งานเดินสายเพิ่มเติม และค่าใช้จ่ายอื่นที่อาจมี แพ็กเกจที่เลือกสิทธิ์ได้หนึ่งอย่างไม่ได้รับทุกสิทธิ์พร้อมกัน",
+          "Describe simultaneous users, activities and rooms needing Wi-Fi. Compare download and upload speeds, contract length, equipment and benefits you will use. Ask the team to confirm the price including VAT, any initial charges, additional cabling and other applicable costs. A plan offering one selected benefit does not include every option together.",
+        ),
       },
       {
         id: "install",
-        title: t("ตรวจพื้นที่และนัดติดตั้ง", "Area check and installation"),
+        title: t("ยืนยันเอกสารและเตรียมวันติดตั้ง", "Confirm documents and prepare for installation"),
         description: t(
-          "ตรวจพื้นที่ติดตั้งตามที่อยู่ของคุณ แล้วนัดวันติดตั้ง",
-          "We check installation at your address and book a date with you.",
+          "แจ้งว่าจะสมัครในนามบุคคลหรือบริษัท แล้วขอรายการเอกสารล่าสุดจากเจ้าหน้าที่ก่อนส่งเอกสาร หลังตรวจพื้นที่และยืนยันการสมัคร จึงตกลงวันติดตั้ง สำหรับคอนโดหรือบ้านเช่า ให้สอบถามผู้ดูแลอาคารหรือเจ้าของเรื่องการเข้าพื้นที่และเดินสาย เตรียมปลั๊กไฟและตำแหน่งวางเราเตอร์ให้เหมาะกับจุดใช้งาน การฝากเบอร์โทรกลับยังไม่ใช่การสมัครสำเร็จหรือยืนยันวันติดตั้ง",
+          "Tell the team whether you are applying as an individual or a business and ask for the current document checklist before supplying documents. Agree the installation date after availability and the application are confirmed. For a condo or rented home, ask the building manager or owner about access and cabling. Prepare power sockets and a router position near the areas you use. A callback request does not complete an application or confirm an installation date.",
         ),
       },
     ],
