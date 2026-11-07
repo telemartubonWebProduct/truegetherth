@@ -185,6 +185,13 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
           </div>
         </section>
       ) : null}
+      {item.category === "broadband-new" ? (
+        <div className="tm-container border-t border-tm-line py-8" data-application-guide="">
+          <TargetLink ctx={ctx} target={{ kind: "page", path: ctx.content.pages.agent.path }} className="tm-link">
+            {ctx.t(ctx.content.pages.agent.steps.heading)}
+          </TargetLink>
+        </div>
+      ) : null}
     </PageShell>
   );
 }
