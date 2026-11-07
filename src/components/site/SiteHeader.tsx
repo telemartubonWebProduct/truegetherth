@@ -25,7 +25,6 @@ function linkView(ctx: RenderContext, entry: { id: string; label: LocalizedText;
 export function SiteHeader({ ctx, path }: { ctx: RenderContext; path: string }) {
   const { site } = ctx;
   const logo = ctx.media(site.brand.logo);
-  const partner = site.brand.partnerLogo ? ctx.media(site.brand.partnerLogo) : null;
   const groups: NavGroupView[] = site.navigation.flatMap((item): NavGroupView[] => {
     const binding = ctx.bind("site", "navigation", item.id)["data-edit"];
     if (item.children) {
@@ -49,13 +48,6 @@ export function SiteHeader({ ctx, path }: { ctx: RenderContext; path: string }) 
           name: ctx.t(site.brand.name),
           logo: { src: logo.src, width: logo.width, height: logo.height },
           binding: ctx.bind("site", "brand", "logo")["data-edit"],
-          partner: partner
-            ? {
-                logo: { src: partner.src, width: partner.width, height: partner.height, alt: ctx.t(partner.alt) },
-                label: site.brand.partnerLabel ? ctx.t(site.brand.partnerLabel) : undefined,
-                binding: ctx.bind("site", "brand", "partnerLogo")["data-edit"],
-              }
-            : undefined,
         },
         labels: {
           menu: ctx.t(site.ui.menu),

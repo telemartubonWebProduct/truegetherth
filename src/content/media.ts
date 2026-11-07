@@ -27,14 +27,14 @@ function generated(src: string, width: number, height: number, th: string, en: s
 
 export const media = {
   // Brand
-  // The site's own mark, drawn for this site (scripts/brand/logo.mjs).
+  // Stable media id retained for saved drafts; owner-supplied True Online artwork with dealer attribution.
   "truegetherth-logo": {
-    src: "/brand/truegetherth-logo.png",
-    width: 1404,
-    height: 200,
+    src: "/brand/true-online-telemart-v1.png",
+    width: 744,
+    height: 189,
     kind: "brand",
-    alt: { th: "truegetherth", en: "truegetherth" },
-    source: "วาดสำหรับเว็บนี้ (scripts/brand/logo.mjs)",
+    alt: { th: "ทรูออนไลน์ โดย เทเลมาร์ท", en: "True Online by Telemart" },
+    source: "ไฟล์ True Online ของเจ้าของ พร้อมชื่อ Telemart (scripts/brand/logo.mjs)",
   },
   "true-online-logo": asset("/assets/wEnergy/trueonline.png", 744, 117, "brand", "ทรูออนไลน์", "True Online"),
   "line-logo": asset("/assets/IcoSocialMedia/LINE_APP_iOS.png", 1001, 1000, "brand", "LINE", "LINE"),
@@ -172,13 +172,13 @@ export const media = {
   },
 
   "og-image": {
-    src: "/media/og-image-v2.png",
+    src: "/media/og-image-v3.png",
     width: 1200,
     height: 630,
     kind: "illustration",
     alt: {
-      th: "โลโก้ truegetherth บนภาพวาดสีน้ำมัน เทพธิดาชูเราเตอร์ทรูเหนือศีรษะ ท่ามกลางคิวปิดและเทพที่ถืออุปกรณ์ออนไลน์",
-      en: "The truegetherth logo over an oil painting of a goddess lifting the True router over her head, among cherubs and gods holding online devices",
+      th: "โลโก้ทรูออนไลน์ โดย เทเลมาร์ท บนภาพวาดสีน้ำมัน เทพธิดาชูเราเตอร์ทรูเหนือศีรษะ ท่ามกลางคิวปิดและเทพที่ถืออุปกรณ์ออนไลน์",
+      en: "The True Online by Telemart logo over an oil painting of a goddess lifting the True router over her head, among cherubs and gods holding online devices",
     },
     source: "สร้างจากโลโก้และภาพนิ่งของเราเตอร์ (scripts/brand/logo.mjs)",
   },

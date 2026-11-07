@@ -20,11 +20,8 @@ export type NavLinkView = {
 
 export type NavGroupView = { id: string; label: string; binding?: string; link?: NavLinkView; children: NavLinkView[] };
 
-/** The partner's badge beside the logo: its own mark and the line under it. */
-export type PartnerView = { logo: { src: string; width: number; height: number; alt: string }; label?: string; binding?: string };
-
 export type NavbarView = {
-  brand: { href: string; name: string; logo: { src: string; width: number; height: number }; binding?: string; partner?: PartnerView };
+  brand: { href: string; name: string; logo: { src: string; width: number; height: number }; binding?: string };
   labels: { menu: string; navigation: string; newTab: string };
   /** Short links beside the menu on wide screens. */
   shortcuts: NavLinkView[];
@@ -144,13 +141,6 @@ function NavPills({ view }: { view: NavbarView }) {
               for ahead of the page: the bar fades in, and the first paint is the words' alone. */}
           <Image src={view.brand.logo.src} alt="" width={view.brand.logo.width} height={view.brand.logo.height} sizes="160px" />
         </Link>
-        {/* A pill of its own, so the partner's mark never reads as part of ours; wide screens only (the footer has it on every screen). */}
-        {view.brand.partner ? (
-          <p className="nav-partner" data-edit={view.brand.partner.binding}>
-            <Image src={view.brand.partner.logo.src} alt={view.brand.partner.logo.alt} width={view.brand.partner.logo.width} height={view.brand.partner.logo.height} sizes="96px" />
-            {view.brand.partner.label ? <span>{view.brand.partner.label}</span> : null}
-          </p>
-        ) : null}
         <div className="nav-menu-wrap" ref={wrap}>
           <button type="button" className="nav-menu" aria-expanded={open} aria-controls={panelId} onClick={() => (open ? close() : (setLeaving(false), setOpen(true)))}>
             <span className="nav-menu-dot" data-open={open || undefined}>

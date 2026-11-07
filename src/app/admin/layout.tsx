@@ -12,8 +12,8 @@ import "../globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "หลังบ้าน truegetherth",
-    template: "%s · หลังบ้าน truegetherth",
+    default: "หลังบ้าน Telemart",
+    template: "%s · หลังบ้าน Telemart",
   },
   robots: { index: false, follow: false },
 };

@@ -8,8 +8,8 @@ export const contactPage: ContactPage = {
   seo: {
     title: t("ติดต่อเจ้าหน้าที่ เช็คพื้นที่เน็ตบ้านทรู", "Contact us and check True home internet at your address"),
     description: t(
-      "ติดต่อ truegetherth ทาง LINE โทรศัพท์ อีเมล หรือเฟซบุ๊ก หรือขอให้เจ้าหน้าที่โทรกลับเพื่อเช็คพื้นที่ติดตั้งเน็ตบ้านทรูและแนะนำแพ็กเกจ รับเรื่องทุกจังหวัด จันทร์–เสาร์ 09:00–18:00 น.",
-      "Contact truegetherth on LINE, by phone, email or Facebook, or ask us to call you back to check True home internet at your address and suggest a package. We take requests from every province, Monday to Saturday, 9:00 to 18:00.",
+      "ติดต่อ Telemart ทาง LINE โทรศัพท์ อีเมล หรือเฟซบุ๊ก หรือขอให้เจ้าหน้าที่โทรกลับเพื่อเช็คพื้นที่ติดตั้งเน็ตบ้านทรูและแนะนำแพ็กเกจ รับเรื่องทุกจังหวัด จันทร์–เสาร์ 09:00–18:00 น.",
+      "Contact Telemart on LINE, by phone, email or Facebook, or ask us to call you back to check True home internet at your address and suggest a package. We take requests from every province, Monday to Saturday, 9:00 to 18:00.",
     ),
   },
   hero: {
@@ -134,14 +134,14 @@ export const termsPage: LegalPage = {
   seo: {
     title: t("ข้อตกลงการใช้บริการและนโยบายความเป็นส่วนตัว", "Terms of service and privacy policy"),
     description: t(
-      "ข้อตกลงการใช้เว็บไซต์ truegetherth และวิธีที่เราเก็บและใช้ข้อมูลส่วนบุคคลของคุณ",
-      "The terms for using the truegetherth website and how we collect and use your personal data.",
+      "ข้อตกลงการใช้เว็บไซต์ Telemart และวิธีที่เราเก็บและใช้ข้อมูลส่วนบุคคลของคุณ",
+      "The terms for using the Telemart website and how we collect and use your personal data.",
     ),
   },
   heading: t("ข้อตกลงและเงื่อนไขการให้บริการ และนโยบายความเป็นส่วนตัว", "Terms of service and privacy policy"),
   intro: t(
-    "เว็บไซต์ truegetherth ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) หน้านี้คือเงื่อนไขการใช้เว็บไซต์ และวิธีที่เราดูแลข้อมูลส่วนบุคคลของคุณ",
-    "The truegetherth website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online. These are the terms for using it, and how we look after your personal data.",
+    "เว็บไซต์ Telemart ดำเนินงานโดย บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด (Telemart) พาร์ทเนอร์ที่ได้รับการแต่งตั้งอย่างเป็นทางการของทรู ออนไลน์ (Authorized Partner) หน้านี้คือเงื่อนไขการใช้เว็บไซต์ และวิธีที่เราดูแลข้อมูลส่วนบุคคลของคุณ",
+    "The Telemart website is run by Telemart Communication Co., Ltd. (Telemart), an officially appointed Authorized Partner of True Online. These are the terms for using it, and how we look after your personal data.",
   ),
   sections: [
     {
