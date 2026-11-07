@@ -24,14 +24,17 @@ try {
   // The large home-screen icon retains the full dealer identity.
   const appleTile = await sharp({ create: { width: 512, height: 512, channels: 4, background: "#ffffff" } })
     .composite([{ input: await sharp(logo).resize({ width: 456 }).toBuffer(), gravity: "centre" }]).png().toBuffer();
-  // At 16px a full horizontal logo becomes unreadable. Extract the original
-  // initial instead of redrawing it; leave the source file unchanged.
-  const initial = await sharp(original).extract({ left: 0, top: 0, width: 80, height: 117 }).resize({ height: 416 }).toBuffer();
+  // Keep both words legible in a square instead of reducing the identity to
+  // its first letter. Stack the original artwork; never redraw its lettering.
+  // The source's transparent gap between the words is x=344..359.
+  const trueWord = await sharp(original).extract({ left: 0, top: 0, width: 344, height: 117 }).resize({ width: 424 }).toBuffer();
+  const onlineWord = await sharp(original).extract({ left: 360, top: 0, width: 384, height: 117 }).resize({ width: 448 }).toBuffer();
   const tile = await sharp({ create: { width: 512, height: 512, channels: 4, background: "#ffffff" } })
-    .composite([{ input: initial, gravity: "centre" }]).png().toBuffer();
+    .composite([{ input: trueWord, left: 44, top: 98 }, { input: onlineWord, left: 32, top: 272 }]).png().toBuffer();
   writeFileSync(at("src/app/icon.svg"), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image width="512" height="512" href="data:image/png;base64,${tile.toString("base64")}"/></svg>\n`);
   await sharp(appleTile).resize(180, 180).png().toFile(at("src/app/apple-icon.png"));
-  const sizes = [16, 32, 48];
+  // Include a large square for Search as well as browser-size ICO entries.
+  const sizes = [16, 32, 48, 96];
   const pictures = await Promise.all(sizes.map((px) => sharp(tile).resize(px, px).png().toBuffer()));
   const header = Buffer.alloc(6 + 16 * sizes.length);
   header.writeUInt16LE(1, 2);
