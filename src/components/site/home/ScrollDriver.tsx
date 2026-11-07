@@ -219,7 +219,9 @@ export function ScrollDriver({ locked = false }: { locked?: boolean }) {
     let later = 0;
     const painted = requestAnimationFrame(() => {
       later = window.setTimeout(() => {
-        if (!motion) return;
+        // Touch-only devices use native scrolling. Lenis's root sizing rules
+        // can stop vertical touch scroll chaining over the horizontal rail.
+        if (!motion || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
         void import("lenis").then(({ default: Smooth }) => {
           if (!over) lenis = new Smooth({ autoRaf: true, anchors: true, lerp: 0.11 });
         });

@@ -120,6 +120,8 @@ test("broadband answers its questions on the page and gives them to search engin
       .evaluateAll((scripts) => scripts.flatMap((script) => (JSON.parse(script.textContent ?? "{}")["@graph"] ?? []) as { "@type": string; mainEntity?: { name: string }[] }[]));
     expect(nodes.find((node) => node["@type"] === "FAQPage")?.mainEntity?.map((entry) => entry.name)).toEqual(faq.items.map((item) => item.question[locale]));
     expect(nodes.some((node) => node["@type"] === "BreadcrumbList")).toBe(true);
+    await expect(section.getByRole("link", { name: content.pages.contact.hero.heading[locale], exact: true })).toHaveAttribute("href", `${prefix}/service`);
+    await expect(section.getByRole("link", { name: content.pages.agent.hero.heading[locale], exact: true })).toHaveAttribute("href", `${prefix}/wifiService`);
   }
 });
 

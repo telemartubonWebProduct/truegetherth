@@ -339,7 +339,14 @@ test("the row of packages is not pinned: scrolling down carries it by and never 
 
 test("a swipe moves the row and it stops at a card; scrolling down over it moves the page", async ({ page, isMobile }) => {
   await open(page);
+  await page.evaluate(() => document.fonts.ready);
   await toPackages(page, 60);
+  await expect(row(page)).toHaveClass(/is-in/);
+  // Test the settled row, after its entrance and deferred scroll bootstrap.
+  await row(page).evaluate(async (track) => {
+    await Promise.all(track.getAnimations({ subtree: true }).filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity).map((animation) => animation.finished));
+  });
+  if (isMobile) await expect(page.locator("html")).not.toHaveClass(/\blenis\b/);
   const start = await along(page);
 
   // Down, over the row: the page goes down and the row stays where it was.

@@ -58,6 +58,30 @@ export const broadbandNewPage: PackagePage = {
     heading: t("คำถามเรื่องติดเน็ตบ้านทรู", "Questions about getting True home internet"),
     items: [
       {
+        id: "choose-speed",
+        question: t("เลือกเน็ตบ้าน 500 Mbps หรือ 1 Gbps อย่างไร", "How do I choose between 500 Mbps and 1 Gbps?"),
+        answer: t(
+          "เริ่มจากจำนวนอุปกรณ์ที่ใช้งานพร้อมกัน และงานที่ทำ เช่น ประชุมวิดีโอ ดูสตรีม หรือดาวน์โหลดไฟล์ใหญ่ แล้วเทียบความเร็วดาวน์โหลดและอัปโหลดของแต่ละแพ็ก หากหลายอุปกรณ์รับส่งข้อมูลพร้อมกัน ให้แจ้งลักษณะการใช้งานกับเจ้าหน้าที่เพื่อช่วยเลือกแพ็ก ไม่ควรเลือกจากตัวเลขความเร็วเพียงอย่างเดียว",
+          "Start with the devices used at the same time and what they do, such as video calls, streaming or large downloads. Compare each package's download and upload speeds. Tell our team about simultaneous use so they can help you choose; the speed figure alone does not determine the right package.",
+        ),
+      },
+      {
+        id: "multi-floor-wifi",
+        question: t("บ้านหลายชั้นต้องเลือกแพ็กที่เร็วขึ้นเสมอไหม", "Does a home with several floors always need a faster package?"),
+        answer: t(
+          "ควรดูทั้งความเร็วของแพ็กและการกระจายสัญญาณ Wi-Fi ระยะห่างจากเราเตอร์ ผนัง และอุปกรณ์ที่ใช้มีผลต่อสัญญาณในแต่ละห้อง การเพิ่มความเร็วแพ็กอย่างเดียวจึงอาจไม่แก้จุดอับสัญญาณ แจ้งจำนวนชั้นและห้องที่ใช้งานกับเจ้าหน้าที่ เพื่อสอบถามตำแหน่งเราเตอร์และทางเลือกอุปกรณ์ พร้อมยืนยันค่าใช้จ่ายและเงื่อนไขก่อนสมัคร",
+          "Consider both package speed and Wi-Fi coverage. Distance from the router, walls and your devices affect the connection in each room. A faster package alone may not fix weak coverage. Tell our team about the floors and rooms you use, ask about router placement and equipment options, and confirm costs and terms before applying.",
+        ),
+      },
+      {
+        id: "compare-terms",
+        question: t("นอกจากราคา ควรเทียบอะไรในแพ็กเน็ตบ้านทรู", "What should I compare besides the price?"),
+        answer: t(
+          "เทียบความเร็วดาวน์โหลดและอัปโหลด ระยะสัญญา อุปกรณ์ และสิทธิประโยชน์ที่คุณใช้จริง บางแพ็กให้เลือกสิทธิประโยชน์ได้เพียงหนึ่งอย่าง ให้เปิดรายละเอียดของแพ็กเพื่ออ่านเงื่อนไขทั้งหมด และให้เจ้าหน้าที่ยืนยันราคาไม่รวม VAT ค่าใช้จ่ายอื่นและเงื่อนไขล่าสุดก่อนสมัคร",
+          "Compare download and upload speeds, contract length, equipment and benefits you will actually use. Some packages let you choose only one benefit. Open the package details for all conditions, then ask our team to confirm the price before VAT, any other charges and the latest terms before you apply.",
+        ),
+      },
+      {
         id: "can-i-get-it",
         question: t("บ้านของฉันติดเน็ตบ้านทรูได้ไหม", "Can True home internet be installed at my home?"),
         answer: t(
