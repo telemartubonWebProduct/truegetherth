@@ -22,6 +22,8 @@ Organic search research and application guidance are recorded in `docs/renovatio
 
 The broadband FAQ's 500 Mbps workload examples and Wi-Fi test guidance are sourced in `docs/renovation/R18-BROADBAND-USAGE-GUIDANCE.md`. Netflix/Zoom bandwidth figures are general app requirements, not added subscriptions or a guarantee of per-device speed. Preserve that distinction when editing the answers.
 
+New-customer broadband detail illustrations use native lazy loading with a desktop-only media preload (R19, `docs/renovation/R19-DETAIL-IMAGE-LOADING.md`), since on phones they follow the offer and contact actions. Their dimensions stay reserved. Other package categories retain their existing preload behavior. This is a loading-policy change, not a new price, offer or ranking claim.
+
 ## Look and motion
 
 Package cards (`docs/renovation/R8-PROMO-CARDS.md`): on package pages a card is a slip (`PackageCompare.tsx`, `.tm-slip` in `globals.css`) led by what the package gives in figures, with its price on a stub under a perforation, and it needs no picture of its own; on the home page a card is a picture plate with the figure over the picture (`PackageCard` in `Landing.tsx`). What comes with a package is always shown with its picture, in a white tile of one size (`BenefitList`); where only the tiles show, the names stay in the page for screen readers.

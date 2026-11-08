@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 
 import { packageHomeIn } from "@/lib/content/lookup";
 import { packageDetailPath, shownBenefits } from "@/lib/content/package-facts";
@@ -19,6 +19,16 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
   const home = packageHomeIn(ctx.content, item);
   const imageId = item.image ?? null;
   const image = imageId ? ctx.media(imageId) : null;
+  // On phones this illustration follows the offer and contact actions (R19).
+  const responsiveIllustration = item.category === "broadband-new";
+  const imageProps = image ? {
+    src: image.src,
+    width: image.width,
+    height: image.height,
+    alt: ctx.t(image.alt),
+    sizes: "(min-width: 1024px) 34rem, 100vw",
+  } : null;
+  const desktopImage = responsiveIllustration && imageProps ? getImageProps(imageProps).props : null;
   const term = item.contract ?? item.validity;
   const own = (field: string) => ctx.bind(`package:${item.id}`, field);
   const notes = home?.notes ?? [];
@@ -113,16 +123,19 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
             </div>
           </div>
 
-          {image ? (
-            <Image
-              src={image.src}
-              width={image.width}
-              height={image.height}
-              alt={ctx.t(image.alt)}
-              sizes="(min-width: 1024px) 34rem, 100vw"
-              className="aspect-[4/3] w-full rounded-tm-panel object-cover"
-              priority
-            />
+          {imageProps ? (
+            <>
+              {desktopImage ? (
+                <link rel="preload" as="image" media="(min-width: 1024px)" href={desktopImage.srcSet ? undefined : desktopImage.src} imageSrcSet={desktopImage.srcSet} imageSizes={desktopImage.sizes} />
+              ) : null}
+              <Image
+                {...imageProps}
+                alt={imageProps.alt}
+                className="aspect-[4/3] w-full rounded-tm-panel object-cover"
+                loading={responsiveIllustration ? "lazy" : undefined}
+                preload={!responsiveIllustration}
+              />
+            </>
           ) : null}
         </div>
       </section>
