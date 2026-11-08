@@ -53,7 +53,8 @@ export const broadbandNewPage: PackagePage = {
       tone: "canvas",
     },
   ],
-  // Answers say only what the page and the site already state (VAT, contract, area check, who runs the site).
+  // Offer facts come from the catalog; general usage guidance uses the primary
+  // sources recorded in R18. App bandwidth examples are not bundled benefits.
   faq: {
     heading: t("คำถามเรื่องติดเน็ตบ้านทรู", "Questions about getting True home internet"),
     items: [
@@ -63,6 +64,22 @@ export const broadbandNewPage: PackagePage = {
         answer: t(
           "เริ่มจากจำนวนอุปกรณ์ที่ใช้งานพร้อมกัน และงานที่ทำ เช่น ประชุมวิดีโอ ดูสตรีม หรือดาวน์โหลดไฟล์ใหญ่ แล้วเทียบความเร็วดาวน์โหลดและอัปโหลดของแต่ละแพ็ก หากหลายอุปกรณ์รับส่งข้อมูลพร้อมกัน ให้แจ้งลักษณะการใช้งานกับเจ้าหน้าที่เพื่อช่วยเลือกแพ็ก ไม่ควรเลือกจากตัวเลขความเร็วเพียงอย่างเดียว",
           "Start with the devices used at the same time and what they do, such as video calls, streaming or large downloads. Compare each package's download and upload speeds. Tell our team about simultaneous use so they can help you choose; the speed figure alone does not determine the right package.",
+        ),
+      },
+      {
+        id: "500-mbps-use",
+        question: t("เน็ตบ้านทรู 500 Mbps พอสำหรับทำงานและดู 4K ไหม", "Is 500 Mbps enough for working from home and 4K streaming?"),
+        answer: t(
+          "ให้ดูงานที่ใช้พร้อมกัน ไม่ใช่จำนวนเครื่องอย่างเดียว ตัวอย่างเช่น Netflix แนะนำการเชื่อมต่อที่เสถียรอย่างน้อย 15 Mbps สำหรับ 4K ส่วน Zoom ระบุว่าเมื่อใช้งานวิดีโอ 1080p ต้องการอัปโหลดอย่างน้อย 3.8 Mbps และดาวน์โหลด 3.0 Mbps จึงควรเผื่อแบนด์วิดท์สำหรับงานอื่นที่เกิดพร้อมกันด้วย และเทียบอัปโหลดของแพ็กเมื่อต้องประชุมหรือส่งไฟล์ ความเสถียรของ Wi-Fi อุปกรณ์ และเงื่อนไขของแอปยังมีผล ตัวเลขเหล่านี้เป็นแนวทางการใช้งาน ไม่รับประกันความเร็วทุกเครื่องหรือหมายความว่ามีสมาชิก Netflix หรือ Zoom รวมในแพ็ก ให้ตรวจสิทธิ์จริงในรายละเอียดแพ็กและยืนยันกับเจ้าหน้าที่",
+          "Consider simultaneous tasks, not just the device count. Netflix recommends a stable connection of at least 15 Mbps for 4K. Zoom specifies at least 3.8 Mbps upload and 3.0 Mbps download when using 1080p video. Leave capacity for other simultaneous tasks and compare upload speeds for calls and file transfers. Wi-Fi stability, devices and app requirements also matter. These are usage guidelines, not guaranteed speeds per device or a promise that Netflix or Zoom subscriptions are included. Check the actual package benefits and confirm with our team.",
+        ),
+      },
+      {
+        id: "wifi-speed-check",
+        question: t("ทำไมทดสอบ Wi-Fi แล้วความเร็วไม่เท่าตัวเลขแพ็ก", "Why can a Wi-Fi speed test be slower than the package speed?"),
+        answer: t(
+          "ผลผ่าน Wi-Fi ยังขึ้นกับอุปกรณ์ ระยะห่างจากเราเตอร์ ผนัง และการใช้งานพร้อมกัน ลองใช้อุปกรณ์เดิมใกล้เราเตอร์ และเปรียบเทียบย่าน 2.4 GHz กับ 5 GHz ตามที่อุปกรณ์รองรับ ก่อนสรุปว่าต้องเพิ่มความเร็วแพ็ก จดจุดที่ทดสอบ ช่วงเวลา และผลดาวน์โหลดกับอัปโหลดไว้ หากยังผิดปกติให้แจ้งเจ้าหน้าที่เพื่อตรวจสอบ สปีดแพ็กกับความครอบคลุมของ Wi-Fi เป็นคนละเรื่อง การเพิ่ม Mbps อย่างเดียวอาจไม่แก้จุดอับสัญญาณ",
+          "Wi-Fi results also depend on your device, distance from the router, walls and simultaneous use. Try the same device near the router and compare the 2.4 GHz and 5 GHz bands if supported before deciding you need a faster package. Record the location, time, download and upload results. If the problem persists, ask the team to investigate. Package speed and Wi-Fi coverage are different: more Mbps alone may not fix a weak-signal area.",
         ),
       },
       {
