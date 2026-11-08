@@ -200,6 +200,10 @@ test("each package has its own page, in both languages", async ({ page }) => {
   await expect(page).toHaveURL(packageDetailPath(item.id));
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(item.name.th);
   await expect(page.locator("main")).toContainText(formatNumber(item.price.amount, "th"));
+  const thaiPrice = page.locator("dl dd").filter({ hasText: ui.unverifiedNote.th });
+  await expect(thaiPrice).toHaveCount(1);
+  await expect(thaiPrice).toContainText(formatNumber(item.price.amount, "th"));
+  await expect(thaiPrice).toContainText(ui.vatExcluded.th);
   await expect(page.getByRole("navigation", { name: ui.breadcrumb.th }).getByRole("link", { name: home.pageTitle.th })).toHaveAttribute("href", `${home.path}#${home.hash}`);
   await expect(page.locator("[data-package-notes]")).toContainText(ui.unverifiedNote.th);
   for (const note of home.notes) await expect(page.locator("[data-package-notes]")).toContainText(note.th);
@@ -209,6 +213,10 @@ test("each package has its own page, in both languages", async ({ page }) => {
   await page.goto(`/en${packageDetailPath(item.id)}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(item.name.en);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  const englishPrice = page.locator("dl dd").filter({ hasText: ui.unverifiedNote.en });
+  await expect(englishPrice).toHaveCount(1);
+  await expect(englishPrice).toContainText(formatNumber(item.price.amount, "en"));
+  await expect(englishPrice).toContainText(ui.vatExcluded.en);
 });
 
 test("broadband detail preloads only at the desktop layout and still displays on scroll", async ({ page }) => {

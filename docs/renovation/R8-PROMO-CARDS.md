@@ -36,6 +36,12 @@ At 390 × 844, after choosing necessary cookies, the first card starts at 427 px
 
 The comparison selection belongs to the listing's browser history entry. Following a detail link and pressing Back restores the selected packages, in both languages. Clearing the selection also updates that entry. Packages removed from the current listing are excluded on restore, duplicates are removed, and the three-package limit still applies. No selection is read during server rendering.
 
+### Detail price disclosure (8 November 2026)
+
+On an unverified package's detail page, the existing localized “confirm with our team” note now appears directly after the price's VAT label, in the same definition. Previously the detail page showed this note only in its later notes section. That later section remains, along with the category's notes. Verified prices do not acquire an unverified label. No package facts, price, review status, metadata, URL or benefit are changed.
+
+The bilingual detail regression checks that the price, VAT and review note share the price definition. [Before, 390 px](images/detail-price-note-before-390.png) · [After, 390 px](images/detail-price-note-after-390.png).
+
 ## 3. The home page: the picture plate (B)
 
 `PackageCard` in `Landing.tsx`, styles in `src/styles/landing.css`.
