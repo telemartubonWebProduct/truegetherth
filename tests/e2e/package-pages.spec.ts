@@ -211,6 +211,28 @@ test("each package has its own page, in both languages", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
 });
 
+test("broadband detail preloads only at the desktop layout and still displays on scroll", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/packages/fiber-500-499`);
+    const illustration = page.locator("main section img").first();
+    await expect(illustration).toHaveAttribute("loading", "lazy");
+    const preload = page.locator('link[rel="preload"][as="image"]');
+    await expect(preload).toHaveCount(1);
+    await expect(preload).toHaveAttribute("media", "(min-width: 1024px)");
+    expect(await preload.evaluate((link) => matchMedia((link as HTMLLinkElement).media).matches)).toBe(false);
+    expect(await preload.getAttribute("imagesrcset")).toBe(await illustration.getAttribute("srcset"));
+    await illustration.scrollIntoViewIfNeeded();
+    await expect.poll(() => illustration.evaluate((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0)).toBe(true);
+    await page.setViewportSize({ width: 1280, height: 844 });
+    expect(await preload.evaluate((link) => matchMedia((link as HTMLLinkElement).media).matches)).toBe(true);
+    await page.setViewportSize({ width: 390, height: 844 });
+  }
+  // The existing-customer offer keeps its prior preload behavior.
+  await page.goto("/packages/addon-cctv");
+  await expect(page.locator('link[rel="preload"][as="image"]')).toHaveCount(1);
+});
+
 test("every package page renders, and hidden packages have none", async ({ page, request, isMobile }) => {
   test.skip(isMobile, "the same pages as desktop");
   for (const item of detailPackagesIn(content, today)) {
