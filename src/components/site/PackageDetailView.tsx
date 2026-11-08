@@ -85,6 +85,9 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
                 <dt className="sr-only">{ctx.t(ui.offerPrice)}</dt>
                 <dd>
                   <PriceBlock ctx={ctx} price={item.price} size="large" />
+                  {item.review.status === "unverified" ? (
+                    <p className="mt-1 text-tm-caption text-tm-muted">{ctx.t(ui.unverifiedNote)}</p>
+                  ) : null}
                 </dd>
               </div>
               {item.allowance ? (
