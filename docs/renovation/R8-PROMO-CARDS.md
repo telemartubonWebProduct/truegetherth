@@ -42,6 +42,12 @@ On an unverified package's detail page, the existing localized “confirm with o
 
 The bilingual detail regression checks that the price, VAT and review note share the price definition. [Before, 390 px](images/detail-price-note-before-390.png) · [After, 390 px](images/detail-price-note-after-390.png).
 
+### Detail benefit choices (9 November 2026)
+
+New-customer broadband details place any existing package conditions above the full benefit list, within the benefits section. Previously the phone layout showed all choices before its “choose one” condition. Each condition appears once and retains its editor binding; the list still reads every entry from `shownBenefits` without changing any benefit. A package whose conditions move here and has no other details uses the full desktop row rather than leaving an empty sidebar. Other package categories retain their existing condition placement.
+
+The bilingual regression checks that the choice is shown once, above the first benefit picture, and that every visible benefit remains. [Before,390px](images/detail-benefit-choices-before-390.png) · [After,390px](images/detail-benefit-choices-after-390.png). This is offer clarity, not a ranking improvement claim; price, VAT/review notes, metadata, contact tracking, homepage and hero are unchanged.
+
 ## 3. The home page: the picture plate (B)
 
 `PackageCard` in `Landing.tsx`, styles in `src/styles/landing.css`.

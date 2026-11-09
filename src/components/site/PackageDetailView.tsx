@@ -32,6 +32,8 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
   const term = item.contract ?? item.validity;
   const own = (field: string) => ctx.bind(`package:${item.id}`, field);
   const notes = home?.notes ?? [];
+  const benefits = shownBenefits(item);
+  const conditionsBeforeBenefits = item.category === "broadband-new" && benefits.length > 0 && item.conditions.length > 0;
 
   return (
     <PageShell ctx={ctx} path={packageDetailPath(item.id)}>
@@ -143,14 +145,24 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
         </div>
       </section>
 
-      {shownBenefits(item).length > 0 || item.details.length > 0 || item.conditions.length > 0 ? (
+      {benefits.length > 0 || item.details.length > 0 || item.conditions.length > 0 ? (
         <section className="border-t border-tm-line py-10 lg:py-14" data-tone="surface">
           <div className="tm-container grid gap-10 lg:grid-cols-2 lg:gap-14">
-            {shownBenefits(item).length > 0 ? (
-              <div {...own("benefits")}>
+            {benefits.length > 0 ? (
+              <div {...own("benefits")} className={conditionsBeforeBenefits && item.details.length === 0 ? "lg:col-span-2" : undefined} data-package-benefits="">
                 <h2 className="text-tm-h3 font-semibold">{ctx.t(ui.benefits)}</h2>
+                {conditionsBeforeBenefits ? (
+                  <div className="mt-4" {...own("conditions")}>
+                    <h3 className="text-tm-small font-semibold">{ctx.t(ui.conditions)}</h3>
+                    <ul className="mt-2 grid list-disc gap-2 pl-5 font-medium">
+                      {item.conditions.map((line, index) => (
+                        <li key={index}>{ctx.t(line)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
                 <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {shownBenefits(item).map((id) => {
+                  {benefits.map((id) => {
                     const benefit = ctx.benefit(id);
                     const icon = ctx.media(benefit.icon);
                     return (
@@ -163,28 +175,30 @@ export function PackageDetailView({ ctx, item }: { ctx: RenderContext; item: Cat
                 </ul>
               </div>
             ) : null}
-            <div className="grid content-start gap-8">
-              {item.details.length > 0 ? (
-                <div {...own("details")}>
-                  <h2 className="text-tm-h3 font-semibold">{ctx.t(ui.details)}</h2>
-                  <ul className="mt-4 grid list-disc gap-2 pl-5">
-                    {item.details.map((line, index) => (
-                      <li key={index}>{ctx.t(line)}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              {item.conditions.length > 0 ? (
-                <div {...own("conditions")}>
-                  <h2 className="text-tm-h3 font-semibold">{ctx.t(ui.conditions)}</h2>
-                  <ul className="mt-4 grid list-disc gap-2 pl-5 text-tm-muted">
-                    {item.conditions.map((line, index) => (
-                      <li key={index}>{ctx.t(line)}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
+            {!conditionsBeforeBenefits || item.details.length > 0 ? (
+              <div className="grid content-start gap-8">
+                {item.details.length > 0 ? (
+                  <div {...own("details")}>
+                    <h2 className="text-tm-h3 font-semibold">{ctx.t(ui.details)}</h2>
+                    <ul className="mt-4 grid list-disc gap-2 pl-5">
+                      {item.details.map((line, index) => (
+                        <li key={index}>{ctx.t(line)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {item.conditions.length > 0 && !conditionsBeforeBenefits ? (
+                  <div {...own("conditions")}>
+                    <h2 className="text-tm-h3 font-semibold">{ctx.t(ui.conditions)}</h2>
+                    <ul className="mt-4 grid list-disc gap-2 pl-5 text-tm-muted">
+                      {item.conditions.map((line, index) => (
+                        <li key={index}>{ctx.t(line)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </section>
       ) : null}
