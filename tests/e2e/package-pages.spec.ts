@@ -219,6 +219,23 @@ test("each package has its own page, in both languages", async ({ page }) => {
   await expect(englishPrice).toContainText(ui.vatExcluded.en);
 });
 
+test("broadband details explain benefit choices before the full visible benefit list", async ({ page }) => {
+  const item = packageById("fiber-500-499");
+  const ids = shownBenefits(item);
+  for (const locale of ["th", "en"] as const) {
+    await page.goto(`${locale === "en" ? "/en" : ""}${packageDetailPath(item.id)}`);
+    const benefits = page.locator("[data-package-benefits]");
+    const choice = benefits.getByText(item.conditions[0][locale], { exact: true });
+    await expect(page.getByText(item.conditions[0][locale], { exact: true })).toHaveCount(1);
+    await expect(choice).toBeVisible();
+    await expect(benefits.locator("img")).toHaveCount(ids.length);
+    for (const id of ids) await expect(benefits.getByText(content.benefits[id].label[locale], { exact: true })).toBeVisible();
+    const choiceBox = await choice.boundingBox();
+    const firstBenefitBox = await benefits.locator("img").first().boundingBox();
+    expect(choiceBox!.y + choiceBox!.height).toBeLessThanOrEqual(firstBenefitBox!.y);
+  }
+});
+
 test("broadband detail preloads only at the desktop layout and still displays on scroll", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const prefix of ["", "/en"]) {
