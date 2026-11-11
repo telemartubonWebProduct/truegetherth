@@ -51,6 +51,8 @@ export function packageFactLines(content: SiteContent, item: CatalogPackage, loc
     item.contract ? `${ui.contract[locale]} ${item.contract[locale]}` : null,
     `${formatNumber(price.amount, locale)} ${unit}${vat ? ` (${vat})` : ""}`,
     price.regularAmount !== undefined ? `${ui.regularPrice[locale]} ${formatNumber(price.regularAmount, locale)} ${ui.baht[locale]}` : null,
+    // Keep broadband choices qualified in search/share descriptions and llms.txt, as on the page.
+    ...(item.category === "broadband-new" && benefits.length > 0 ? item.conditions.map((line) => line[locale]) : []),
     benefits.length > 0 ? `${ui.benefits[locale]}: ${benefits.join(", ")}` : null,
     item.dialCode ? `${ui.dialCode[locale]} ${item.dialCode}` : null,
   ].filter((line): line is string => Boolean(line));

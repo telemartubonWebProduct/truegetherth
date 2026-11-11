@@ -225,6 +225,11 @@ test("broadband details explain benefit choices before the full visible benefit 
   for (const locale of ["th", "en"] as const) {
     await page.goto(`${locale === "en" ? "/en" : ""}${packageDetailPath(item.id)}`);
     const benefits = page.locator("[data-package-benefits]");
+    for (const selector of ['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]']) {
+      const description = await page.locator(selector).getAttribute("content");
+      expect(description).toContain(item.conditions[0][locale]);
+      expect(description!.indexOf(item.conditions[0][locale])).toBeLessThan(description!.indexOf(`${ui.benefits[locale]}:`));
+    }
     const choice = benefits.getByText(item.conditions[0][locale], { exact: true });
     await expect(page.getByText(item.conditions[0][locale], { exact: true })).toHaveCount(1);
     await expect(choice).toBeVisible();

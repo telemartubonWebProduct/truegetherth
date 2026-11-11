@@ -25,6 +25,12 @@ Read from https://www.truegetherth.com on 2026-11-03:
 
 The price is where it was before (the description) and no price was added to the structured data: package prices are imported and not verified (R9, section 3).
 
+### Benefit-choice qualifications (11 November 2026)
+
+New-customer broadband descriptions now include the package's existing localized conditions immediately before the named benefits, when there are visible benefits. The 500 Mbps package previously named multiple options without its “choose one” condition in the meta, Open Graph and Twitter descriptions, despite that condition being visible on the detail page. These descriptions and the Thai package facts in `/llms.txt` share `packageFactLines`, so both now retain the qualification. Hidden benefits still come only from `shownBenefits`; when all are hidden no benefit-choice line is advertised. Other categories, titles, price/VAT, confirmation wording, package facts and visible layout are unchanged.
+
+This corrects an omitted offer qualification, rather than testing a new keyword/title hypothesis. [Google's snippet guidance](https://developers.google.com/search/docs/appearance/snippet) explains that Search may generate a different snippet or truncate the supplied description; release verification does not prove the displayed Google snippet or rankings changed. Tests cover both languages, hidden benefits and the rendered meta/share descriptions.
+
 ## 3. The pages' titles and descriptions
 
 Worded as people search, in `src/content` (and so editable in the Mirror editor): the home page "สมัครเน็ตบ้านทรูออนไลน์ เน็ตมือถือ และโซลาร์เซลล์", new customers "โปรเน็ตบ้านทรูไฟเบอร์ สำหรับลูกค้าใหม่", current customers "เพิ่มสปีดเน็ตบ้านทรูออนไลน์ สำหรับลูกค้าปัจจุบัน", mobile "แพ็กเสริมทรูรายเดือน" and "แพ็กเสริมทรูเติมเงิน" (their dial codes are True's, `*900*`), solar "ติดตั้งโซลาร์เซลล์บนหลังคา โดย W&W Energy", contact "ติดต่อเจ้าหน้าที่ truegetherth", applying "สมัครเน็ตบ้านทรูผ่านเจ้าหน้าที่". Several descriptions now say who takes the application. The headings on the pages are unchanged.
