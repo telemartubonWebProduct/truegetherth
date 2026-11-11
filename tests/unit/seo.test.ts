@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { content } from "@/lib/content";
 import { detailPackagesIn, packageIn } from "@/lib/content/lookup";
 import { formatPhone } from "@/lib/content/render";
+import { shownBenefits } from "@/lib/content/package-facts";
 import { llmsText } from "@/lib/seo/llms";
 import { pageMetadata, siteUrl } from "@/lib/seo/metadata";
 import { nameGivesSpeed, packageSeo, speedLabel } from "@/lib/seo/package-seo";
@@ -108,6 +109,30 @@ describe("a package's page in search results", () => {
     const pictured = detailPackagesIn(content, today).find((item) => item.image)!;
     expect(packageSeo(content, pictured).image).toBe(pictured.image);
     expect(packageSeo(content, value).image).toBe(value.image);
+  });
+
+  it("qualifies broadband benefit choices before naming the visible options in both languages", () => {
+    const hidden = value.benefits[0];
+    const item = { ...value, hiddenBenefits: [hidden] };
+    for (const locale of ["th", "en"] as const) {
+      const description = packageSeo(content, item).description[locale];
+      const condition = item.conditions[0][locale];
+      expect(description.split(condition)).toHaveLength(2);
+      expect(description.indexOf(condition)).toBeLessThan(description.indexOf(`${content.site.ui.benefits[locale]}:`));
+      expect(description).not.toContain(content.benefits[hidden].label[locale]);
+      for (const id of shownBenefits(item)) expect(description).toContain(content.benefits[id].label[locale]);
+      expect(description).toContain(content.site.ui.vatExcluded[locale]);
+      expect(description.endsWith(content.site.ui.packageContactNote[locale])).toBe(true);
+    }
+  });
+
+  it("does not advertise a benefit choice when all benefits are hidden", () => {
+    const item = { ...value, hiddenBenefits: [...value.benefits] };
+    for (const locale of ["th", "en"] as const) {
+      const description = packageSeo(content, item).description[locale];
+      expect(description).not.toContain(item.conditions[0][locale]);
+      expect(description).not.toContain(`${content.site.ui.benefits[locale]}:`);
+    }
   });
 });
 
