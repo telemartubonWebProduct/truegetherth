@@ -22,6 +22,7 @@ for (const locale of ["th", "en"] as const) {
     await expect(office).toContainText(address.postalCode);
     await expect(page.locator(`#office a[href="${content.site.contact.mapUrl}"]`)).toBeVisible();
     await expect(page.locator(`main a[href="${localizePath("/broadband", locale)}"]`).first()).toBeVisible();
+    await expect(page.locator("#area li")).toHaveText(content.pages.ubon!.serviceArea!.provinces.map((province) => province[locale]));
     await expect(page.locator("#faq details")).toHaveCount(content.pages.ubon!.faq.items.length);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 

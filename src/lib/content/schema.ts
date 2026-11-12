@@ -352,6 +352,12 @@ export const siteSettings = z.strictObject({
         postalCode: z.string().regex(/^[0-9]{5}$/, "รหัสไปรษณีย์ 5 หลัก"),
       })
       .optional(),
+    /**
+     * Where the head office is on the map: the pin of mapUrl, which the owner
+     * confirmed is the company's (12 Nov 2026). For search engines only.
+     * Optional, like the address.
+     */
+    geo: z.strictObject({ latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).optional(),
     /** When the team answers. */
     hours: localizedText,
   }),
@@ -640,6 +646,11 @@ export const localPage = z.strictObject({
   hero: z.strictObject({ heading: localizedText, description: localizedText, primaryCta: cta, secondaryCta: cta, tone }),
   /** The head office: the address itself is site.contact.address. */
   office: z.strictObject({ heading: localizedText, description: localizedText, mapLabel: localizedText, tone }),
+  /**
+   * The provinces the team itself looks after, on the owner's word (12 Nov
+   * 2026). Optional, so a release published before it still reads.
+   */
+  serviceArea: z.strictObject({ heading: localizedText, description: localizedText, provinces: z.array(localizedText).min(1), tone }).optional(),
   faq: z.strictObject({
     heading: localizedText,
     items: z.array(z.strictObject({ id: stableId, question: localizedText, answer: localizedText })).min(1),

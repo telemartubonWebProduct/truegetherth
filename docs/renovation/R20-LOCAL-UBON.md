@@ -20,6 +20,14 @@ A search for True home internet in Ubon Ratchathani had nothing to land on: the 
 - `address` and `pages.ubon` are optional, so the schema version stays at 10 and a release published before them still reads; `published.ts` gives such a release the repository's address and page.
 - It is one page for the one town the office is in. Pages for other provinces or districts are not to be made from this one by changing the name: Google treats those as doorway pages.
 
+## The provinces and the map position (later the same day)
+
+The owner said the team looks after Si Sa Ket and Amnat Charoen as well as Ubon Ratchathani, and confirmed that the pin of `mapUrl` is the company's.
+
+- `pages.ubon.serviceArea` (optional): a section of `/ubon` that lists the three provinces, a question about the two others, and the same three as `areaServed` of the business after the whole country. The page's title and heading still name Ubon Ratchathani only, and there is still one page: no page for each province.
+- `site.contact.geo` (optional): the pin's latitude and longitude, given to search engines as `GeoCoordinates`.
+- Still the owner's to add: districts, an installation time, customers.
+
 ## Checked
 
 `npm run lint`, `npm run typecheck`, `npm test` (198), `npm run build`; `tests/e2e/local-page.spec.ts` reads the page without scripts in both languages.

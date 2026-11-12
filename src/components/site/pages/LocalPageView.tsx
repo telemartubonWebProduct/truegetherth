@@ -8,7 +8,8 @@ const doc = "page:ubon" as const;
 
 /**
  * The page for a search for True home internet in Ubon Ratchathani: the head
- * office with its postal address, map and hours, then the questions such a
+ * office with its postal address, map and hours, the provinces the team
+ * looks after, then the questions such a
  * visitor asks. The channels to reach the team are the shell's contact band.
  */
 export function LocalPageView({ ctx }: { ctx: RenderContext }) {
@@ -65,6 +66,25 @@ export function LocalPageView({ ctx }: { ctx: RenderContext }) {
           </div>
         </div>
       </section>
+      {page.serviceArea ? (
+        <section aria-labelledby="area-heading" id="area" className="border-t border-tm-line py-12 lg:py-16" data-tone={page.serviceArea.tone} {...ctx.bind(doc, "serviceArea")}>
+          <div className="tm-container grid gap-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-14">
+            <h2 id="area-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "serviceArea", "heading")}>
+              {ctx.t(page.serviceArea.heading)}
+            </h2>
+            <div className="max-w-[46rem]">
+              <ul className="text-tm-lead" {...ctx.bind(doc, "serviceArea", "provinces")}>
+                {page.serviceArea.provinces.map((province, index) => (
+                  <li key={index}>{ctx.t(province)}</li>
+                ))}
+              </ul>
+              <p className="mt-3 text-tm-muted" {...ctx.bind(doc, "serviceArea", "description")}>
+                {ctx.t(page.serviceArea.description)}
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <section aria-labelledby="faq-heading" id="faq" className="border-t border-tm-line py-12 lg:py-16" data-tone="canvas" {...ctx.bind(doc, "faq")}>
         <div className="tm-container grid gap-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-14">
           <h2 id="faq-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "faq", "heading")}>
