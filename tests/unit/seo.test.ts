@@ -57,6 +57,9 @@ describe("structured data", () => {
     });
     expect(organizationData(content, "en").address).toMatchObject({ streetAddress: "296 Non Hong Thong Village, Moo 12, Rai Noi", addressRegion: "Ubon Ratchathani" });
     expect(organization.telephone).toBe("+66639274977");
+    expect(organization.geo).toEqual({ "@type": "GeoCoordinates", latitude: 15.2835271, longitude: 104.8767848 });
+    expect((organization.areaServed as { name: string }[]).map((area) => area.name)).toEqual(["TH", "อุบลราชธานี", "ศรีสะเกษ", "อำนาจเจริญ"]);
+    expect((organizationData(content, "en").areaServed as { name: string }[]).map((area) => area.name)).toEqual(["TH", "Ubon Ratchathani", "Si Sa Ket", "Amnat Charoen"]);
     expect(String(organization.logo)).toMatch(/^https:\/\/www\.truegetherth\.com\//);
   });
 

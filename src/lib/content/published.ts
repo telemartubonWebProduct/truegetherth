@@ -75,17 +75,21 @@ async function resolve(read: () => Promise<ReleaseRow | null>): Promise<Publishe
 }
 
 /**
- * A release published before the head office's address and the Ubon page
- * existed has neither; it gets the repository's, so the page and the address
- * do not disappear when such a release is live.
+ * A release published before the head office's address and map position, the
+ * Ubon page or that page's provinces existed lacks them; it gets the
+ * repository's, so they do not disappear when such a release is live.
  */
 function withLaterAdditions(release: SiteContent): SiteContent {
   const { site, pages } = release;
-  if (site.contact.address && pages.ubon) return release;
+  const repository = repositoryContent;
+  const serviceArea = pages.ubon?.serviceArea ?? repository.pages.ubon?.serviceArea;
+  const ubon = pages.ubon ? { ...pages.ubon, ...(serviceArea ? { serviceArea } : {}) } : repository.pages.ubon;
+  const address = site.contact.address ?? repository.site.contact.address;
+  const geo = site.contact.geo ?? repository.site.contact.geo;
   return {
     ...release,
-    site: { ...site, contact: { ...site.contact, address: site.contact.address ?? repositoryContent.site.contact.address } },
-    pages: { ...pages, ubon: pages.ubon ?? repositoryContent.pages.ubon },
+    site: { ...site, contact: { ...site.contact, ...(address ? { address } : {}), ...(geo ? { geo } : {}) } },
+    pages: { ...pages, ...(ubon ? { ubon } : {}) },
   };
 }
 

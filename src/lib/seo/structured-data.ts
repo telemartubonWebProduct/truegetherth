@@ -27,7 +27,9 @@ const international = (number: string) => `+66${number.slice(1)}`;
 export function organizationData(content: SiteContent, locale: Locale): Node {
   const { brand, contact, footer } = content.site;
   const logo = mediaIn(content, brand.logo);
-  const { address } = contact;
+  const { address, geo } = contact;
+  // The whole country (requests come from every province), then the provinces the team itself looks after.
+  const provinces = content.pages.ubon?.serviceArea?.provinces ?? [];
   return {
     "@type": address ? "LocalBusiness" : "Organization",
     "@id": absolute("/#organization"),
@@ -37,7 +39,9 @@ export function organizationData(content: SiteContent, locale: Locale): Node {
     logo: absolute(logo.src),
     description: tx(footer.about, locale),
     email: contact.email,
-    areaServed: { "@type": "Country", name: "TH" },
+    areaServed: provinces.length
+      ? [{ "@type": "Country", name: "TH" }, ...provinces.map((province) => ({ "@type": "AdministrativeArea", name: tx(province, locale) }))]
+      : { "@type": "Country", name: "TH" },
     ...(address ? { image: absolute(logo.src), telephone: international(contact.phones[0].number) } : {}),
     address: address
       ? {
@@ -49,6 +53,7 @@ export function organizationData(content: SiteContent, locale: Locale): Node {
           addressCountry: "TH",
         }
       : { "@type": "PostalAddress", addressLocality: tx(contact.office, locale), addressCountry: "TH" },
+    ...(geo ? { geo: { "@type": "GeoCoordinates", latitude: geo.latitude, longitude: geo.longitude } } : {}),
     hasMap: contact.mapUrl,
     contactPoint: contact.phones.map((phone) => ({
       "@type": "ContactPoint",

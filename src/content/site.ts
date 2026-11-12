@@ -42,6 +42,8 @@ export const site: SiteSettings = {
       province: t("จังหวัดอุบลราชธานี", "Ubon Ratchathani"),
       postalCode: "34000",
     },
+    // The pin of mapUrl (the place "เทเลมาร์ท คอมมิวนิเคชั่น" on Google Maps); the owner confirmed on 2026-11-12 that it is the company's.
+    geo: { latitude: 15.2835271, longitude: 104.8767848 },
     hours: t("จันทร์–เสาร์ 09:00–18:00 น.", "Monday to Saturday, 9:00 to 18:00"),
   },
   navigation: [
