@@ -7,6 +7,7 @@ import {
   contactPage,
   homePage,
   legalPage,
+  localPage,
   mediaAsset,
   packagePage,
   packageRef,
@@ -37,6 +38,7 @@ export const pageDocumentIds = [
   "solar",
   "contact",
   "apply-with-agent",
+  "ubon",
   "terms",
 ] as const;
 export type PageDocumentId = (typeof pageDocumentIds)[number];
@@ -96,6 +98,8 @@ export function documentSchema(id: DocumentId): ZodType {
       return contactPage;
     case "apply-with-agent":
       return agentPage;
+    case "ubon":
+      return localPage;
     default:
       return legalPage;
   }
@@ -139,6 +143,8 @@ export function readDocument(content: SiteContent, id: DocumentId): unknown {
       return pages.contact;
     case "apply-with-agent":
       return pages.agent;
+    case "ubon":
+      return pages.ubon;
     case "terms":
       return pages.terms;
     default:
@@ -198,6 +204,8 @@ export function writeDocument(content: SiteContent, id: DocumentId, body: unknow
       return { ...content, pages: { ...pages, contact: body as typeof pages.contact } };
     case "apply-with-agent":
       return { ...content, pages: { ...pages, agent: body as typeof pages.agent } };
+    case "ubon":
+      return { ...content, pages: { ...pages, ubon: body as typeof pages.ubon } };
     case "terms":
       return { ...content, pages: { ...pages, terms: body as typeof pages.terms } };
     default:
@@ -230,6 +238,7 @@ export const pagePaths: Record<PageDocumentId, string> = {
   solar: "/wEnergy",
   contact: "/service",
   "apply-with-agent": "/wifiService",
+  ubon: "/ubon",
   terms: "/termsAndPrivacy",
 };
 

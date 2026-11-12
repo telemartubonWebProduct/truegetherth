@@ -20,13 +20,16 @@ const international = (number: string) => `+66${number.slice(1)}`;
 /**
  * The business behind the site: its trading and legal names, what it is (the
  * footer's statement that it is an appointed dealer and not True itself), how
- * to reach it and where its head office is.
+ * to reach it and where its head office is. With the head office's postal
+ * address it is a LocalBusiness (a kind of Organization), which is what a
+ * search for the service in that town reads.
  */
 export function organizationData(content: SiteContent, locale: Locale): Node {
   const { brand, contact, footer } = content.site;
   const logo = mediaIn(content, brand.logo);
+  const { address } = contact;
   return {
-    "@type": "Organization",
+    "@type": address ? "LocalBusiness" : "Organization",
     "@id": absolute("/#organization"),
     name: tx(brand.name, locale),
     legalName: tx(brand.legalName, locale),
@@ -35,7 +38,17 @@ export function organizationData(content: SiteContent, locale: Locale): Node {
     description: tx(footer.about, locale),
     email: contact.email,
     areaServed: { "@type": "Country", name: "TH" },
-    address: { "@type": "PostalAddress", addressLocality: tx(contact.office, locale), addressCountry: "TH" },
+    ...(address ? { image: absolute(logo.src), telephone: international(contact.phones[0].number) } : {}),
+    address: address
+      ? {
+          "@type": "PostalAddress",
+          streetAddress: `${tx(address.street, locale)}${locale === "th" ? " " : ", "}${tx(address.subdistrict, locale)}`,
+          addressLocality: tx(address.district, locale),
+          addressRegion: tx(address.province, locale),
+          postalCode: address.postalCode,
+          addressCountry: "TH",
+        }
+      : { "@type": "PostalAddress", addressLocality: tx(contact.office, locale), addressCountry: "TH" },
     hasMap: contact.mapUrl,
     contactPoint: contact.phones.map((phone) => ({
       "@type": "ContactPoint",

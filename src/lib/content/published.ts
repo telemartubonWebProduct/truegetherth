@@ -65,13 +65,28 @@ async function resolve(read: () => Promise<ReleaseRow | null>): Promise<Publishe
     const row = await read();
     if (row) {
       const usable = usableRelease(row);
-      if (usable) return { content: usable, release: row.number };
+      if (usable) return { content: withLaterAdditions(usable), release: row.number };
       console.error("The published release does not fit this version of the site; showing the repository content", { release: row.number });
     }
   } catch (error) {
     console.error("Reading the published release failed; showing the repository content", { error: error instanceof Error ? error.message : "unknown" });
   }
   return { content: repositoryContent, release: null };
+}
+
+/**
+ * A release published before the head office's address and the Ubon page
+ * existed has neither; it gets the repository's, so the page and the address
+ * do not disappear when such a release is live.
+ */
+function withLaterAdditions(release: SiteContent): SiteContent {
+  const { site, pages } = release;
+  if (site.contact.address && pages.ubon) return release;
+  return {
+    ...release,
+    site: { ...site, contact: { ...site.contact, address: site.contact.address ?? repositoryContent.site.contact.address } },
+    pages: { ...pages, ubon: pages.ubon ?? repositoryContent.pages.ubon },
+  };
 }
 
 export async function getPublishedContent(): Promise<SiteContent> {

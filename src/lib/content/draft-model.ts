@@ -34,7 +34,9 @@ export const CONTENT_SCHEMA_VERSION = 10;
 // of version 10 still reads, so the version stays, and the drafts the owner had
 // not yet published were not thrown away for it. The same holds for the
 // partner's badge of the brand (partnerLogo, partnerLabel; 3 Nov 2026) and
-// for a package page's questions and answers (faq; 6 Nov 2026).
+// for a package page's questions and answers (faq; 6 Nov 2026), and for the
+// head office's postal address and the Ubon page (contact.address, pages.ubon;
+// 12 Nov 2026), which published.ts adds to a release that lacks them.
 
 export type DraftRecord = {
   documentId: DocumentId;

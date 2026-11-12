@@ -6,6 +6,7 @@ import { PackagePageView } from "../PackagePageView";
 import { AgentPageView } from "./AgentPageView";
 import { ContactPageView } from "./ContactPageView";
 import { HomePageView } from "./HomePageView";
+import { LocalPageView } from "./LocalPageView";
 import { SolarPageView } from "./SolarPageView";
 import { TermsPageView } from "./TermsPageView";
 
@@ -20,6 +21,8 @@ export function PageView({ ctx, pageId }: { ctx: RenderContext; pageId: PageDocu
       return <ContactPageView ctx={ctx} />;
     case "apply-with-agent":
       return <AgentPageView ctx={ctx} />;
+    case "ubon":
+      return <LocalPageView ctx={ctx} />;
     case "terms":
       return <TermsPageView ctx={ctx} />;
     default:

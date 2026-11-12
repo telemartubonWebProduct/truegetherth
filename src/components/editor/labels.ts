@@ -15,6 +15,7 @@ export const pageLabels: Record<PageDocumentId, string> = {
   solar: "โซลาร์เซลล์",
   contact: "ติดต่อเรา",
   "apply-with-agent": "สมัครผ่านตัวแทน",
+  ubon: "เน็ตบ้านทรู อุบลราชธานี",
   terms: "ข้อตกลงและนโยบาย",
 };
 
@@ -97,6 +98,12 @@ const labels: Record<string, string> = {
   facebook: "ลิงก์เฟซบุ๊ก",
   office: "ที่ตั้งสำนักงานใหญ่",
   mapUrl: "ลิงก์แผนที่สำนักงาน",
+  address: "ที่อยู่สำนักงานใหญ่",
+  street: "บ้านเลขที่ หมู่บ้าน หมู่ที่",
+  subdistrict: "ตำบล",
+  district: "อำเภอ",
+  postalCode: "รหัสไปรษณีย์",
+  mapLabel: "ข้อความลิงก์แผนที่",
   hours: "เวลาทำการ",
   footer: "ส่วนท้ายของเว็บ",
   about: "ข้อความแนะนำ",
@@ -300,6 +307,7 @@ const contextLabels: Record<string, string> = {
   "speed.download": "ดาวน์โหลด",
   "hero.note": "ข้อความเล็กใต้ปุ่ม",
   "about.body": "ย่อหน้า",
+  "address.province": "จังหวัด",
   "bundle.items": "รายการในโปร",
   "stats.items": "ตัวเลข",
 };

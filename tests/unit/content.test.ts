@@ -52,6 +52,7 @@ describe("site content", () => {
       content.pages.contact.path,
       content.pages.agent.path,
       content.pages.terms.path,
+      content.pages.ubon!.path,
     ].sort();
     expect(documentPaths).toEqual(publicPages.map((entry) => entry.path).sort());
   });

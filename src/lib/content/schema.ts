@@ -338,6 +338,20 @@ export const siteSettings = z.strictObject({
     office: localizedText,
     /** A map of the head office. */
     mapUrl: httpsUrl,
+    /**
+     * The head office's postal address, as the owner gave it (12 Nov 2026): the
+     * local page shows it and search engines get it. Optional, so releases
+     * published before it still read.
+     */
+    address: z
+      .strictObject({
+        street: localizedText,
+        subdistrict: localizedText,
+        district: localizedText,
+        province: localizedText,
+        postalCode: z.string().regex(/^[0-9]{5}$/, "รหัสไปรษณีย์ 5 หลัก"),
+      })
+      .optional(),
     /** When the team answers. */
     hours: localizedText,
   }),
@@ -618,6 +632,21 @@ export const agentPage = z.strictObject({
 });
 export type AgentPage = z.infer<typeof agentPage>;
 
+/** The page for people looking for True home internet where the head office is (Ubon Ratchathani). */
+export const localPage = z.strictObject({
+  id: z.literal("ubon"),
+  path: z.literal("/ubon"),
+  seo,
+  hero: z.strictObject({ heading: localizedText, description: localizedText, primaryCta: cta, secondaryCta: cta, tone }),
+  /** The head office: the address itself is site.contact.address. */
+  office: z.strictObject({ heading: localizedText, description: localizedText, mapLabel: localizedText, tone }),
+  faq: z.strictObject({
+    heading: localizedText,
+    items: z.array(z.strictObject({ id: stableId, question: localizedText, answer: localizedText })).min(1),
+  }),
+});
+export type LocalPage = z.infer<typeof localPage>;
+
 export const legalPage = z.strictObject({
   id: z.literal("terms"),
   path: z.literal("/termsAndPrivacy"),
@@ -653,6 +682,8 @@ export const siteContent = z.strictObject({
     contact: contactPage,
     agent: agentPage,
     terms: legalPage,
+    /** Optional, so releases published before the page existed still read (published.ts adds it to them). */
+    ubon: localPage.optional(),
   }),
 });
 export type SiteContent = z.infer<typeof siteContent>;
