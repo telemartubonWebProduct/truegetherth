@@ -8,7 +8,7 @@ The company had two older sites that were still live and indexed: `telemartubon.
 
 - Every path of both domains now answers 308 to the matching page of `www.truegetherth.com` (`next.config.ts` of each repository). `telemartubon.com` shared this site's URLs, so the path is kept; on `truetechservice.com`, `/home` goes to `/`, `/boardband` to `/broadband`, `/monthly` to `/monthy` and `/about` to `/service`.
 - `/google*.html` is not redirected: Google's ownership file (the same one this site has) is in both repositories, and both domains are verified in Search Console in the owner's account.
-- The change of address to `www.truegetherth.com` was filed and accepted for `telemartubon.com`. For `truetechservice.com` Search Console refused it four times ("could not fetch the page") although its own live test of that home page passed; it is not filed. Not known why.
+- The change of address to `www.truegetherth.com` was filed and accepted for both domains on 12 November 2026. For `truetechservice.com` Search Console refused it four times that morning ("could not fetch the page") although its own live test of that home page passed; the same request passed in the evening with nothing changed in between. Do not cancel either move, and keep both domains registered and redirecting for at least a year.
 - Not changed: Vercel and DNS settings of any project. `truetechservice.com` without `www` still answers 307 (temporary) to `www`, which is a setting of that Vercel project.
 
 ## The page `/ubon`
