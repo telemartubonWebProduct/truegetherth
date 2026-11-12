@@ -20,6 +20,7 @@ const publicPaths = [
   "/wEnergy",
   "/service",
   "/wifiService",
+  "/ubon",
   "/termsAndPrivacy",
 ];
 

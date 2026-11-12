@@ -14,7 +14,7 @@ describe("content documents", () => {
     expect(ids).toContain("package:fiber-500-499");
     expect(ids).toContain("media:hero-tableau-sky");
     expect(ids).toContain("catalog");
-    expect(ids.length).toBe(2 + 9 + content.catalog.length + Object.keys(content.media).length + Object.keys(content.benefits).length);
+    expect(ids.length).toBe(2 + 10 + content.catalog.length + Object.keys(content.media).length + Object.keys(content.benefits).length);
     for (const id of ids) {
       expect(isDocumentId(id), id).toBe(true);
       expect(documentSchema(id).safeParse(readDocument(content, id)).success, id).toBe(true);

@@ -32,7 +32,7 @@ describe("structured data", () => {
 
   it("says who runs the site: the company, an appointed dealer and not True itself", () => {
     expect(organization).toMatchObject({
-      "@type": "Organization",
+      "@type": "LocalBusiness",
       name: content.site.brand.name.th,
       legalName: "บริษัท เทเลมาร์ท คอมมิวนิเคชั่น จำกัด",
       url: "https://www.truegetherth.com/",
@@ -47,7 +47,16 @@ describe("structured data", () => {
     const points = organization.contactPoint as { telephone: string; description: string }[];
     expect(points.map((point) => point.telephone)).toEqual(content.site.contact.phones.map((phone) => `+66${phone.number.slice(1)}`));
     expect(points[0].description).toBe(content.site.contact.hours.th);
-    expect(organization.address).toMatchObject({ addressLocality: content.site.contact.office.th, addressCountry: "TH" });
+    expect(organization.address).toEqual({
+      "@type": "PostalAddress",
+      streetAddress: "296 หมู่บ้านโนนหงษ์ทอง หมู่ที่ 12 ตำบลไร่น้อย",
+      addressLocality: "อำเภอเมืองอุบลราชธานี",
+      addressRegion: "จังหวัดอุบลราชธานี",
+      postalCode: "34000",
+      addressCountry: "TH",
+    });
+    expect(organizationData(content, "en").address).toMatchObject({ streetAddress: "296 Non Hong Thong Village, Moo 12, Rai Noi", addressRegion: "Ubon Ratchathani" });
+    expect(organization.telephone).toBe("+66639274977");
     expect(String(organization.logo)).toMatch(/^https:\/\/www\.truegetherth\.com\//);
   });
 

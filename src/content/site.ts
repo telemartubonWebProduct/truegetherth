@@ -34,6 +34,14 @@ export const site: SiteSettings = {
     // The head office, its map and the hours are as the company's other site states them (truefiberhome.com, read 2026-10-11).
     office: t("สำนักงานใหญ่ จังหวัดอุบลราชธานี", "Head office in Ubon Ratchathani"),
     mapUrl: "https://maps.app.goo.gl/rHnXppgYGqKn9aD97",
+    // The address as the owner gave it on 2026-11-12.
+    address: {
+      street: t("296 หมู่บ้านโนนหงษ์ทอง หมู่ที่ 12", "296 Non Hong Thong Village, Moo 12"),
+      subdistrict: t("ตำบลไร่น้อย", "Rai Noi"),
+      district: t("อำเภอเมืองอุบลราชธานี", "Mueang Ubon Ratchathani"),
+      province: t("จังหวัดอุบลราชธานี", "Ubon Ratchathani"),
+      postalCode: "34000",
+    },
     hours: t("จันทร์–เสาร์ 09:00–18:00 น.", "Monday to Saturday, 9:00 to 18:00"),
   },
   navigation: [
@@ -88,6 +96,7 @@ export const site: SiteSettings = {
         links: [
           { id: "footer-contact", label: t("ติดต่อเรา", "Contact us"), target: page("/service") },
           { id: "footer-apply-with-agent", label: t("สมัครผ่านเจ้าหน้าที่", "Apply through our team"), target: page("/wifiService") },
+          { id: "footer-ubon", label: t("เน็ตบ้านทรู อุบลราชธานี", "True home internet in Ubon Ratchathani"), target: page("/ubon") },
           { id: "footer-terms", label: t("ข้อตกลงและนโยบายความเป็นส่วนตัว", "Terms and privacy policy"), target: page("/termsAndPrivacy") },
           {
             id: "footer-staff-system",

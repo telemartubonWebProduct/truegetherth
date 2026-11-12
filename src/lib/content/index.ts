@@ -5,6 +5,7 @@ import { media } from "@/content/media";
 import { home } from "@/content/pages/home";
 import { broadbandExistingPage, broadbandNewPage, mobileMonthlyPage, mobilePrepaidPage } from "@/content/pages/packages";
 import { solarPage } from "@/content/pages/solar";
+import { ubonPage } from "@/content/pages/local";
 import { agentPage, contactPage, termsPage } from "@/content/pages/support";
 import { site } from "@/content/site";
 
@@ -36,6 +37,7 @@ function load(): SiteContent {
       contact: contactPage,
       agent: agentPage,
       terms: termsPage,
+      ubon: ubonPage,
     },
   });
   const problems = contentProblems(parsed);

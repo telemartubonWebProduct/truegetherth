@@ -9,6 +9,7 @@ export const publicPages = [
   { path: "/wEnergy", page: "solar" },
   { path: "/service", page: "contact" },
   { path: "/wifiService", page: "apply-with-agent" },
+  { path: "/ubon", page: "ubon" },
   { path: "/termsAndPrivacy", page: "terms" },
 ] as const;
 

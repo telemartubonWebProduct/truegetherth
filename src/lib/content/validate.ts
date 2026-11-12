@@ -87,7 +87,7 @@ export function contentProblems(content: SiteContent): string[] {
     for (const id of article.images) needMedia(id, `หน้าโซลาร์ บทความ ${article.id}`);
   }
   needMedia(pages.agent.hero.image, "หน้าสมัครผ่านตัวแทน");
-  for (const page of [pages.home, pages.solar, pages.contact, pages.agent, pages.terms, ...pages.packages]) {
+  for (const page of [pages.home, pages.solar, pages.contact, pages.agent, pages.terms, ...(pages.ubon ? [pages.ubon] : []), ...pages.packages]) {
     needMedia(page.seo.image, `หน้า ${page.id} รูปสำหรับแชร์`);
   }
 
@@ -111,7 +111,13 @@ export function contentProblems(content: SiteContent): string[] {
   }
   for (const tag of home.hero.tags) checkLink(tag.target, `หน้าแรก ป้าย ${tag.id}`);
   for (const item of home.services.items) checkLink(item.target, `หน้าแรก บริการ ${item.id}`);
-  for (const cta of [pages.agent.hero.primaryCta, pages.agent.hero.secondaryCta, pages.solar.hero.cta, pages.solar.packages.packageCta]) {
+  for (const cta of [
+    pages.agent.hero.primaryCta,
+    pages.agent.hero.secondaryCta,
+    ...(pages.ubon ? [pages.ubon.hero.primaryCta, pages.ubon.hero.secondaryCta] : []),
+    pages.solar.hero.cta,
+    pages.solar.packages.packageCta,
+  ]) {
     checkLink(cta.target, `ปุ่ม ${cta.id}`);
   }
 
