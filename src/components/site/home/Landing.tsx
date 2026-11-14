@@ -393,6 +393,13 @@ export function Landing({ ctx }: { ctx: RenderContext }) {
                   <span className="faq-mark" aria-hidden="true" />
                 </summary>
                 <p {...bind("faq", "items", item.id, "answer")}>{ctx.t(item.answer)}</p>
+                {item.link ? (
+                  <p className="faq-link">
+                    <TargetLink ctx={ctx} target={item.link.target} bind={bind("faq", "items", item.id, "link")}>
+                      {ctx.t(item.link.label)}
+                    </TargetLink>
+                  </p>
+                ) : null}
               </details>
             ))}
           </div>

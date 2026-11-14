@@ -111,6 +111,7 @@ export function contentProblems(content: SiteContent): string[] {
   }
   for (const tag of home.hero.tags) checkLink(tag.target, `หน้าแรก ป้าย ${tag.id}`);
   for (const item of home.services.items) checkLink(item.target, `หน้าแรก บริการ ${item.id}`);
+  for (const item of home.faq.items) if (item.link) checkLink(item.link.target, `หน้าแรก คำถาม ${item.id}`);
   for (const cta of [
     pages.agent.hero.primaryCta,
     pages.agent.hero.secondaryCta,

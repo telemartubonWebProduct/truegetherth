@@ -28,6 +28,10 @@ The owner said the team looks after Si Sa Ket and Amnat Charoen as well as Ubon 
 - `site.contact.geo` (optional): the pin's latitude and longitude, given to search engines as `GeoCoordinates`.
 - Still the owner's to add: districts, an installation time, customers.
 
+## The way from the home page (14 November)
+
+`telemartubon.com`'s home page, which Google listed third for "เน็ตบ้านทรู อุบล", now redirects to this site's home page, and that page named Ubon only in one answer and linked to `/ubon` only from the footer. The home page's questions now have one about the office and the three provinces, which ends with a link to `/ubon` (a question's `link`, optional in the schema), and the home page's description names the head office. The opening, the title and the scroll stages are untouched.
+
 ## Checked
 
 `npm run lint`, `npm run typecheck`, `npm test` (198), `npm run build`; `tests/e2e/local-page.spec.ts` reads the page without scripts in both languages.
