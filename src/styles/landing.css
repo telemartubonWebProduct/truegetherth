@@ -1984,6 +1984,26 @@ html:not([data-motion]) .stage-season .pin {
   color: var(--ink-56);
 }
 
+/* An answer's link to the page that says more: the answer above it gives up its space. */
+.faq details p:has(+ .faq-link) {
+  padding-bottom: 4px;
+}
+
+.faq-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.faq-link a:hover {
+  text-decoration-color: var(--red);
+}
+
 /* Per-word and per-item motion ------------------------------------------------------- */
 
 html[data-motion] .w {

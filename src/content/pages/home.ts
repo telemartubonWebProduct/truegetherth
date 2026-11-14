@@ -22,8 +22,8 @@ export const home: HomePage = {
     // Worded as people search ("สมัครเน็ตบ้านทรู"), and saying who takes the application (R13).
     title: t("สมัครเน็ตบ้านทรูออนไลน์ เน็ตมือถือ และโซลาร์เซลล์", "Apply for True Online home internet, mobile and solar"),
     description: t(
-      "สมัครเน็ตบ้านทรูออนไลน์กับ Telemart พาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เทียบแพ็กเกจลูกค้าใหม่และลูกค้าปัจจุบัน แพ็กเสริมมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ตรวจพื้นที่และนัดติดตั้งให้ รับเรื่องจากทุกจังหวัด",
-      "Apply for True Online home internet with Telemart, an appointed Authorized Partner of True Online. Compare packages for new and current customers, mobile add-ons and W&W Energy solar. We check your area and book the installation, from any province.",
+      "สมัครเน็ตบ้านทรูออนไลน์กับ Telemart พาร์ทเนอร์ที่ได้รับการแต่งตั้งของทรู ออนไลน์ เทียบแพ็กเกจลูกค้าใหม่และลูกค้าปัจจุบัน แพ็กเสริมมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ตรวจพื้นที่และนัดติดตั้งให้ สำนักงานใหญ่อยู่ที่อุบลราชธานี รับเรื่องจากทุกจังหวัด",
+      "Apply for True Online home internet with Telemart, an appointed Authorized Partner of True Online. Compare packages for new and current customers, mobile add-ons and W&W Energy solar. We check your area and book the installation. Head office in Ubon Ratchathani; requests from any province.",
     ),
   },
   hero: {
@@ -230,6 +230,16 @@ export const home: HomePage = {
           "รับเรื่องจากทุกจังหวัด แต่การติดตั้งเน็ตบ้านและโซลาร์เซลล์ขึ้นกับผลตรวจพื้นที่และเงื่อนไขของแต่ละที่อยู่ เจ้าหน้าที่จะแจ้งผลก่อนยืนยันทุกครั้ง",
           "We take requests from every province, but home internet and solar installation depend on a check of each address and its conditions. We always tell you the result before confirming.",
         ),
+      },
+      {
+        // Where the company is and which provinces its own team looks after (the owner's word, 2026-11-12), with the way to the Ubon page (R20).
+        id: "office-ubon",
+        question: t("สำนักงานเทเลมาร์ทอยู่ที่ไหน และดูแลจังหวัดใดบ้าง", "Where is Telemart's office, and which provinces does its team look after?"),
+        answer: t(
+          "สำนักงานใหญ่ของเทเลมาร์ทอยู่ที่ตำบลไร่น้อย อำเภอเมืองอุบลราชธานี ทีมของเราดูแลลูกค้าเน็ตบ้านทรูในอุบลราชธานี ศรีสะเกษ และอำนาจเจริญ การติดตั้งขึ้นกับผลตรวจพื้นที่ของแต่ละที่อยู่",
+          "Telemart's head office is in Rai Noi, Mueang Ubon Ratchathani. Our team looks after True home internet customers in Ubon Ratchathani, Si Sa Ket and Amnat Charoen. Installation depends on the check of each address.",
+        ),
+        link: { id: "faq-ubon", label: t("เน็ตบ้านทรู อุบลราชธานี: ที่อยู่สำนักงานและแผนที่", "True home internet in Ubon Ratchathani: office address and map"), target: page("/ubon") },
       },
       {
         // Who is behind the site, as the footer and the terms say it: asked by visitors, and by search engines and assistants.

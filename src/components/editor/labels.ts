@@ -28,6 +28,7 @@ const labels: Record<string, string> = {
   notes: "หมายเหตุท้ายหมวด",
   label: "ข้อความ",
   target: "ปลายทาง",
+  link: "ลิงก์ต่อท้ายคำตอบ",
   style: "รูปแบบปุ่ม",
   tone: "พื้นหลังของส่วนนี้",
   image: "รูป",

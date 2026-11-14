@@ -533,7 +533,8 @@ export const homePage = z.strictObject({
   faq: z.strictObject({
     label: localizedText,
     heading: localizedText,
-    items: z.array(z.strictObject({ id: stableId, question: localizedText, answer: localizedText })).min(1),
+    /** An answer may end with a link to the page that says more (optional, so earlier releases still read). */
+    items: z.array(z.strictObject({ id: stableId, question: localizedText, answer: localizedText, link: link.optional() })).min(1),
   }),
 });
 export type HomePage = z.infer<typeof homePage>;
